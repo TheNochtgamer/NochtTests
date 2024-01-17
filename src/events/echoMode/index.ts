@@ -16,6 +16,7 @@ export default {
       await message.reply({
         content: `\`\`\`\n${message.content.replace(/`/g, '')}\n\`\`\``,
         allowedMentions: { repliedUser: false, parse: [] },
+        flags: 'SuppressNotifications',
       });
     } catch (error) {
       console.log(error);
