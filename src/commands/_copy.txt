@@ -1,0 +1,14 @@
+import type { MySlashCommand } from '../types';
+import { SlashCommandBuilder } from 'discord.js';
+import utils from '../lib/Utils';
+
+export default {
+  data: new SlashCommandBuilder()
+    .setName('')
+    .setDescription(''),
+
+  async run(interaction) {
+    
+  },
+} satisfies MySlashCommand;
+
