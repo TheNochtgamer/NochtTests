@@ -13,7 +13,9 @@ export default class Bot extends Client {
   // }
 
   async loadCommands(): Promise<void> {
-    console.log('Cargando comandos...');
+    const pref = '(loadCommands())';
+
+    console.log(pref, 'Cargando comandos...');
     const FILES = await utils.obtainMyFiles('commands');
     this.commands.clear();
 
@@ -26,15 +28,17 @@ export default class Bot extends Client {
         this.commands.set(command.data.name, command);
         success++;
       } catch (error) {
-        console.log(`(/) Error al cargar el comando "${commandFile}"`, error);
+        console.log(pref, `Error al cargar el comando "${commandFile}"`, error);
       }
     }
 
-    console.log(`(/) ${success}/${FILES.length} comandos cargados`);
+    console.log(pref, `${success}/${FILES.length} comandos cargados`);
   }
 
   async loadEvents(): Promise<void> {
-    console.log('Cargando eventos...');
+    const pref = '(loadEvents())';
+
+    console.log(pref, 'Cargando eventos...');
     const FILES = await utils.obtainMyFiles('events');
     this.removeAllListeners();
 
@@ -51,18 +55,20 @@ export default class Bot extends Client {
         }
         success++;
       } catch (error) {
-        console.log(`(E) Error al cargar el evento "${eventFile}"`, error);
+        console.log(pref, `Error al cargar el evento "${eventFile}"`, error);
       }
     }
 
-    console.log(`(E) ${success}/${FILES.length} eventos cargados`);
+    console.log(pref, `${success}/${FILES.length} eventos cargados`);
   }
 
   async init(token: string): Promise<void> {
+    const pref = '(init())';
+
     if (this.user?.id) return;
     await Promise.all([this.loadEvents(), this.loadCommands()]);
 
-    console.log('Login in...');
+    console.log(pref, 'Login in...');
     await this.login(token);
   }
 }

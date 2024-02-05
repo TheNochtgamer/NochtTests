@@ -1,5 +1,7 @@
+# Bot de pruebas de Nocht
 
-<h1 align="center">Nochttests</h1>
-<h3 align="center">now Typescript edition</h3>
+---
 
-----
+## Recommended
+
+> Node > 20

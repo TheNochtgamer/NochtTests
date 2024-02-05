@@ -104,16 +104,19 @@ class Utils {
     client: Bot,
     guildId = process.env.GUILDID,
   ): Promise<void> {
+    const pref = '(summitCommands())';
+
     if (!client.commands.size) return;
     let cmds = null;
 
     console.log(
+      pref,
       `Subiendo comandos${guildId ? ` (en el guild: ${guildId})` : ''}...`,
     );
     try {
       if (guildId && this.checkId(guildId)) {
         const GUILD = await client.guilds.fetch(guildId);
-        if (!GUILD) throw new Error('No se encontro el guild');
+        if (!GUILD) throw new Error(`No se encontro el guild`);
         cmds = await GUILD.commands.set(client.commands.map(cmd => cmd.data));
       } else {
         cmds = await client.application?.commands?.set(
@@ -132,10 +135,10 @@ class Utils {
       // }
       if (!cmds) throw new Error('No se subio ningun comando');
     } catch (error) {
-      console.log('Error al intentar subir los comandos', error);
+      console.log(pref, 'Error al intentar subir los comandos', error);
       return;
     }
-    console.log(`(/) ${cmds.size} comandos subidos`);
+    console.log(pref, `${cmds.size} comandos subidos`);
   }
 
   /**

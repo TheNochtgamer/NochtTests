@@ -3,13 +3,13 @@ import type Discord, {
   EmbedData,
   ColorResolvable,
 } from 'discord.js';
-import type Bot0 from './lib/structures/Bot';
-import type GuildData0 from './lib/structures/GuildData';
-import type UserData0 from './lib/structures/UserData';
+import type _Bot from './lib/structures/Bot';
+import type _GuildData from './lib/structures/GuildData';
+import type _UserData from './lib/structures/UserData';
 
-declare type Bot = Bot0;
-declare type GuildData = GuildData0;
-declare type UserData = UserData0;
+declare type Bot = _Bot;
+declare type GuildData = _GuildData;
+declare type UserData = _UserData;
 
 declare type MyEmbedData = Omit<EmbedData, 'color'> & {
   color: ColorResolvable | number;

@@ -19,3 +19,12 @@ export const bot = new Bot({
 (async function init() {
   await Promise.all([bot.init(process.env.TOKEN ?? '')]);
 })().catch(console.error);
+
+if (process.env.NODE_ENV === 'production') {
+  process.on('unhandledRejection', err => {
+    console.error(err);
+  });
+  process.on('uncaughtException', err => {
+    console.error(err);
+  });
+}
