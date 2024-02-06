@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import type { Bot } from '../../types';
 import {
   type CommandInteraction,
@@ -13,17 +14,20 @@ export default {
       opt
         .setName('codigo')
         .setDescription('El codigo a evaluar')
-        .setRequired(true),
+        .setRequired(true)
     ),
 
   async run(interaction: CommandInteraction & { client: Bot }) {
-    const code = (interaction.options.get('codigo', true).value as string)
-      .replace(/token/i, '')
-      .replace(/env/i, '');
+    let runme = interaction.options.get('codigo', true).value as string;
+
+    if (runme.match(/process/gi))
+      runme = 'throw new Error("You cannot use the variable process");';
+    if (runme.match(/token/gi))
+      runme = 'throw new Error("You cannot get the token");';
 
     console.log(`${interaction.user.username} esta ejecutando codigo...`);
 
-    // vars
+    // shortcuts
     const client = interaction.client;
     const bot = interaction.client;
     const channel = interaction.channel;
@@ -42,14 +46,14 @@ export default {
     await interaction.deferReply({ ephemeral: true });
     try {
       // eslint-disable-next-line no-eval
-      const result = await eval(code);
+      const result = await eval(runme);
 
       await utils.embedReply(interaction, {
         title: 'Resultado',
         description: `\`\`\`json\n${JSON.stringify(
           result || '',
           null,
-          2,
+          2
         )}\`\`\``,
         color: 'Green',
       });
