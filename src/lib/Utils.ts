@@ -66,7 +66,7 @@ class Utils {
   //   return FILES;
   // }
 
-  async obtainMyFiles(dirName = ''): Promise<string[]> {
+  async obtainMyFiles(dirName = '', complete = false): Promise<string[]> {
     const PATH = path.join(__dirname, '../', dirName);
     const FILES = fs
       .readdirSync(PATH, {
@@ -82,8 +82,9 @@ class Utils {
           .filter(
             f =>
               f.isFile() &&
-              (path.parse(f.name).name.toLowerCase() ===
-                item.name.toLowerCase() ||
+              (complete ||
+                path.parse(f.name).name.toLowerCase() ===
+                  item.name.toLowerCase() ||
                 path.parse(f.name).name.toLowerCase() === 'index')
           )
           .map(f => path.join(PATH, item.name, f.name));

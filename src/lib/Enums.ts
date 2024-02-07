@@ -57,7 +57,7 @@ export const Embeds = {
       description:
         '```\n \n' +
         `> ${username}\n` +
-        'Este comando esta deshabilido' +
+        'Este comando esta deshabilitado' +
         (reason ? ` por la razon:\n${reason}` : '') +
         '.\n \n```',
     };

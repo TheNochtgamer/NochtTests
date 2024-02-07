@@ -20,8 +20,8 @@ export default {
     )
     .addStringOption(option =>
       option
-        .setName('type')
-        .setDescription('Tipo de deshabilitacion')
+        .setName('context')
+        .setDescription('Contexto de la deshabilitacion')
         .setRequired(true)
         .setChoices(
           {
@@ -48,7 +48,7 @@ export default {
   async run(interaction: CommandInteraction & { client: Bot }) {
     const commandName = interaction.options.get('command', true)
       .value as string;
-    const type = interaction.options.get('type', true).value as
+    const context = interaction.options.get('context', true).value as
       | 'user'
       | 'guild'
       | 'global';
@@ -57,17 +57,25 @@ export default {
       | undefined;
     const id = interaction.options.get('id')?.value as string | undefined;
 
-    if ((type === 'user' || type === 'guild') && !utils.validateId(id)) {
+    if (!interaction.client.commands.has(commandName)) {
+      await interaction.reply({
+        content: `El comando \`${commandName}\` no existe`,
+        ephemeral: true,
+      });
+      return;
+    }
+
+    if ((context === 'user' || context === 'guild') && !utils.validateId(id)) {
       await interaction.reply({
         content: `Debes ingresar una ID valida de un ${
-          type === 'user' ? 'usuario' : 'guild'
+          context === 'user' ? 'usuario' : 'guild'
         }`,
         ephemeral: true,
       });
       return;
     }
 
-    switch (type) {
+    switch (context) {
       case 'user': {
         if (!id) return;
         const dC = usersManager.getUserData(id).disabledCommands;

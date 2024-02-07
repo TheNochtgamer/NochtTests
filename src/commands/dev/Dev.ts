@@ -4,13 +4,15 @@ import utils from '../../lib/Utils';
 //
 import evaluate from './eval';
 import reload from './reload';
+import disable from './disable';
 
 export default {
   data: new SlashCommandBuilder()
     .setName('dev')
     .setDescription('Comandos de desarrollador')
     .addSubcommand(evaluate.data)
-    .addSubcommand(reload.data),
+    .addSubcommand(reload.data)
+    .addSubcommand(disable.data),
   onlyOwners: true,
 
   async run(interaction) {
@@ -22,6 +24,9 @@ export default {
         break;
       case 'reloadall':
         await reload.run(interaction);
+        break;
+      case 'disable':
+        await disable.run(interaction);
         break;
     }
   },
