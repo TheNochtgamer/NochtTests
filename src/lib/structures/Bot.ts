@@ -15,8 +15,10 @@ export default class Bot extends Client {
   async loadCommands(reload = false): Promise<void> {
     const pref = '(loadCommands())';
 
-    console.log(pref, 'Purgando comandos...');
-    if (reload) await utils.refreshCachedFiles('commands');
+    if (reload) {
+      console.log(pref, 'Purgando comandos...');
+      await utils.refreshCachedFiles('commands');
+    }
     console.log(pref, 'Cargando comandos...');
     const FILES = await utils.obtainMyFiles('commands');
     this.commands.clear();
@@ -40,8 +42,10 @@ export default class Bot extends Client {
   async loadEvents(reload = false): Promise<void> {
     const pref = '(loadEvents())';
 
-    console.log(pref, 'Purgando eventos...');
-    if (reload) await utils.refreshCachedFiles('events');
+    if (reload) {
+      console.log(pref, 'Purgando eventos...');
+      await utils.refreshCachedFiles('events');
+    }
     console.log(pref, 'Cargando eventos...');
     const FILES = await utils.obtainMyFiles('events');
     this.removeAllListeners();
