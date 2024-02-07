@@ -10,7 +10,7 @@ export default {
     .setName('reloadall')
     .setDescription('Recarga todos los comandos')
     .addBooleanOption(option =>
-      option.setName('forceupload').setDescription('Forzar subida de comandos'),
+      option.setName('forceupload').setDescription('Forzar subida de comandos')
     ),
 
   async run(interaction: CommandInteraction & { client: Bot }) {
@@ -18,7 +18,7 @@ export default {
 
     const confirm = await utils.confirmationForm(
       interaction,
-      '¿Estas seguro de recargar los comandos y eventos?',
+      '¿Estas seguro de recargar los comandos y eventos?'
     );
 
     if (confirm) {
@@ -32,8 +32,8 @@ export default {
     });
 
     await Promise.allSettled([
-      interaction.client.loadEvents(),
-      interaction.client.loadCommands(),
+      interaction.client.loadEvents(true),
+      interaction.client.loadCommands(true),
     ]);
 
     // utils.deleteMyRequire();

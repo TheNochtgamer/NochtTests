@@ -91,10 +91,14 @@ class Utils {
       })
       .filter(f => f.endsWith('.js') || f.endsWith('.ts'));
 
+    return FILES;
+  }
+
+  async refreshCachedFiles(dirName = ''): Promise<void> {
+    const FILES = await this.obtainMyFiles(dirName, true);
+
     // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
     FILES.forEach(f => delete require.cache[require.resolve(f)]);
-
-    return FILES;
   }
 
   /**
