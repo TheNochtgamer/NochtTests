@@ -1,6 +1,6 @@
 import { SlashCommandBuilder } from 'discord.js';
 import type { MySlashCommand } from '../../types';
-import utils from '../../lib/Utils';
+// import utils from '../../lib/Utils';
 //
 import evaluate from './eval';
 import reload from './reload';
