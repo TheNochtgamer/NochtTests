@@ -4,7 +4,7 @@ export default class UserData {
   // data
   public readonly id: string;
   public blocked: boolean = false;
-  public blockedReason: string = '';
+  public blockedReason: string | null = null;
   public disabledCommands: DisabledCommand[] = [];
 
   // experimental
