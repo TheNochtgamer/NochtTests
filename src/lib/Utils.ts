@@ -26,8 +26,8 @@ import {
   type InteractionResponse,
 } from 'discord.js';
 import { CachePointers } from './Enums';
-import cacheMe from '../services/cacheMe';
 import { bot } from '../index';
+import cacheMe from '../services/cacheMe';
 
 class Utils {
   constructor() {
@@ -43,14 +43,14 @@ class Utils {
   /**
    * Revisa que un snowflake de discord sea valido
    */
-  validateId(id: string = ''): boolean {
+  public validateId(id: string = ''): boolean {
     return !!id && !isNaN(parseInt(id)) && id?.length >= 17 && id?.length <= 20;
   }
 
   /**
    * Revisa que un id pertenezca a un bot developer
    */
-  checkBotDev(id: string = ''): boolean {
+  public checkBotDev(id: string = ''): boolean {
     return process.env.BOT_OWNERS?.includes(id) ?? false;
   }
 
@@ -66,7 +66,10 @@ class Utils {
   //   return FILES;
   // }
 
-  async obtainMyFiles(dirName = '', complete = false): Promise<string[]> {
+  public async obtainMyFiles(
+    dirName = '',
+    complete = false
+  ): Promise<string[]> {
     const PATH = path.join(__dirname, '../', dirName);
     const FILES = fs
       .readdirSync(PATH, {
@@ -94,7 +97,7 @@ class Utils {
     return FILES;
   }
 
-  async refreshCachedFiles(dirName = ''): Promise<void> {
+  public async refreshCachedFiles(dirName = ''): Promise<void> {
     const FILES = await this.obtainMyFiles(dirName, true);
 
     // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
