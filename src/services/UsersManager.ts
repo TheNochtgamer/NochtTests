@@ -11,7 +11,7 @@ export default class UsersManager {
   }
 
   public static getUserData(id: string): UserData {
-    if (!utils.checkId(id)) throw new Error('Invalid id');
+    if (!utils.validateId(id)) throw new Error('Invalid id');
 
     return (
       (cacheMe.get(id + CachePointers.user) as UserData) ||

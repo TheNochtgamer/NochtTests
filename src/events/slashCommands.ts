@@ -36,22 +36,21 @@ export default {
 
     // --DisableCheck--
     const disabledCommand = utils.getDisabledCommand(
-      client,
       command.data.name,
       userData,
-      guildData,
+      guildData
     );
 
     if (disabledCommand && !utils.checkBotDev(interaction.user.id)) {
       console.log(
-        `${interaction.user.username} intento acceder al comando "${interaction.commandName}" el cual esta deshabilitado`,
+        `${interaction.user.username} intento acceder al comando "${interaction.commandName}" el cual esta deshabilitado`
       );
       void utils.embedReply(
         interaction,
         Embeds.commandDisabled(
           interaction.user.username,
-          disabledCommand.disabled.reason,
-        ),
+          disabledCommand.disabled.reason
+        )
       );
 
       return;
@@ -61,11 +60,11 @@ export default {
     // --NCheckAuth--
     if (!(await utils.authorizationCheck(interaction, command))) {
       console.log(
-        `${interaction.user.username} intento acceder al comando "${interaction.commandName}" sin autorizacion`,
+        `${interaction.user.username} intento acceder al comando "${interaction.commandName}" sin autorizacion`
       );
       void utils.embedReply(
         interaction,
-        Embeds.notAuthorised(interaction.user.username),
+        Embeds.notAuthorised(interaction.user.username)
       );
 
       return;
@@ -79,7 +78,7 @@ export default {
       utils.rateLimitCheck(
         identifier,
         command.rateLimit?.cooldown,
-        command.rateLimit?.maxUses,
+        command.rateLimit?.maxUses
       ) &&
       !utils.checkBotDev(interaction.user.id)
     ) {
@@ -89,16 +88,16 @@ export default {
         ? Math.round(
             (rateLimit.lastTick.getTime() +
               (now.getTime() - rateLimit.lastTick.getTime())) /
-              1000,
+              1000
           )
         : undefined;
 
       console.log(
-        `${interaction.user.username} supero el limite del comando "${interaction.commandName}"`,
+        `${interaction.user.username} supero el limite del comando "${interaction.commandName}"`
       );
       void utils.embedReply(
         interaction,
-        Embeds.rateLimit(interaction.user.username, timestamp),
+        Embeds.rateLimit(interaction.user.username, timestamp)
       );
 
       return;
@@ -106,7 +105,7 @@ export default {
     // --RateLimiter--
 
     console.log(
-      `${interaction.user.username} ejecuto el comando "${interaction.commandName}"`,
+      `${interaction.user.username} ejecuto el comando "${interaction.commandName}"`
     );
     // TODO crear un comando el cual sirva para eliminar mensajes del bot con el id, y para eso revise los permisos del miembro sobre el canal
 
@@ -125,7 +124,7 @@ export default {
     } catch (error) {
       console.log(
         `Hubo un error ejecutando el comando ${interaction.commandName}:`,
-        error,
+        error
       );
       try {
         const content = `Hubo un error interno al ejecutar el comando ${

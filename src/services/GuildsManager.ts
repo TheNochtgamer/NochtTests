@@ -11,7 +11,7 @@ export default class GuildsManager {
   }
 
   public static getGuildData(id: string): GuildData {
-    if (!utils.checkId(id)) throw new Error('Invalid id');
+    if (!utils.validateId(id)) throw new Error('Invalid id');
 
     return (
       (cacheMe.get(id + CachePointers.guild) as GuildData) ||

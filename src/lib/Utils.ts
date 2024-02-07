@@ -27,6 +27,7 @@ import {
 } from 'discord.js';
 import { CachePointers } from './Enums';
 import cacheMe from '../services/cacheMe';
+import { bot } from '../index';
 
 class Utils {
   constructor() {
@@ -42,7 +43,7 @@ class Utils {
   /**
    * Revisa que un snowflake de discord sea valido
    */
-  checkId(id: string = ''): boolean {
+  validateId(id: string = ''): boolean {
     return !!id && !isNaN(parseInt(id)) && id?.length >= 17 && id?.length <= 20;
   }
 
@@ -83,7 +84,7 @@ class Utils {
               f.isFile() &&
               (path.parse(f.name).name.toLowerCase() ===
                 item.name.toLowerCase() ||
-                path.parse(f.name).name.toLowerCase() === 'index'),
+                path.parse(f.name).name.toLowerCase() === 'index')
           )
           .map(f => path.join(PATH, item.name, f.name));
       })
@@ -102,7 +103,7 @@ class Utils {
    */
   async summitCommands(
     client: Bot,
-    guildId = process.env.GUILDID,
+    guildId = process.env.GUILDID
   ): Promise<void> {
     const pref = '(summitCommands())';
 
@@ -111,16 +112,16 @@ class Utils {
 
     console.log(
       pref,
-      `Subiendo comandos${guildId ? ` (en el guild: ${guildId})` : ''}...`,
+      `Subiendo comandos${guildId ? ` (en el guild: ${guildId})` : ''}...`
     );
     try {
-      if (guildId && this.checkId(guildId)) {
+      if (guildId && this.validateId(guildId)) {
         const GUILD = await client.guilds.fetch(guildId);
         if (!GUILD) throw new Error(`No se encontro el guild`);
         cmds = await GUILD.commands.set(client.commands.map(cmd => cmd.data));
       } else {
         cmds = await client.application?.commands?.set(
-          client.commands.map(cmd => cmd.data),
+          client.commands.map(cmd => cmd.data)
         );
       }
 
@@ -152,7 +153,7 @@ class Utils {
    */
   async checkSyncedCommands(
     client: Bot,
-    guildId = process.env.GUILDID,
+    guildId = process.env.GUILDID
   ): Promise<0 | 1 | 2> {
     const clientCmds = client.commands.map(cmd => cmd.data);
     let serverCmds: Collection<string, ApplicationCommand> | null | undefined;
@@ -160,7 +161,7 @@ class Utils {
 
     try {
       serverCmds =
-        guildId && this.checkId(guildId)
+        guildId && this.validateId(guildId)
           ? await client.guilds.cache.get(guildId)?.commands?.fetch()
           : await client.application?.commands?.fetch();
       if (!serverCmds) throw new Error('No se encontraron los comandos');
@@ -185,10 +186,10 @@ class Utils {
                     ? true
                     : sCmdOption.options?.length ===
                       // @ts-expect-error Discord js no lo definio correctamente, pero existe y funciona
-                      cCmdOption.options?.length),
-              ),
-            ),
-        ),
+                      cCmdOption.options?.length)
+              )
+            )
+        )
       ) ||
       !serverCmds.every(sCmd =>
         clientCmds.some(
@@ -198,10 +199,10 @@ class Utils {
               cCmd.options.some(
                 cCmdOption =>
                   // @ts-expect-error Discord js no lo definio correctamente, pero existe y funciona
-                  cCmdOption.name === sCmdOption.name,
-              ),
-            ),
-        ),
+                  cCmdOption.name === sCmdOption.name
+              )
+            )
+        )
       )
     )
       return 0;
@@ -214,7 +215,7 @@ class Utils {
    */
   async embedReply(
     interaction: CommandInteraction,
-    embedData: MyEmbedData | EmbedBuilder,
+    embedData: MyEmbedData | EmbedBuilder
   ): Promise<Message | InteractionResponse | null> {
     const embed =
       embedData instanceof EmbedBuilder ? embedData : new EmbedBuilder();
@@ -271,7 +272,7 @@ class Utils {
   rateLimitCheck(
     identifier: string,
     cooldown?: number,
-    uses: number = 1,
+    uses: number = 1
   ): boolean {
     if (!cooldown || cooldown < 500) return false;
 
@@ -295,7 +296,7 @@ class Utils {
         lastTick: now,
         uses,
       } satisfies RateLimit,
-      { ttl: cooldown },
+      { ttl: cooldown }
     );
     return false;
   }
@@ -319,7 +320,7 @@ class Utils {
    */
   async authorizationCheck(
     interaction: CommandInteraction,
-    command: MySlashCommand,
+    command: MySlashCommand
   ): Promise<0 | 1> {
     // TODO Reworkear el sistema para que tambien tome en cuenta los permisos de discord con respecto a los slash
     if (this.checkBotDev(interaction.user.id)) return 1;
@@ -352,10 +353,10 @@ class Utils {
       const hasPerms = member?.permissions.toArray();
       permsCheck = command.allPerms_req
         ? hasPerms.every(hasPerm =>
-            command.perms_req?.some(neededPerm => neededPerm === hasPerm),
+            command.perms_req?.some(neededPerm => neededPerm === hasPerm)
           )
         : hasPerms.some(hasPerm =>
-            command.perms_req?.some(neededPerm => neededPerm === hasPerm),
+            command.perms_req?.some(neededPerm => neededPerm === hasPerm)
           );
     } else permsCheck = true;
 
@@ -372,27 +373,28 @@ class Utils {
    * Revisa si un comando esta desactivado y devuelve el tipo de desactivacion con la razon
    */
   getDisabledCommand(
-    client: Bot,
     commandName: string,
-    userData: UserData,
-    guildData?: GuildData,
+    userData?: UserData,
+    guildData?: GuildData
   ): null | { type: 'user' | 'guild' | 'global'; disabled: DisabledCommand } {
-    let disabled = userData.disabledCommands.find(
-      cmd => cmd.name === commandName,
+    let disabledCommand = bot.settings.disabledCommands.find(
+      cmd => cmd.name === commandName
     );
-    if (disabled) return { type: 'user', disabled };
+    if (disabledCommand) return { type: 'global', disabled: disabledCommand };
 
-    if (guildData) {
-      disabled = guildData.disabledCommands.find(
-        cmd => cmd.name === commandName,
+    if (userData) {
+      disabledCommand = userData.disabledCommands.find(
+        cmd => cmd.name === commandName
       );
-      if (disabled) return { type: 'guild', disabled };
+      if (disabledCommand) return { type: 'user', disabled: disabledCommand };
     }
 
-    disabled = client.settings.disabledCommands.find(
-      cmd => cmd.name === commandName,
-    );
-    if (disabled) return { type: 'global', disabled };
+    if (guildData) {
+      disabledCommand = guildData.disabledCommands.find(
+        cmd => cmd.name === commandName
+      );
+      if (disabledCommand) return { type: 'guild', disabled: disabledCommand };
+    }
 
     return null;
   }
@@ -413,7 +415,7 @@ class Utils {
       | ModalSubmitInteraction
       | ChatInputCommandInteraction,
     message: string,
-    timeout: number = 30 * 1000,
+    timeout: number = 30 * 1000
   ): Promise<0 | 1 | 2> {
     const row = new ActionRowBuilder<ButtonBuilder>().setComponents(
       new ButtonBuilder()
@@ -423,7 +425,7 @@ class Utils {
       new ButtonBuilder()
         .setCustomId('deny')
         .setStyle(ButtonStyle.Danger)
-        .setLabel('❌'),
+        .setLabel('❌')
     );
 
     const reply =
