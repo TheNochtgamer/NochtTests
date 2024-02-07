@@ -33,7 +33,7 @@ export default {
     const add = (str = ''): string => (log += str + '\n');
 
     // Para mati
-    log += 'Tirando los dados.';
+    add('Tirando los dados.');
     await interaction.reply(log);
     //
 
