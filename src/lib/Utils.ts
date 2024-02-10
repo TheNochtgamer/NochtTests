@@ -456,6 +456,16 @@ class Utils {
     if (response.customId === 'deny') return 1;
     return 2;
   }
+
+  /**
+   * Obtiene un elemento random del array enviado
+   *
+   * si esta vacio, devuelve undefined
+   */
+  public arrayRandom<T>(array: T[]): T | undefined {
+    if (array.length === 0) return;
+    return array[Math.floor(Math.random() * array.length)];
+  }
 }
 
 export default new Utils();
