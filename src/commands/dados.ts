@@ -30,12 +30,16 @@ export default {
     let log = '';
     const Dado1 = Math.floor(Math.random() * 6) + 1; // El Dado de la PC
     const Dado2 = Math.floor(Math.random() * 6) + 1; // El Dado de la PC
-    const add = (str = ''): string => (log += str + '\n');
+    const say = async (str = ''): Promise<void> => {
+      log += str + '\n';
+      if (!(interaction.replied || interaction.deferred)) {
+        await interaction.reply(log);
+        return;
+      }
+      await interaction.editReply(log);
+    };
 
-    // Para mati
-    add('Tirando los dados.');
-    await interaction.reply(log);
-    //
+    await say('Tirando los dados.');
 
     await sleep(500);
     await interaction.editReply(`Tirando los dados..`);
