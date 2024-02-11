@@ -163,6 +163,9 @@ class Utils {
     client: Bot,
     guildId = process.env.GUILDID
   ): Promise<0 | 1 | 2> {
+    const _debug = false;
+    const pref = '(checkSyncedCommands())';
+
     const clientCmds = client.commands.map(cmd => cmd.data);
     let serverCmds: Collection<string, ApplicationCommand> | null | undefined;
     if (!clientCmds.length) return 2;
@@ -180,22 +183,53 @@ class Utils {
 
     // if (serverCmds.size !== clientCmds.length) return 0;
 
+    /**
+     * For debugging
+     *
+     * clientCmds.map(c => {return {n:c.name, o:c.options.map(o => o.name)}})
+     * serverCmds.map(c => {return {n:c.name, o:c.options.map(o => o.name)}})
+     *
+     */
+
+    // TODO Crear un type personalizado para evitar el uso de @ts-expect-error
     if (
       !clientCmds.every(cCmd =>
         serverCmds?.some(
           sCmd =>
             cCmd.name === sCmd.name &&
             cCmd.options.every(cCmdOption =>
-              sCmd.options.some(
-                sCmdOption =>
+              sCmd.options.some(sCmdOption => {
+                const res =
                   // @ts-expect-error Discord js no lo definio correctamente, pero existe y funciona
                   sCmdOption.name === cCmdOption.name &&
-                  (sCmdOption.type !== 1
-                    ? true
-                    : sCmdOption.options?.length ===
+                  // @ts-expect-error Discord js no lo definio correctamente, pero existe y funciona
+                  (cCmdOption.options instanceof Array &&
+                  // @ts-expect-error Discord js no lo definio correctamente, pero existe y funciona
+                  sCmdOption.options instanceof Array
+                    ? // @ts-expect-error Discord js no lo definio correctamente, pero existe y funciona
+                      cCmdOption.options.length === sCmdOption.options.length &&
                       // @ts-expect-error Discord js no lo definio correctamente, pero existe y funciona
-                      cCmdOption.options?.length)
-              )
+                      (cCmdOption.options as any[]).every(cCmdSubOption =>
+                        // @ts-expect-error Discord js no lo definio correctamente, pero existe y funciona
+                        sCmdOption.options.some(
+                          // @ts-expect-error Discord js no lo definio correctamente, pero existe y funciona
+                          sCmdSubOption =>
+                            sCmdSubOption.name === cCmdSubOption.name
+                        )
+                      )
+                    : true);
+
+                if (_debug)
+                  console.log(
+                    pref,
+                    // @ts-expect-error Discord js no lo definio correctamente, pero existe y funciona
+                    `${cCmdOption.name} === ${sCmdOption.name} : ${res}`,
+                    // @ts-expect-error Discord js no lo definio correctamente, pero existe y funciona
+                    (cCmdOption.name === sCmdOption.name) === res ? '✅' : '❌'
+                  );
+
+                return res;
+              })
             )
         )
       ) ||
@@ -204,11 +238,38 @@ class Utils {
           cCmd =>
             cCmd.name === sCmd.name &&
             sCmd.options.every(sCmdOption =>
-              cCmd.options.some(
-                cCmdOption =>
+              cCmd.options.some(cCmdOption => {
+                const res =
                   // @ts-expect-error Discord js no lo definio correctamente, pero existe y funciona
-                  cCmdOption.name === sCmdOption.name
-              )
+                  sCmdOption.name === cCmdOption.name &&
+                  // @ts-expect-error Discord js no lo definio correctamente, pero existe y funciona
+                  (cCmdOption.options instanceof Array &&
+                  // @ts-expect-error Discord js no lo definio correctamente, pero existe y funciona
+                  sCmdOption.options instanceof Array
+                    ? // @ts-expect-error Discord js no lo definio correctamente, pero existe y funciona
+                      cCmdOption.options.length === sCmdOption.options.length &&
+                      // @ts-expect-error Discord js no lo definio correctamente, pero existe y funciona
+                      (cCmdOption.options as any[]).every(cCmdSubOption =>
+                        // @ts-expect-error Discord js no lo definio correctamente, pero existe y funciona
+                        sCmdOption.options.some(
+                          // @ts-expect-error Discord js no lo definio correctamente, pero existe y funciona
+                          sCmdSubOption =>
+                            sCmdSubOption.name === cCmdSubOption.name
+                        )
+                      )
+                    : true);
+
+                if (_debug)
+                  console.log(
+                    pref,
+                    // @ts-expect-error Discord js no lo definio correctamente, pero existe y funciona
+                    `${sCmdOption.name} === ${cCmdOption.name} : ${res}`,
+                    // @ts-expect-error Discord js no lo definio correctamente, pero existe y funciona
+                    (sCmdOption.name === cCmdOption.name) === res ? '✅' : '❌'
+                  );
+
+                return res;
+              })
             )
         )
       )
@@ -416,7 +477,7 @@ class Utils {
    *
    * devuelve 2 si se acabo el tiempo de respuesta
    */
-  async confirmationForm(
+  public async confirmationForm(
     interaction:
       | CommandInteraction
       | ButtonInteraction
