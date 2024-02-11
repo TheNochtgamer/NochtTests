@@ -26,66 +26,72 @@ export default {
       'Se me acabaron los bardeos',
       '*Se cae a un poso por boludo*',
     ];
+    const log: string[] = [];
+    const say = async (str = '', replaceLine = -1): Promise<void> => {
+      if (replaceLine > -1 && replaceLine < log.length) {
+        log[replaceLine] = str;
+      } else {
+        log.push(str);
+      }
 
-    let log = '';
-    const Dado1 = Math.floor(Math.random() * 6) + 1; // El Dado de la PC
-    const Dado2 = Math.floor(Math.random() * 6) + 1; // El Dado de la PC
-    const say = async (str = ''): Promise<void> => {
-      log += str + '\n';
       if (!(interaction.replied || interaction.deferred)) {
-        await interaction.reply(log);
+        await interaction.reply(log.join('\n'));
         return;
       }
-      await interaction.editReply(log);
+      await interaction.editReply(log.join('\n'));
     };
 
+    const Dado1 = Math.floor(Math.random() * 6) + 1; // El Dado del usuario
+    const Dado2 = Math.floor(Math.random() * 6) + 1; // El Dado de la PC
+
     await say('Tirando los dados.');
-
     await sleep(500);
-    await interaction.editReply(`Tirando los dados..`);
+    await say('Tirando los dados..', 0);
     await sleep(500);
-    await interaction.editReply(`Tirando los dados...`);
+    await say('Tirando los dados...', 0);
+    await sleep(500);
 
-    await interaction.editReply(
-      `El dado de | ${interaction.member?.user?.username} | : ${Dado1}`
+    await say(
+      `El dado de | ${interaction.member?.user?.username} | : ${Dado1}\nMi Turno Bro`,
+      0
     );
-    await interaction.editReply(`Mi Turno Bro`);
 
-    await interaction.editReply(`Tirando los dados.`);
+    await say('Tirando los dados.', 1);
     await sleep(500);
-    await interaction.editReply(`Tirando los dados..`);
+    await say('Tirando los dados..', 1);
     await sleep(500);
-    await interaction.editReply(`Tirando los dados...`);
+    await say('Tirando los dados...', 1);
+    await sleep(500);
 
-    await interaction.editReply(`El dado de | CHESTER EL BOT | : ${Dado2}`);
-
-    await interaction.editReply(`Resultados Finales`);
-
+    await say(
+      `El dado de | CHESTER EL BOT | : ${Dado2}\nResultados Finales`,
+      1
+    );
     await sleep(500);
 
     // RESULTADOS FINALES
     if (Dado1 > Dado2) {
-      await interaction.editReply(
+      await say(
         'Ganaste' +
           interaction.member?.user?.username +
           ' ' +
           utils.arrayRandom(FrasesDeVictoria)
       );
-      await interaction.editReply(
+      await say(
         'Perdiste' + 'CHESTER EL BOT' + ' ' + utils.arrayRandom(FrasesDeDerrota)
       );
     } else if (Dado1 < Dado2) {
-      await interaction.editReply(
+      await say(
         'Perdiste' +
           interaction.member?.user?.username +
           ' ' +
           utils.arrayRandom(FrasesDeDerrota)
       );
-      await interaction.editReply(
+      await say(
         'Ganaste' + 'CHESTER EL BOT' + ' ' + utils.arrayRandom(FrasesDeVictoria)
       );
     } else {
-      await interaction.editReply(
+      await say(
         'Nose como pero ambos perdieron, y ganaron a la vez, deberian revisar este error los programadores :/'
       );
     }
