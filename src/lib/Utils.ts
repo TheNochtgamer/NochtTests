@@ -527,6 +527,27 @@ class Utils {
     if (array.length === 0) return;
     return array[Math.floor(Math.random() * array.length)];
   }
+
+  public everyXExecutions(identifier: string, maxExecutions: number): boolean {
+    const existingExecutions = cacheMe.get(
+      identifier + CachePointers.iterationsCacher
+    ) as number | undefined;
+
+    const count = existingExecutions ?? 0;
+
+    cacheMe.set(identifier + CachePointers.iterationsCacher, count + 1, {
+      ttl: 2 * 1000,
+    });
+
+    if (count >= maxExecutions) {
+      cacheMe.set(identifier + CachePointers.iterationsCacher, 0, {
+        ttl: 2 * 1000,
+      });
+      return true;
+    }
+
+    return false;
+  }
 }
 
 export default new Utils();
