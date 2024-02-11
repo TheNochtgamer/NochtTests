@@ -1,16 +1,13 @@
-import type { Bot, DisabledCommand } from '../../types';
-import {
-  type CommandInteraction,
-  SlashCommandSubcommandBuilder,
-} from 'discord.js';
+import type { DisabledCommand, MySlashSubCommand } from '../../types';
+import { SlashCommandSubcommandBuilder } from 'discord.js';
 import utils from '../../lib/Utils';
 import usersManager from '../../services/UsersManager';
 import guildsManager from '../../services/GuildsManager';
 
 export default {
   data: new SlashCommandSubcommandBuilder()
-    .setName('disable')
-    .setDescription('Deshabilita un comando')
+    .setName('cmdtoggle')
+    .setDescription('Habilita o deshabilita un comando')
     .addStringOption(option =>
       option
         .setName('command')
@@ -45,7 +42,16 @@ export default {
       option.setName('id').setDescription('ID del usuario o guild')
     ),
 
-  async run(interaction: CommandInteraction & { client: Bot }) {
+  autoComplete(interaction) {
+    const bot = interaction.client;
+
+    return bot.commands.map(c => ({
+      name: c.data.name,
+      value: c.data.name,
+    }));
+  },
+
+  async run(interaction) {
     const commandName = interaction.options.get('command', true)
       .value as string;
     const context = interaction.options.get('context', true).value as
@@ -163,4 +169,4 @@ export default {
       }
     }
   },
-};
+} satisfies MySlashSubCommand;
