@@ -1,9 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import type { Bot } from '../../types';
-import {
-  type CommandInteraction,
-  SlashCommandSubcommandBuilder,
-} from 'discord.js';
+import type { MySlashSubCommand } from '../../types';
+import { SlashCommandSubcommandBuilder } from 'discord.js';
 import utils from '../../lib/Utils';
 
 export default {
@@ -17,7 +14,7 @@ export default {
         .setRequired(true)
     ),
 
-  async run(interaction: CommandInteraction & { client: Bot }) {
+  async run(interaction) {
     let runme = interaction.options.get('codigo', true).value as string;
 
     if (runme.match(/process/gi))
@@ -67,4 +64,4 @@ export default {
 
     console.log(`${interaction.user.username} termino de ejecutar codigo.`);
   },
-};
+} satisfies MySlashSubCommand;

@@ -1,8 +1,5 @@
-import type { Bot } from '../../types';
-import {
-  type CommandInteraction,
-  SlashCommandSubcommandBuilder,
-} from 'discord.js';
+import type { MySlashSubCommand } from '../../types';
+import { SlashCommandSubcommandBuilder } from 'discord.js';
 import utils from '../../lib/Utils';
 
 export default {
@@ -13,7 +10,7 @@ export default {
       option.setName('forceupload').setDescription('Forzar subida de comandos')
     ),
 
-  async run(interaction: CommandInteraction & { client: Bot }) {
+  async run(interaction) {
     const forceUpload = interaction.options.get('forceupload')?.value ?? false;
 
     const confirm = await utils.confirmationForm(
@@ -48,4 +45,4 @@ export default {
       content: `Recarga de archivos terminada.`,
     });
   },
-};
+} satisfies MySlashSubCommand;

@@ -4,6 +4,8 @@ import utils from '../lib/Utils';
 import UsersManager from '../services/UsersManager';
 import GuildsManager from '../services/GuildsManager';
 
+const _pref = '(slashCommands())';
+
 // EVENTO PARA CUANDO SE EJECUTA UN COMANDO
 export default {
   name: 'interactionCreate',
@@ -21,7 +23,10 @@ export default {
     // --/UserData--
 
     if (!command) {
-      console.log(`No se encontro el comando ${interaction.commandName}`);
+      console.log(
+        _pref,
+        `No se encontro el comando ${interaction.commandName}`
+      );
       if (interaction.replied) return;
       interaction
         .reply({
@@ -43,6 +48,7 @@ export default {
 
     if (disabledCommand && !utils.checkBotDev(interaction.user.id)) {
       console.log(
+        _pref,
         `${interaction.user.username} intento acceder al comando "${interaction.commandName}" el cual esta deshabilitado`
       );
       void utils.embedReply(
@@ -60,6 +66,7 @@ export default {
     // --NCheckAuth--
     if (!(await utils.authorizationCheck(interaction, command))) {
       console.log(
+        _pref,
         `${interaction.user.username} intento acceder al comando "${interaction.commandName}" sin autorizacion`
       );
       void utils.embedReply(
@@ -93,6 +100,7 @@ export default {
         : undefined;
 
       console.log(
+        _pref,
         `${interaction.user.username} supero el limite del comando "${interaction.commandName}"`
       );
       void utils.embedReply(
@@ -105,6 +113,7 @@ export default {
     // --RateLimiter--
 
     console.log(
+      _pref,
       `${interaction.user.username} ejecuto el comando "${interaction.commandName}"`
     );
     // TODO crear un comando el cual sirva para eliminar mensajes del bot con el id, y para eso revise los permisos del miembro sobre el canal
@@ -123,6 +132,7 @@ export default {
       await command.run(interaction);
     } catch (error) {
       console.log(
+        _pref,
         `Hubo un error ejecutando el comando ${interaction.commandName}:`,
         error
       );

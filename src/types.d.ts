@@ -103,10 +103,21 @@ declare interface MySlashCommand {
       >;
 
   /**
+   * La function que se ejecuta al necesitar auto completar una opcion del comando
+   */
+  autoComplete?: (
+    interaction: Discord.AutocompleteInteraction & { client: Bot }
+  ) =>
+    | Array<Discord.ApplicationCommandOptionChoiceData<string | number>>
+    | Promise<
+        Array<Discord.ApplicationCommandOptionChoiceData<string | number>>
+      >;
+
+  /**
    * La funcion principal del comando
    */
   run: (
-    interaction: Discord.ChatInputCommandInteraction & { client: Bot },
+    interaction: Discord.ChatInputCommandInteraction & { client: Bot }
   ) => void | Promise<void>;
 }
 
@@ -117,10 +128,21 @@ declare interface MySlashSubCommand {
   data: Discord.SlashCommandSubcommandBuilder;
 
   /**
+   * La function que se ejecuta al necesitar auto completar una opcion del comando
+   */
+  autoComplete?: (
+    interaction: Discord.AutocompleteInteraction & { client: Bot }
+  ) =>
+    | Array<Discord.ApplicationCommandOptionChoiceData<string | number>>
+    | Promise<
+        Array<Discord.ApplicationCommandOptionChoiceData<string | number>>
+      >;
+
+  /**
    * La funcion principal del comando
    */
   run: (
-    interaction: Discord.ChatInputCommandInteraction & { client: Bot },
+    interaction: Discord.ChatInputCommandInteraction & { client: Bot }
   ) => void | Promise<void>;
 }
 

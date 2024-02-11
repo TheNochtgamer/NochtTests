@@ -4,7 +4,7 @@ import type { MySlashCommand } from '../../types';
 //
 import evaluate from './eval';
 import reload from './reload';
-import disable from './disable';
+import cmdtoggle from './cmdtoggle';
 
 export default {
   data: new SlashCommandBuilder()
@@ -12,7 +12,7 @@ export default {
     .setDescription('Comandos de desarrollador')
     .addSubcommand(evaluate.data)
     .addSubcommand(reload.data)
-    .addSubcommand(disable.data),
+    .addSubcommand(cmdtoggle.data),
   onlyOwners: true,
 
   async run(interaction) {
@@ -25,8 +25,8 @@ export default {
       case 'reloadall':
         await reload.run(interaction);
         break;
-      case 'disable':
-        await disable.run(interaction);
+      case 'cmdtoggle':
+        await cmdtoggle.run(interaction);
         break;
     }
   },
