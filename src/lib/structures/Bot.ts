@@ -13,13 +13,13 @@ export default class Bot extends Client {
   // }
 
   async loadCommands(reload = false): Promise<void> {
-    const pref = '(loadCommands())';
+    const _pref = '(loadCommands())';
 
     if (reload) {
-      console.log(pref, 'Purgando comandos...');
+      console.log(_pref, 'Purgando comandos...');
       await utils.refreshCachedFiles('commands');
     }
-    console.log(pref, 'Cargando comandos...');
+    console.log(_pref, 'Cargando comandos...');
     const FILES = await utils.obtainMyFiles('commands');
     this.commands.clear();
 
@@ -32,21 +32,25 @@ export default class Bot extends Client {
         this.commands.set(command.data.name, command);
         success++;
       } catch (error) {
-        console.log(pref, `Error al cargar el comando "${commandFile}"`, error);
+        console.log(
+          _pref,
+          `Error al cargar el comando "${commandFile}"`,
+          error
+        );
       }
     }
 
-    console.log(pref, `${success}/${FILES.length} comandos cargados`);
+    console.log(_pref, `${success}/${FILES.length} comandos cargados`);
   }
 
   async loadEvents(reload = false): Promise<void> {
-    const pref = '(loadEvents())';
+    const _pref = '(loadEvents())';
 
     if (reload) {
-      console.log(pref, 'Purgando eventos...');
+      console.log(_pref, 'Purgando eventos...');
       await utils.refreshCachedFiles('events');
     }
-    console.log(pref, 'Cargando eventos...');
+    console.log(_pref, 'Cargando eventos...');
     const FILES = await utils.obtainMyFiles('events');
     this.removeAllListeners();
 
@@ -63,20 +67,20 @@ export default class Bot extends Client {
         }
         success++;
       } catch (error) {
-        console.log(pref, `Error al cargar el evento "${eventFile}"`, error);
+        console.log(_pref, `Error al cargar el evento "${eventFile}"`, error);
       }
     }
 
-    console.log(pref, `${success}/${FILES.length} eventos cargados`);
+    console.log(_pref, `${success}/${FILES.length} eventos cargados`);
   }
 
   async init(token: string): Promise<void> {
-    const pref = '(init())';
+    const _pref = '(init())';
 
     if (this.user?.id) return;
     await Promise.all([this.loadEvents(), this.loadCommands()]);
 
-    console.log(pref, 'Login in...');
+    console.log(_pref, 'Login in...');
     await this.login(token);
   }
 }

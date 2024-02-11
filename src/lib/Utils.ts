@@ -113,13 +113,13 @@ class Utils {
     client: Bot,
     guildId = process.env.GUILDID
   ): Promise<void> {
-    const pref = '(summitCommands())';
+    const _pref = '(summitCommands())';
 
     if (!client.commands.size) return;
     let cmds = null;
 
     console.log(
-      pref,
+      _pref,
       `Subiendo comandos${guildId ? ` (en el guild: ${guildId})` : ''}...`
     );
     try {
@@ -144,10 +144,10 @@ class Utils {
       // }
       if (!cmds) throw new Error('No se subio ningun comando');
     } catch (error) {
-      console.log(pref, 'Error al intentar subir los comandos', error);
+      console.log(_pref, 'Error al intentar subir los comandos', error);
       return;
     }
-    console.log(pref, `${cmds.size} comandos subidos`);
+    console.log(_pref, `${cmds.size} comandos subidos`);
   }
 
   /**
@@ -164,7 +164,7 @@ class Utils {
     guildId = process.env.GUILDID
   ): Promise<0 | 1 | 2> {
     const _debug = false;
-    const pref = '(checkSyncedCommands())';
+    const _pref = '(checkSyncedCommands())';
 
     const clientCmds = client.commands.map(cmd => cmd.data);
     let serverCmds: Collection<string, ApplicationCommand> | null | undefined;
@@ -221,7 +221,7 @@ class Utils {
 
                 if (_debug)
                   console.log(
-                    pref,
+                    _pref,
                     // @ts-expect-error Discord js no lo definio correctamente, pero existe y funciona
                     `${cCmdOption.name} === ${sCmdOption.name} : ${res}`,
                     // @ts-expect-error Discord js no lo definio correctamente, pero existe y funciona
@@ -261,7 +261,7 @@ class Utils {
 
                 if (_debug)
                   console.log(
-                    pref,
+                    _pref,
                     // @ts-expect-error Discord js no lo definio correctamente, pero existe y funciona
                     `${sCmdOption.name} === ${cCmdOption.name} : ${res}`,
                     // @ts-expect-error Discord js no lo definio correctamente, pero existe y funciona
