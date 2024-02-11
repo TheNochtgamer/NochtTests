@@ -20,7 +20,17 @@ export default {
         )
     )
     .addSubcommand(subcommand =>
-      subcommand.setName('join').setDescription('Unete a una sala')
+      subcommand
+        .setName('join')
+        .setDescription('Unete a una sala')
+
+        .addStringOption(option =>
+          option
+            .setName('lobby')
+            .setDescription('El ID de la sala')
+            .setRequired(true)
+            .setAutocomplete(true)
+        )
     )
     .addSubcommand(subcommand =>
       subcommand.setName('leave').setDescription('Abandona la sala actual')
@@ -30,10 +40,10 @@ export default {
 
     switch (subCommand) {
       case 'create':
-        await LobbiesManager.handleCreateLobby(interaction);
+        await LobbiesManager.handleLobbyCreation(interaction);
         break;
       case 'join':
-        await LobbiesManager.handleJoinLobby(interaction);
+        await LobbiesManager.handleLobbyJoining(interaction);
         break;
       case 'leave':
         await interaction.reply('Dejaste la sala');

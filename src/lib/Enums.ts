@@ -4,6 +4,7 @@ export enum CachePointers {
   rateLimit = '-rateLimit',
   user = '-user',
   guild = '-guild',
+  iterationsCacher = '-iterationsCacher',
 }
 
 export const Errors = Object.freeze({

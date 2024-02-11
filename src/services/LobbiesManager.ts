@@ -6,29 +6,64 @@ export default class LobbiesManager {
   private static readonly activeLobbies = new Map<string, Lobby>();
 
   private static makeLobbyId(): string {
-    return (Math.random() + this.activeLobbies.size)
-      .toString(36)
-      .substring(2, 8);
+    const gen = (): string =>
+      (Math.random() + this.activeLobbies.size).toString(36).substring(2, 8);
+
+    let id = gen();
+    while (this.activeLobbies.has(id)) {
+      id = gen();
+    }
+
+    return id;
   }
 
-  public static async handleCreateLobby(
+  private static userIsOnLobby(userId: string): boolean {
+    for (const lobby of this.activeLobbies.values()) {
+      if (lobby.userIsHere(userId)) return true;
+    }
+
+    return false;
+  }
+  // TODO convertir los reply en una forma mas elegante de ejecutarlos
+
+  public static async handleLobbyCreation(
     interaction: ChatInputCommandInteraction
   ): Promise<void> {
-    const game = interaction.options.get('game')?.value as string;
+    if (this.userIsOnLobby(interaction.user.id)) {
+      await interaction.reply({
+        content: 'Ya estas en una sala',
+        ephemeral: false,
+      });
+      return;
+    }
+    await interaction.deferReply({
+      ephemeral: false,
+    });
+
+    const game = interaction.options.get('game', true).value as string;
     const lobbyId = this.makeLobbyId();
     const lobby = new Lobby(game, lobbyId);
 
     this.activeLobbies.set(lobbyId, lobby);
-    await interaction.reply({
-      content: `Se ha creado la sala ${lobbyId}`,
-      ephemeral: false,
-    });
+    lobby.addUser(interaction);
+    // await interaction.reply({
+    //   content: `Se ha creado la sala\nInternal ID:${lobbyId}`,
+    //   ephemeral: false,
+    // });
   }
 
-  public static async handleJoinLobby(
+  public static async handleLobbyJoining(
     interaction: ChatInputCommandInteraction
   ): Promise<void> {
-    const lobbyId = interaction.options.get('lobby')?.value as string;
+    if (this.userIsOnLobby(interaction.user.id)) {
+      await interaction.reply({
+        content: 'Ya estas en una sala',
+        ephemeral: false,
+      });
+      return;
+    }
+
+    const lobbyId = interaction.options.get('lobby', true).value as string;
     const lobby = this.activeLobbies.get(lobbyId);
 
     if (!lobby) {
@@ -39,7 +74,7 @@ export default class LobbiesManager {
       return;
     }
 
-    lobby.addUser(interaction.user.id);
+    lobby.addUser(interaction);
     await interaction.reply({
       content: `Te has unido a la sala`,
       ephemeral: false,

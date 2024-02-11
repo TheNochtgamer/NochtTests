@@ -1,17 +1,78 @@
+import { type ChatInputCommandInteraction } from 'discord.js';
 import utils from '../Utils';
 
 export default class Lobby {
-  public usersIds: string[] = [];
-  public game: string;
-  public id: string;
+  private readonly waitingTask: NodeJS.Timeout;
 
-  constructor(game: string, id: string) {
-    this.game = game;
+  public readonly id: string;
+  public readonly complex: boolean;
+  public game: string | null;
+  public readonly usersInteractions = new Map<
+    string,
+    ChatInputCommandInteraction
+  >();
+
+  constructor(id: string, game: string | null, complex = false) {
     this.id = id;
+    this.game = game;
+    this.complex = complex;
+
+    this.waitingTask = setInterval(this._waitingLoop.bind(this), 1000);
   }
 
-  public addUser(userId: string): void {
-    if (!utils.validateId(userId)) throw new Error('Invalid id');
-    this.usersIds.push(userId);
+  private async _waitingLoop(): Promise<void> {
+    // const _pref = '(_waitingLoop())';
+
+    if (this.usersInteractions.size === 0) {
+      clearInterval(this.waitingTask);
+      return;
+    }
+    if (!utils.everyXExecutions(this.id, 10)) return;
+
+    const players = Array.from(this.usersInteractions.values());
+
+    players.forEach(player => {
+      void this.sendShowMessage(player);
+    });
   }
+
+  // Un metodo para enviar a un usuario seleccionado sin utilizar el getShowMessage dentro de un editReply
+  private async sendShowMessage(
+    interaction: ChatInputCommandInteraction
+  ): Promise<void> {
+    const content =
+      '```yaml\n \n' +
+      `Lobby ${this.id} : ${this.game}\nPlayers: ${this.usersInteractions.size}\n` +
+      Array.from(this.usersInteractions.values())
+        .map(interaction => `- ${interaction.user.username}`)
+        .join('\n') +
+      '\n```';
+
+    try {
+      await interaction.editReply({ content });
+    } catch (error) {
+      console.error('Error al enviar el mensaje', error);
+      this.disconnectUser(interaction);
+    }
+  }
+
+  public userIsHere(userId: string): boolean {
+    return this.usersInteractions.has(userId);
+  }
+
+  public addUser(interaction: ChatInputCommandInteraction): void {
+    // if (!utils.validateId(userId)) throw new Error('Invalid id');
+    if (this.usersInteractions.has(interaction.id)) return;
+    this.usersInteractions.set(interaction.user.id, interaction);
+
+    void this.sendShowMessage(interaction);
+  }
+
+  public disconnectUser(interaction: ChatInputCommandInteraction): void {
+    this.usersInteractions.delete(interaction.user.id);
+  }
+
+  //   public getShowMessage(): string {
+  //     return
+  //   }
 }
