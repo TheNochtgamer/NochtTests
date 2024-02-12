@@ -100,7 +100,8 @@ declare interface MySlashCommand {
         | 'addStringOption'
         | 'addIntegerOption'
         | 'addNumberOption'
-      >;
+      >
+    | Omit<Discord.SlashCommandBuilder, 'addSubcommand' | 'addSubcommandGroup'>;
 
   /**
    * La function que se ejecuta al necesitar auto completar una opcion del comando
@@ -128,7 +129,7 @@ declare interface MySlashSubCommand {
   data: Discord.SlashCommandSubcommandBuilder;
 
   /**
-   * La function que se ejecuta al necesitar auto completar una opcion del comando
+   * La function que se ejecuta al necesitar auto completar una opcion del sub comando
    */
   autoComplete?: (
     interaction: Discord.AutocompleteInteraction & { client: Bot }
