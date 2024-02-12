@@ -8,14 +8,7 @@ const sleep = setTimeout;
 export default {
   data: new SlashCommandBuilder()
     .setName('dados')
-    .setDescription('Tira los dados, el que tire el numero mas alto gana')
-    .addStringOption(option =>
-      option
-        .setName('apuesta')
-        .setDescription('Apuesta de dinero')
-        .setRequired(false)
-        .setAutocomplete(true)
-    ),
+    .setDescription('Tira los dados, el que tire el numero mas alto gana'),
 
   async run(interaction) {
     const FrasesDeVictoria = [
