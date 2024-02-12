@@ -1,8 +1,8 @@
 import { LRUCache } from 'lru-cache';
+import { CacheTts } from '../lib/Enums';
 
 export default new LRUCache({
-  ttl: 1000 * 60 * 30,
+  ttl: CacheTts.default,
   ttlAutopurge: true,
   updateAgeOnGet: true,
 });
-

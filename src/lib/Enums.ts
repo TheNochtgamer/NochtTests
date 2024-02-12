@@ -4,7 +4,12 @@ export enum CachePointers {
   rateLimit = '-rateLimit',
   user = '-user',
   guild = '-guild',
-  iterationsCacher = '-iterationsCacher',
+  executionsCacher = '-executionsCacher',
+}
+
+export enum CacheTts {
+  default = 30 * 60 * 1000,
+  executionsCacher = 2 * 60 * 1000,
 }
 
 export const Errors = Object.freeze({
