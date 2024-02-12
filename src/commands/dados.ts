@@ -1,9 +1,6 @@
 import type { MySlashCommand } from '../types';
 import { SlashCommandBuilder } from 'discord.js';
-import { setTimeout } from 'node:timers/promises';
 import utils from '../lib/Utils';
-
-const sleep = setTimeout;
 
 export default {
   data: new SlashCommandBuilder()
@@ -45,11 +42,11 @@ export default {
     const Dado2 = Math.floor(Math.random() * 6) + 1; // El Dado de la PC
 
     await say('Tirando los dados.');
-    await sleep(500);
+    await utils.sleep(500);
     await say('Tirando los dados..', 0);
-    await sleep(500);
+    await utils.sleep(500);
     await say('Tirando los dados...', 0);
-    await sleep(500);
+    await utils.sleep(500);
 
     await say(
       `El dado de | ${interaction.member?.user?.username} | : ${Dado1}\nMi Turno Bro`,
@@ -57,17 +54,17 @@ export default {
     );
 
     await say('Tirando los dados.', 1);
-    await sleep(500);
+    await utils.sleep(500);
     await say('Tirando los dados..', 1);
-    await sleep(500);
+    await utils.sleep(500);
     await say('Tirando los dados...', 1);
-    await sleep(500);
+    await utils.sleep(500);
 
     await say(
       `El dado de | CHESTER EL BOT | : ${Dado2}\nResultados Finales`,
       1
     );
-    await sleep(500);
+    await utils.sleep(500);
 
     // RESULTADOS FINALES
     if (Dado1 > Dado2) {

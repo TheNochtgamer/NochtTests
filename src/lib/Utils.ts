@@ -28,8 +28,11 @@ import {
 import { CachePointers, CacheTts } from './Enums';
 import { bot } from '../index';
 import cacheMe from '../services/cacheMe';
+import { setTimeout } from 'node:timers/promises';
 
 class Utils {
+  public sleep = setTimeout;
+
   constructor() {
     Object.keys(this).forEach((key: string) => {
       // @ts-expect-error Proteccion OPCIONAL del objeto ante cualquier modificacion externa, el copilador reconoce this como any
