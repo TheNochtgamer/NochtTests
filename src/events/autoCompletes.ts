@@ -1,7 +1,9 @@
+import Utils from '../lib/Utils';
 import type { MyBotEvent } from '../types';
 
 const _pref = '(autoCompletes())';
 
+// EVENTO PARA CUANDO SE EJECUTA UN AUTOCOMPLETE
 export default {
   name: 'interactionCreate',
 
@@ -10,7 +12,18 @@ export default {
     const client = interaction.client;
     const command = client.commands.get(interaction.commandName);
 
-    if (interaction.responded || !command?.autoComplete) return;
+    // TODO Añadir que revise los permisos del usuario
+
+    if (interaction.responded) return;
+    if (!command?.autoComplete) {
+      console.log(_pref, 'executed');
+      if (Utils.everyXExecutions('autoCompleteSpam', 3))
+        console.log(
+          _pref,
+          `Se intento utilizar el autoComplete del comando ${interaction.commandName} pero no se detecto`
+        );
+      return;
+    }
 
     try {
       const res = await command.autoComplete(interaction);

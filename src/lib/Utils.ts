@@ -25,7 +25,7 @@ import {
   type Message,
   type InteractionResponse,
 } from 'discord.js';
-import { CachePointers } from './Enums';
+import { CachePointers, CacheTts } from './Enums';
 import { bot } from '../index';
 import cacheMe from '../services/cacheMe';
 
@@ -471,11 +471,11 @@ class Utils {
   /**
    * Envia una simple solicitud de confirmacion
    *
-   * devuelve 0 si fue aceptada
+   * @returns 0 si fue aceptada
    *
-   * devuelve 1 si fue rechazada
+   * @returns 1 si fue rechazada
    *
-   * devuelve 2 si se acabo el tiempo de respuesta
+   * @returns 2 si se acabo el tiempo de respuesta
    */
   public async confirmationForm(
     interaction:
@@ -521,27 +521,36 @@ class Utils {
   /**
    * Obtiene un elemento random del array enviado
    *
-   * si esta vacio, devuelve undefined
+   * @returns devuelve un elemento al azar del array, si esta vacio, devuelve undefined
    */
   public arrayRandom<T>(array: T[]): T | undefined {
     if (array.length === 0) return;
     return array[Math.floor(Math.random() * array.length)];
   }
 
+  /**
+   * Utilidad para limitar la cantidad de veces que se debe ejecutar un codigo cada tantas iteraciones
+   *
+   * @param identifier identificador para el cache
+   * @param maxExecutions limite de iteraciones para que se deba ejecutar el codigo
+   * @returns devuelve true en el caso de que la ejecuciones lleguen al limite establecido o sea la primer iteracion
+   */
   public everyXExecutions(identifier: string, maxExecutions: number): boolean {
     const existingExecutions = cacheMe.get(
-      identifier + CachePointers.iterationsCacher
+      identifier + CachePointers.executionsCacher
     ) as number | undefined;
 
     const count = existingExecutions ?? 0;
 
-    cacheMe.set(identifier + CachePointers.iterationsCacher, count + 1, {
-      ttl: 2 * 1000,
+    cacheMe.set(identifier + CachePointers.executionsCacher, count + 1, {
+      ttl: CacheTts.executionsCacher,
     });
 
+    if (existingExecutions === undefined) return true;
+
     if (count >= maxExecutions) {
-      cacheMe.set(identifier + CachePointers.iterationsCacher, 0, {
-        ttl: 2 * 1000,
+      cacheMe.set(identifier + CachePointers.executionsCacher, 0, {
+        ttl: CacheTts.executionsCacher,
       });
       return true;
     }
