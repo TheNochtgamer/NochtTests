@@ -9,21 +9,25 @@ export default {
 
   async run(interaction) {
     const FrasesDeVictoria = [
-      'Sos un capo sabelo',
-      'Se te cayo la corona rey',
-      'Quiero se como vos cuando sea humano',
-      'Sos un grande pa',
-      'VIVA CRISTO REY',
+      ' Sos un capo sabelo ',
+      ' Se te cayo la corona rey ',
+      ' Quiero se como vos cuando sea humano ',
+      ' Sos un grande pa ',
+      ' VIVA CRISTO REY ',
+      ' Sos messi!! ',
+      ' BRAVO LEONELLL ',
     ];
     const FrasesDeDerrota = [
-      'Sos un pete',
-      '*Se ahoga con su baba y muere*',
-      '*Un pajaro te picotea el pito*',
-      'Taradini',
-      'Se me acabaron los bardeos',
-      '*Se cae a un poso por boludo*',
+      ' Sos un pete ',
+      ' *Se ahoga con su baba y muere* ',
+      ' *Un pajaro te picotea el pito* ',
+      ' Taradini ',
+      ' Se me acabaron los bardeos ',
+      ' *Se cae a un poso por boludo* ',
+      '*Pitochu te electrocuta y mueres* '
     ];
     const log: string[] = [];
+
     const say = async (str = '', replaceLine = -1): Promise<void> => {
       if (replaceLine > -1 && replaceLine < log.length) {
         log[replaceLine] = str;
@@ -66,30 +70,30 @@ export default {
     );
     await utils.sleep(500);
 
-    // RESULTADOS FINALES
+///===RESULTADOS FINALES===///
     if (Dado1 > Dado2) {
       await say(
-        'Ganaste' +
+        'Ganaste: ' +
           interaction.member?.user?.username +
           ' ' +
           utils.arrayRandom(FrasesDeVictoria)
       );
       await say(
-        'Perdiste' + 'CHESTER EL BOT' + ' ' + utils.arrayRandom(FrasesDeDerrota)
+        'Perdiste: ' + ' CHESTER EL BOT ' + '  ' + utils.arrayRandom(FrasesDeDerrota)
       );
     } else if (Dado1 < Dado2) {
       await say(
-        'Perdiste' +
+        'Perdiste: ' +
           interaction.member?.user?.username +
           ' ' +
           utils.arrayRandom(FrasesDeDerrota)
       );
       await say(
-        'Ganaste' + 'CHESTER EL BOT' + ' ' + utils.arrayRandom(FrasesDeVictoria)
+        'Ganaste: ' + ' CHESTER EL BOT ' + '  ' + utils.arrayRandom(FrasesDeVictoria)
       );
     } else {
       await say(
-        'Nose como pero ambos perdieron, y ganaron a la vez, deberian revisar este error los programadores :/'
+        'Nose como, pero ambos perdieron y ganaron a la vez, deberian revisar este error los programadores :/'
       );
     }
   },
