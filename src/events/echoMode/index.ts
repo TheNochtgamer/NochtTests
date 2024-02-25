@@ -1,4 +1,4 @@
-import type { MyBotEvent } from '../../types';
+import type { IMyBotEvent } from '../../types';
 import UsersManager from '../../services/UsersManager';
 
 // EVENTO PARA EL MODO ECO
@@ -22,4 +22,4 @@ export default {
       console.log(error);
     }
   },
-} satisfies MyBotEvent<'messageCreate'>;
+} satisfies IMyBotEvent<'messageCreate'>;

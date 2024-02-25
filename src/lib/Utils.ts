@@ -1,10 +1,10 @@
 import type {
-  MySlashCommand,
-  RateLimit,
+  IMySlashCommand,
+  IRateLimit,
   MyEmbedData,
   UserData,
   GuildData,
-  DisabledCommand,
+  IDisabledCommand,
   Bot,
 } from '../types';
 import path from 'path';
@@ -352,7 +352,7 @@ class Utils {
     const rateLimit =
       // this.rateLimits.get(identifier);
       cacheMe.get(identifier + CachePointers.rateLimit) as
-        | RateLimit
+        | IRateLimit
         | undefined;
 
     if (
@@ -367,15 +367,15 @@ class Utils {
       {
         lastTick: now,
         uses,
-      } satisfies RateLimit,
+      } satisfies IRateLimit,
       { ttl: cooldown }
     );
     return false;
   }
 
-  getRateLimit(identifier: string): RateLimit | undefined {
+  getRateLimit(identifier: string): IRateLimit | undefined {
     return cacheMe.get(identifier + CachePointers.rateLimit) as
-      | RateLimit
+      | IRateLimit
       | undefined;
   }
 
@@ -392,7 +392,7 @@ class Utils {
    */
   async authorizationCheck(
     interaction: CommandInteraction,
-    command: MySlashCommand
+    command: IMySlashCommand
   ): Promise<0 | 1> {
     // TODO Reworkear el sistema para que tambien tome en cuenta los permisos de discord con respecto a los slash
     if (this.checkBotDev(interaction.user.id)) return 1;
@@ -448,7 +448,7 @@ class Utils {
     commandName: string,
     userData?: UserData,
     guildData?: GuildData
-  ): null | { type: 'user' | 'guild' | 'global'; disabled: DisabledCommand } {
+  ): null | { type: 'user' | 'guild' | 'global'; disabled: IDisabledCommand } {
     let disabledCommand = bot.settings.disabledCommands.find(
       cmd => cmd.name === commandName
     );

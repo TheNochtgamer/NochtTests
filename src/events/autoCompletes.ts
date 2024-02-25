@@ -1,5 +1,5 @@
+import type { IMyBotEvent } from '../types';
 import Utils from '../lib/Utils';
-import type { MyBotEvent } from '../types';
 
 const _pref = '(autoCompletes())';
 
@@ -37,4 +37,4 @@ export default {
       );
     }
   },
-} satisfies MyBotEvent<'interactionCreate'>;
+} satisfies IMyBotEvent<'interactionCreate'>;

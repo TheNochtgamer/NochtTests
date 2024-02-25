@@ -1,4 +1,4 @@
-import type { MySlashSubCommand } from '../../types';
+import type { IMySlashSubCommand } from '../../types';
 import { CommandInteraction, SlashCommandSubcommandBuilder } from 'discord.js';
 import utils from '../../lib/Utils';
 
@@ -11,10 +11,10 @@ export default {
         .setName('link')
         .setDescription('Url del clip')
         .setAutocomplete(true)
-        .setRequired(true),
+        .setRequired(true)
     ),
 
   async run(interaction) {
     const link = interaction.options.get('link', true).value as string;
   },
-} satisfies MySlashSubCommand;
+} satisfies IMySlashSubCommand;

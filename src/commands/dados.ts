@@ -1,4 +1,4 @@
-import type { MySlashCommand } from '../types';
+import type { IMySlashCommand } from '../types';
 import { SlashCommandBuilder } from 'discord.js';
 import utils from '../lib/Utils';
 
@@ -24,7 +24,7 @@ export default {
       ' Taradini ',
       ' Se me acabaron los bardeos ',
       ' *Se cae a un poso por boludo* ',
-      '*Pitochu te electrocuta y mueres* '
+      '*Pitochu te electrocuta y mueres* ',
     ];
     const log: string[] = [];
 
@@ -70,7 +70,7 @@ export default {
     );
     await utils.sleep(500);
 
-///===RESULTADOS FINALES===///
+    ///===RESULTADOS FINALES===///
     if (Dado1 > Dado2) {
       await say(
         'Ganaste: ' +
@@ -79,7 +79,10 @@ export default {
           utils.arrayRandom(FrasesDeVictoria)
       );
       await say(
-        'Perdiste: ' + ' CHESTER EL BOT ' + '  ' + utils.arrayRandom(FrasesDeDerrota)
+        'Perdiste: ' +
+          ' CHESTER EL BOT ' +
+          '  ' +
+          utils.arrayRandom(FrasesDeDerrota)
       );
     } else if (Dado1 < Dado2) {
       await say(
@@ -89,7 +92,10 @@ export default {
           utils.arrayRandom(FrasesDeDerrota)
       );
       await say(
-        'Ganaste: ' + ' CHESTER EL BOT ' + '  ' + utils.arrayRandom(FrasesDeVictoria)
+        'Ganaste: ' +
+          ' CHESTER EL BOT ' +
+          '  ' +
+          utils.arrayRandom(FrasesDeVictoria)
       );
     } else {
       await say(
@@ -97,4 +103,4 @@ export default {
       );
     }
   },
-} satisfies MySlashCommand;
+} satisfies IMySlashCommand;

@@ -1,4 +1,4 @@
-import type { MySlashCommand } from '../types';
+import type { IMySlashCommand } from '../types';
 import { SlashCommandBuilder } from 'discord.js';
 
 export default {
@@ -15,4 +15,4 @@ export default {
       content: `Pong! ${interaction.client.ws.ping}ms`,
     });
   },
-} satisfies MySlashCommand;
+} satisfies IMySlashCommand;

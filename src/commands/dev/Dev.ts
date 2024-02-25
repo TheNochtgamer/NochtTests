@@ -1,12 +1,12 @@
 import { SlashCommandBuilder } from 'discord.js';
-import type { MySlashCommand, MySlashSubCommand } from '../../types';
+import type { IMySlashCommand, IMySlashSubCommand } from '../../types';
 // import utils from '../../lib/Utils';
 //
 import evaluate from './eval';
 import reload from './reload';
 import cmdtoggle from './cmdtoggle';
 
-const subs = new Map<string, MySlashSubCommand>([
+const subs = new Map<string, IMySlashSubCommand>([
   ['eval', evaluate],
   ['reloadall', reload],
   ['cmdtoggle', cmdtoggle],
@@ -43,4 +43,4 @@ export default {
 
     await subs.get(subCommand)?.run(interaction);
   },
-} satisfies MySlashCommand;
+} satisfies IMySlashCommand;

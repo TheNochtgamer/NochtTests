@@ -1,11 +1,11 @@
-import type { MyBotEvent, MySlashCommand } from '../../types';
+import type { IMyBotEvent, IMySlashCommand } from '../../types';
 // import type { ClientOptions } from 'discord.js';
 import utils from '../Utils';
 import { Client, Collection } from 'discord.js';
 import BotSettings from './BotSettings';
 
 export default class Bot extends Client {
-  public commands = new Collection<string, MySlashCommand>();
+  public commands = new Collection<string, IMySlashCommand>();
   public settings = new BotSettings();
 
   // constructor(options: ClientOptions) {
@@ -26,7 +26,7 @@ export default class Bot extends Client {
     let success = 0;
     for (const commandFile of FILES) {
       try {
-        const { default: command }: { default: MySlashCommand } = await import(
+        const { default: command }: { default: IMySlashCommand } = await import(
           commandFile
         );
         this.commands.set(command.data.name, command);
@@ -57,7 +57,7 @@ export default class Bot extends Client {
     let success = 0;
     for (const eventFile of FILES) {
       try {
-        const { default: event }: { default: MyBotEvent<any> } = await import(
+        const { default: event }: { default: IMyBotEvent<any> } = await import(
           eventFile
         );
         if (event.name === 'ready' || event.once) {

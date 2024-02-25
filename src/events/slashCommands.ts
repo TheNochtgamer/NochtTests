@@ -1,4 +1,4 @@
-import type { MyBotEvent } from '../types';
+import type { IMyBotEvent } from '../types';
 import { Embeds } from '../lib/Enums';
 import utils from '../lib/Utils';
 import UsersManager from '../services/UsersManager';
@@ -162,4 +162,4 @@ export default {
       } catch (error) {}
     }
   },
-} satisfies MyBotEvent<'interactionCreate'>;
+} satisfies IMyBotEvent<'interactionCreate'>;

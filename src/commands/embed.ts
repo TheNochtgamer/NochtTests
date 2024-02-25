@@ -1,4 +1,4 @@
-import type { MySlashCommand } from '../types';
+import type { IMySlashCommand } from '../types';
 import {
   ChannelType,
   type ColorResolvable,
@@ -20,46 +20,46 @@ export default {
           option
             .setName('edit')
             .setDescription('Link o id del embed que quieras editar')
-            .setMinLength(16),
+            .setMinLength(16)
         )
         .addChannelOption(option =>
           option
             .setName('channel')
-            .setDescription('Canal donde enviar el embed'),
+            .setDescription('Canal donde enviar el embed')
         )
         .addStringOption(option =>
           option
             .setName('asyou')
             .setDescription(
-              'Envia el embed utilizando tu nombre como autor (*No)',
+              'Envia el embed utilizando tu nombre como autor (*No)'
             )
             .setChoices(
               { name: 'Si', value: 'true' },
-              { name: 'No', value: 'false' },
-            ),
+              { name: 'No', value: 'false' }
+            )
         )
         .addStringOption(option =>
-          option.setName('title').setDescription('Titulo del embed'),
+          option.setName('title').setDescription('Titulo del embed')
         )
         .addStringOption(option =>
-          option.setName('description').setDescription('Descripcion del embed'),
+          option.setName('description').setDescription('Descripcion del embed')
         )
         .addStringOption(option =>
           option
             .setName('color')
             .setDescription('Color del embed en exadecimal (ffffff)')
             .setMinLength(6)
-            .setMaxLength(6),
+            .setMaxLength(6)
         )
         .addStringOption(option =>
-          option.setName('imageurl').setDescription('Url imagen del embed'),
+          option.setName('imageurl').setDescription('Url imagen del embed')
         )
         .addStringOption(option =>
-          option.setName('footer').setDescription('Footer del embed'),
+          option.setName('footer').setDescription('Footer del embed')
         )
         .addStringOption(option =>
-          option.setName('author').setDescription('Autor del embed'),
-        ),
+          option.setName('author').setDescription('Autor del embed')
+        )
     )
     .addSubcommand(sub =>
       sub
@@ -69,30 +69,30 @@ export default {
           option
             .setName('data')
             .setDescription('Json del embed')
-            .setRequired(true),
+            .setRequired(true)
         )
         .addChannelOption(option =>
           option
             .setName('channel')
-            .setDescription('Canal donde enviar el embed'),
+            .setDescription('Canal donde enviar el embed')
         )
         .addStringOption(option =>
           option
             .setName('asyou')
             .setDescription(
-              'Envia el embed utilizando tu nombre como autor (*No)',
+              'Envia el embed utilizando tu nombre como autor (*No)'
             )
             .setChoices(
               { name: 'Si', value: 'true' },
-              { name: 'No', value: 'false' },
-            ),
+              { name: 'No', value: 'false' }
+            )
         )
         .addStringOption(option =>
           option
             .setName('edit')
             .setDescription('Link o id del embed que quieras editar')
-            .setMinLength(16),
-        ),
+            .setMinLength(16)
+        )
     ),
   async run(interaction) {
     const subcommand = interaction.options.getSubcommand();
@@ -249,4 +249,4 @@ export default {
         break;
     }
   },
-} satisfies MySlashCommand;
+} satisfies IMySlashCommand;

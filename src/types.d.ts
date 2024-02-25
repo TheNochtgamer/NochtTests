@@ -15,7 +15,7 @@ declare type MyEmbedData = Omit<EmbedData, 'color'> & {
   color: ColorResolvable | number;
 };
 
-declare interface RateLimit {
+declare interface IRateLimit {
   lastTick: Date;
   uses: number;
 }
@@ -23,13 +23,13 @@ declare interface RateLimit {
 /**
  * La interfaz de los eventos del bot para agregar argumentos custom cada de ser necesario
  */
-declare interface MyClientEvents extends ClientEvents {
+declare interface IMyClientEvents extends ClientEvents {
   ready: [client: Bot];
   interactionCreate: [ClientEvents['interactionCreate'][0] & { client: Bot }];
   messageCreate: [ClientEvents['messageCreate'][0] & { client: Bot }];
 }
 
-declare interface MyBotEvent<E extends keyof ClientEvents> {
+declare interface IMyBotEvent<E extends keyof ClientEvents> {
   name: E;
 
   /**
@@ -40,10 +40,10 @@ declare interface MyBotEvent<E extends keyof ClientEvents> {
   /**
    * La funcion principal del evento
    */
-  run: (...args: MyClientEvents[E]) => void | Promise<void>;
+  run: (...args: IMyClientEvents[E]) => void | Promise<void>;
 }
 
-declare interface MySlashCommand {
+declare interface IMySlashCommand {
   /**
    * Lista de ids de roles requeridos para utilizar el comando
    */
@@ -122,7 +122,7 @@ declare interface MySlashCommand {
   ) => void | Promise<void>;
 }
 
-declare interface MySlashSubCommand {
+declare interface IMySlashSubCommand {
   /**
    * Los datos del comando a cargar a discord
    */
@@ -147,7 +147,7 @@ declare interface MySlashSubCommand {
   ) => void | Promise<void>;
 }
 
-declare interface DisabledCommand {
+declare interface IDisabledCommand {
   /**
    * El nombre del comando
    */

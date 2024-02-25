@@ -1,10 +1,10 @@
-import type { DisabledCommand } from '../../types';
+import type { IDisabledCommand } from '../../types';
 
 export default class GuildData {
   // data
   public readonly id: string;
   public prefix: string = '>';
-  public disabledCommands: DisabledCommand[] = [];
+  public disabledCommands: IDisabledCommand[] = [];
 
   // experimental
 

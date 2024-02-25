@@ -1,4 +1,4 @@
-import type { MySlashCommand } from '../types';
+import type { IMySlashCommand } from '../types';
 import {
   type ApplicationCommandSubCommand,
   EmbedBuilder,
@@ -42,7 +42,7 @@ export default {
     const str = filteredCommands
       .map(command => {
         const subs = command.options.filter(
-          opt => opt.type === 1,
+          opt => opt.type === 1
         ) as unknown as ApplicationCommandSubCommand[];
 
         return subs.length
@@ -52,15 +52,15 @@ export default {
                   `> </${command.name} ${sub.name}:${command.id}> ${
                     sub.options
                       ?.map(opt =>
-                        opt.required ? `<${opt.name}>` : `[${opt.name}]`,
+                        opt.required ? `<${opt.name}>` : `[${opt.name}]`
                       )
                       ?.join(' ') ?? ''
-                  } -- ${sub.description}`,
+                  } -- ${sub.description}`
               )
               .join('\n')
           : `> </${command.name}:${command.id}> ${command.options
               .map((opt: any) =>
-                opt.required ? `<${opt.name}>` : `[${opt.name}]`,
+                opt.required ? `<${opt.name}>` : `[${opt.name}]`
               )
               .join(' ')} -- ${command.description}`;
       })
@@ -73,4 +73,4 @@ export default {
     // });
     void utils.embedReply(interaction, embed);
   },
-} satisfies MySlashCommand;
+} satisfies IMySlashCommand;

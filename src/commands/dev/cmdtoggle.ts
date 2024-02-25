@@ -1,4 +1,4 @@
-import type { DisabledCommand, MySlashSubCommand } from '../../types';
+import type { IDisabledCommand, IMySlashSubCommand } from '../../types';
 import { SlashCommandSubcommandBuilder } from 'discord.js';
 import utils from '../../lib/Utils';
 import usersManager from '../../services/UsersManager';
@@ -102,7 +102,7 @@ export default {
         dC.push({
           name: commandName,
           reason,
-        } satisfies DisabledCommand);
+        } satisfies IDisabledCommand);
 
         await interaction.reply({
           content: `El comando \`${commandName}\` ha sido deshabilitado para el usuario <@${id}>`,
@@ -131,7 +131,7 @@ export default {
         dC.push({
           name: commandName,
           reason,
-        } satisfies DisabledCommand);
+        } satisfies IDisabledCommand);
 
         await interaction.reply({
           content: `El comando \`${commandName}\` ha sido deshabilitado en el servidor <@${id}>`,
@@ -158,7 +158,7 @@ export default {
         dC.push({
           name: commandName,
           reason,
-        } satisfies DisabledCommand);
+        } satisfies IDisabledCommand);
 
         await interaction.reply({
           content: `El comando \`${commandName}\` ha sido deshabilitado en el contexto global`,
@@ -169,4 +169,4 @@ export default {
       }
     }
   },
-} satisfies MySlashSubCommand;
+} satisfies IMySlashSubCommand;

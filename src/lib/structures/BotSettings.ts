@@ -1,8 +1,8 @@
-import type { DisabledCommand } from '../../types';
+import type { IDisabledCommand } from '../../types';
 
 export default class BotSettings {
   // data
-  public disabledCommands: DisabledCommand[] = [];
+  public disabledCommands: IDisabledCommand[] = [];
   // experimental
 
   // constructor() {}

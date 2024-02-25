@@ -1,4 +1,4 @@
-import type { MySlashCommand } from '../types';
+import type { IMySlashCommand } from '../types';
 import UsersManager from '../services/UsersManager';
 import { SlashCommandBuilder } from 'discord.js';
 
@@ -17,4 +17,4 @@ export default {
       content: `Modo eco ${userData.echo ? 'activado' : 'desactivado'}`,
     });
   },
-} satisfies MySlashCommand;
+} satisfies IMySlashCommand;

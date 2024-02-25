@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import type { MySlashSubCommand } from '../../types';
+import type { IMySlashSubCommand } from '../../types';
 import { SlashCommandSubcommandBuilder } from 'discord.js';
 import utils from '../../lib/Utils';
 
@@ -64,4 +64,4 @@ export default {
 
     console.log(`${interaction.user.username} termino de ejecutar codigo.`);
   },
-} satisfies MySlashSubCommand;
+} satisfies IMySlashSubCommand;

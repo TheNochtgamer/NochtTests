@@ -1,5 +1,5 @@
 import LobbiesManager from '../../services/LobbiesManager';
-import type { MySlashCommand } from '../../types';
+import type { IMySlashCommand } from '../../types';
 import { SlashCommandBuilder } from 'discord.js';
 // import utils from '../lib/Utils';
 
@@ -52,4 +52,4 @@ export default {
         break;
     }
   },
-} satisfies MySlashCommand;
+} satisfies IMySlashCommand;

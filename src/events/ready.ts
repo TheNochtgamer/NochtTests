@@ -1,4 +1,4 @@
-import type { MyBotEvent } from '../types';
+import type { IMyBotEvent } from '../types';
 import utils from '../lib/Utils';
 
 // EVENTO DEL BOT READY
@@ -11,10 +11,10 @@ export default {
       client.user?.username,
       'a disponibilidad de',
       client.guilds.cache.size,
-      'servidores.',
+      'servidores.'
     );
 
     if ((await utils.checkSyncedCommands(client)) > 0) return;
     void utils.summitCommands(client);
   },
-} satisfies MyBotEvent<'ready'>;
+} satisfies IMyBotEvent<'ready'>;
