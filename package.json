@@ -17,8 +17,8 @@
     "node": ">20.0.0"
   },
   "dependencies": {
-    "discord.js": "14.14.1",
     "axios": "*",
+    "discord.js": "14.15.2",
     "dotenv": "*",
     "lru-cache": "*",
     "mysql2": "*",

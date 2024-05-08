@@ -3,3 +3,4 @@
 /dist
 *.n.*
 *.env
+pnpm-lock.yaml
