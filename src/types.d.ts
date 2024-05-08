@@ -88,20 +88,21 @@ declare interface IMySlashCommand {
    * Los datos del comando a cargar a discord
    */
   data:
-    | Discord.SlashCommandBuilder
-    | Omit<
-        Discord.SlashCommandBuilder,
-        | 'addBooleanOption'
-        | 'addUserOption'
-        | 'addChannelOption'
-        | 'addRoleOption'
-        | 'addAttachmentOption'
-        | 'addMentionableOption'
-        | 'addStringOption'
-        | 'addIntegerOption'
-        | 'addNumberOption'
-      >
-    | Omit<Discord.SlashCommandBuilder, 'addSubcommand' | 'addSubcommandGroup'>;
+    | Discord.SlashCommandOptionsOnlyBuilder
+    | Discord.SlashCommandSubcommandsOnlyBuilder;
+  // | Omit<
+  //     Discord.SlashCommandBuilder,
+  //     | 'addBooleanOption'
+  //     | 'addUserOption'
+  //     | 'addChannelOption'
+  //     | 'addRoleOption'
+  //     | 'addAttachmentOption'
+  //     | 'addMentionableOption'
+  //     | 'addStringOption'
+  //     | 'addIntegerOption'
+  //     | 'addNumberOption'
+  //   >
+  // | Omit<Discord.SlashCommandBuilder, 'addSubcommand' | 'addSubcommandGroup'>;
 
   /**
    * La function que se ejecuta al necesitar auto completar una opcion del comando
