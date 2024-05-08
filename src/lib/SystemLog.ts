@@ -15,5 +15,4 @@ const configureLog = (): void => {
     log(now, ...args);
   };
 };
-
-export default configureLog;
+configureLog();
