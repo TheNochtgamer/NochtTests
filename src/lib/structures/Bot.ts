@@ -3,6 +3,9 @@ import type { IMyBotEvent, IMySlashCommand } from '../../types';
 import utils from '../Utils';
 import { Client, Collection } from 'discord.js';
 import BotSettings from './BotSettings';
+import SystemLog from './SystemLog';
+
+const logger = new SystemLog('lib', 'structures', 'Bot');
 
 export default class Bot extends Client {
   public commands = new Collection<string, IMySlashCommand>();
@@ -13,13 +16,11 @@ export default class Bot extends Client {
   // }
 
   async loadCommands(reload = false): Promise<void> {
-    const _pref = '(loadCommands())';
-
     if (reload) {
-      console.log(_pref, 'Purgando comandos...');
+      logger.log('loadCommands', 'Purgando comandos...');
       await utils.refreshCachedFiles('commands');
     }
-    console.log(_pref, 'Cargando comandos...');
+    logger.log('loadCommands', 'Cargando comandos...');
     const FILES = await utils.obtainMyFiles('commands');
     this.commands.clear();
 
@@ -32,25 +33,26 @@ export default class Bot extends Client {
         this.commands.set(command.data.name, command);
         success++;
       } catch (error) {
-        console.log(
-          _pref,
+        logger.error(
+          'loadCommands',
           `Error al cargar el comando "${commandFile}"`,
           error
         );
       }
     }
 
-    console.log(_pref, `${success}/${FILES.length} comandos cargados`);
+    logger.log(
+      'loadCommands',
+      `[${success}/${FILES.length}] comandos cargados`
+    );
   }
 
   async loadEvents(reload = false): Promise<void> {
-    const _pref = '(loadEvents())';
-
     if (reload) {
-      console.log(_pref, 'Purgando eventos...');
+      logger.log('loadEvents', 'Purgando eventos...');
       await utils.refreshCachedFiles('events');
     }
-    console.log(_pref, 'Cargando eventos...');
+    logger.log('loadEvents', 'Cargando eventos...');
     const FILES = await utils.obtainMyFiles('events');
     this.removeAllListeners();
 
@@ -67,20 +69,24 @@ export default class Bot extends Client {
         }
         success++;
       } catch (error) {
-        console.log(_pref, `Error al cargar el evento "${eventFile}"`, error);
+        logger.error(
+          'loadEvents',
+          `Error al cargar el evento "${eventFile}"`,
+          error
+        );
       }
     }
 
-    console.log(_pref, `${success}/${FILES.length} eventos cargados`);
+    logger.log('loadEvents', `[${success}/${FILES.length}] eventos cargados`);
   }
 
   async init(token: string): Promise<void> {
-    const _pref = '(init())';
-
     if (this.user?.id) return;
     await Promise.all([this.loadEvents(), this.loadCommands()]);
 
-    console.log(_pref, 'Login in...');
+    // console.log(['lib', 'structures', 'bot'], 'Login in...');
+    logger.log('init', 'Login in...');
+
     await this.login(token);
   }
 }

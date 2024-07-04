@@ -31,6 +31,9 @@ import { CachePointers, CacheTts } from './Enums';
 import { bot } from '../index';
 import cacheMe from '../services/cacheMe';
 import { setTimeout } from 'node:timers/promises';
+import SystemLog from './structures/SystemLog';
+
+const logger = new SystemLog('lib', 'Utils');
 
 class Utils {
   public sleep = setTimeout;
@@ -59,26 +62,17 @@ class Utils {
     return process.env.BOT_OWNERS?.includes(id) ?? false;
   }
 
-  // async loadFiles(dirName = ''): Promise<string[]> {
-  //   const PATH = path.join(__dirname, '../', dirName);
-  //   const FILES = fs
-  //     .readdirSync(PATH)
-  //     .filter(f => f.endsWith('.js') || f.endsWith('.ts'))
-  //     .map(f => path.join(PATH, f));
-
-  //   if (!!require) FILES.forEach(f => delete require.cache[require.resolve(f)]);
-
-  //   return FILES;
-  // }
-
   private obtainModules(): string[] {
     const PATH = path.join(__dirname, '../', 'modules');
-    const modules = fs
-      .readdirSync(PATH, {
-        withFileTypes: true,
-      })
-      .filter(f => f.isDirectory())
-      .map(f => path.join(PATH, f.name));
+    const modules = [
+      path.join(PATH, 'init'),
+      fs
+        .readdirSync(PATH, {
+          withFileTypes: true,
+        })
+        .filter(f => f.isDirectory())
+        .map(f => path.join(PATH, f.name)),
+    ].flat();
 
     return modules;
   }
@@ -94,7 +88,9 @@ class Utils {
 
     // Itera todas las carpetas de modulos y busca los archivos dentro de searchDirName, obtiene los archivos y los filtra, permitiendo la existencia de un 'comando' en archivo o carpeta. Pero de todas formas mapea todo en archivos consecutivos
     const totalFiles = modules.flatMap(moduleDir => {
-      const PATH = path.join(__dirname, '../', moduleDir, searchDirName);
+      const PATH = path.join(moduleDir, searchDirName);
+
+      if (!fs.existsSync(PATH)) return [];
 
       const files = fs
         .readdirSync(PATH, {
@@ -141,13 +137,11 @@ class Utils {
     client: Bot,
     guildId = process.env.GUILDID
   ): Promise<void> {
-    const _pref = '(summitCommands())';
-
     if (!client.commands.size) return;
     let cmds = null;
 
-    console.log(
-      _pref,
+    logger.log(
+      'summitCommands',
       `Subiendo comandos${guildId ? ` (en el guild: ${guildId})` : ''}...`
     );
     try {
@@ -172,10 +166,10 @@ class Utils {
       // }
       if (!cmds) throw new Error('No se subio ningun comando');
     } catch (error) {
-      console.log(_pref, 'Error al intentar subir los comandos', error);
+      logger.error('summitCommands', 'Error al intentar subir los comandos');
       return;
     }
-    console.log(_pref, `${cmds.size} comandos subidos`);
+    logger.log('summitCommands', `${cmds.size} comandos subidos`);
   }
 
   /**

@@ -1,12 +1,16 @@
 import type { IMyBotEvent } from '../../../types';
 import utils from '../../../lib/Utils';
+import SystemLog from '../../../lib/structures/SystemLog';
+
+const logger = new SystemLog('modules', 'init', 'events', 'ready');
 
 // EVENTO DEL BOT READY
 export default {
   name: 'ready',
 
   async run(client) {
-    console.log(
+    logger.log(
+      'run',
       'Bot online como',
       client.user?.username,
       'a disponibilidad de',

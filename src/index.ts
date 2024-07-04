@@ -1,7 +1,9 @@
 import 'dotenv/config';
-import './lib/SystemLog';
 import Bot from './lib/structures/Bot';
 import { IntentsBitField, Partials, PresenceUpdateStatus } from 'discord.js';
+import SystemLog from './lib/structures/SystemLog';
+
+const logger = new SystemLog('index');
 
 export const bot = new Bot({
   intents: [
@@ -20,9 +22,9 @@ export const bot = new Bot({
 
 if (process.env.NODE_ENV === 'production') {
   process.on('unhandledRejection', err => {
-    console.error(err);
+    logger.error('errorHandling', err);
   });
   process.on('uncaughtException', err => {
-    console.error(err);
+    logger.error('errorHandling', err);
   });
 }

@@ -1,4 +1,4 @@
-import type { IMySlashCommand } from '../../../types';
+import type { IMySlashCommand } from '../../../../types';
 import { SlashCommandBuilder } from 'discord.js';
 // import streampreview from './streampreview';
 

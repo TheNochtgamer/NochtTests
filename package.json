@@ -16,13 +16,6 @@
   "engines": {
     "node": ">20.0.0"
   },
-  "_moduleAliases": {
-    "@": "./src",
-    "@commands": "./src/commands",
-    "@events": "./src/events",
-    "@lib": "./src/lib",
-    "@services": "./src/services"
-  },
   "dependencies": {
     "axios": "*",
     "discord.js": "14.15.2",
