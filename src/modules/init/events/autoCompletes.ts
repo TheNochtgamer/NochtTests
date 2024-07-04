@@ -1,5 +1,5 @@
-import type { IMyBotEvent } from '../types';
-import Utils from '../lib/Utils';
+import type { IMyBotEvent } from '../../../types';
+import Utils from '../../../lib/Utils';
 
 const _pref = '(autoCompletes())';
 

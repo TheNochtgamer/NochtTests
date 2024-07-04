@@ -1,6 +1,6 @@
-import type { IMySlashSubCommand } from '../../types';
+import type { IMySlashSubCommand } from '../../../types';
 import { SlashCommandSubcommandBuilder } from 'discord.js';
-import utils from '../../lib/Utils';
+import utils from '../../../lib/Utils';
 
 export default {
   data: new SlashCommandSubcommandBuilder()

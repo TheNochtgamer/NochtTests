@@ -1,8 +1,8 @@
-import type { IMyBotEvent } from '../types';
-import { Embeds } from '../lib/Enums';
-import utils from '../lib/Utils';
-import UsersManager from '../services/UsersManager';
-import GuildsManager from '../services/GuildsManager';
+import type { IMyBotEvent } from '../../../types';
+import { Embeds } from '../../../lib/Enums';
+import utils from '../../../lib/Utils';
+import UsersManager from '../../../services/UsersManager';
+import GuildsManager from '../../../services/GuildsManager';
 
 const _pref = '(slashCommands())';
 

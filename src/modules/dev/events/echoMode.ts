@@ -1,5 +1,5 @@
-import type { IMyBotEvent } from '../../types';
-import UsersManager from '../../services/UsersManager';
+import type { IMyBotEvent } from '../../../types';
+import UsersManager from '../../../services/UsersManager';
 
 // EVENTO PARA EL MODO ECO
 export default {

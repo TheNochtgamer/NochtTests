@@ -1,5 +1,5 @@
-import type { IMySlashCommand } from '../types';
-import UsersManager from '../services/UsersManager';
+import type { IMySlashCommand } from '../../../types';
+import UsersManager from '../../../services/UsersManager';
 import { SlashCommandBuilder } from 'discord.js';
 
 export default {

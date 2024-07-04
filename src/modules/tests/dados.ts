@@ -1,6 +1,6 @@
-import type { IMySlashCommand, MyChatInteraction } from '../types';
+import type { IMySlashCommand, MyChatInteraction } from '../../types';
 import { SlashCommandBuilder } from 'discord.js';
-import utils from '../lib/Utils';
+import utils from '../../lib/Utils';
 
 const FrasesDeVictoria = [
   ' Sos un capo sabelo ',

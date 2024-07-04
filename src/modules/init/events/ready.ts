@@ -1,5 +1,5 @@
-import type { IMyBotEvent } from '../types';
-import utils from '../lib/Utils';
+import type { IMyBotEvent } from '../../../types';
+import utils from '../../../lib/Utils';
 
 // EVENTO DEL BOT READY
 export default {

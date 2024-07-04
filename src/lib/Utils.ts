@@ -88,6 +88,8 @@ class Utils {
     complete = false
   ): Promise<string[]> {
     // __dirname + '../' = /src
+    if (!searchDirName) return [];
+
     const modules = this.obtainModules();
 
     // Itera todas las carpetas de modulos y busca los archivos dentro de searchDirName, obtiene los archivos y los filtra, permitiendo la existencia de un 'comando' en archivo o carpeta. Pero de todas formas mapea todo en archivos consecutivos

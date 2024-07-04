@@ -1,8 +1,8 @@
-import type { IDisabledCommand, IMySlashSubCommand } from '../../types';
+import type { IDisabledCommand, IMySlashSubCommand } from '../../../types';
 import { SlashCommandSubcommandBuilder } from 'discord.js';
-import utils from '../../lib/Utils';
-import usersManager from '../../services/UsersManager';
-import guildsManager from '../../services/GuildsManager';
+import utils from '../../../lib/Utils';
+import usersManager from '../../../services/UsersManager';
+import guildsManager from '../../../services/GuildsManager';
 
 export default {
   data: new SlashCommandSubcommandBuilder()
