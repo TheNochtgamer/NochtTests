@@ -15,6 +15,10 @@ declare type MyEmbedData = Omit<EmbedData, 'color'> & {
   color: ColorResolvable | number;
 };
 
+declare type MyChatInteraction = Discord.ChatInputCommandInteraction & {
+  client: Bot;
+};
+
 declare interface IRateLimit {
   lastTick: Date;
   uses: number;
@@ -118,9 +122,7 @@ declare interface IMySlashCommand {
   /**
    * La funcion principal del comando
    */
-  run: (
-    interaction: Discord.ChatInputCommandInteraction & { client: Bot }
-  ) => void | Promise<void>;
+  run: (interaction: MyChatInteraction) => void | Promise<void>;
 }
 
 declare interface IMySlashSubCommand {

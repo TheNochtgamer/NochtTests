@@ -7,24 +7,26 @@ import type {
   IDisabledCommand,
   Bot,
 } from '../types';
-import path from 'path';
-import fs from 'fs';
 import {
   ActionRowBuilder,
-  type ApplicationCommand,
   ButtonBuilder,
-  type ButtonInteraction,
   ButtonStyle,
-  type ChatInputCommandInteraction,
-  type Collection,
-  type CommandInteraction,
   EmbedBuilder,
   GuildMemberRoleManager,
-  type ModalSubmitInteraction,
   PermissionsBitField,
-  type Message,
-  type InteractionResponse,
 } from 'discord.js';
+import type {
+  ButtonInteraction,
+  ApplicationCommand,
+  ModalSubmitInteraction,
+  Collection,
+  ChatInputCommandInteraction,
+  CommandInteraction,
+  Message,
+  InteractionResponse,
+} from 'discord.js';
+import path from 'path';
+import fs from 'fs';
 import { CachePointers, CacheTts } from './Enums';
 import { bot } from '../index';
 import cacheMe from '../services/cacheMe';
@@ -69,35 +71,56 @@ class Utils {
   //   return FILES;
   // }
 
-  public async obtainMyFiles(
-    dirName = '',
-    complete = false
-  ): Promise<string[]> {
-    const PATH = path.join(__dirname, '../', dirName);
-    const FILES = fs
+  private obtainModules(): string[] {
+    const PATH = path.join(__dirname, '../', 'modules');
+    const modules = fs
       .readdirSync(PATH, {
         withFileTypes: true,
       })
-      .flatMap(item => {
-        if (item.isFile()) return path.join(PATH, item.name);
+      .filter(f => f.isDirectory())
+      .map(f => path.join(PATH, f.name));
 
-        return fs
-          .readdirSync(path.join(PATH, item.name), {
-            withFileTypes: true,
-          })
-          .filter(
-            f =>
-              f.isFile() &&
-              (complete ||
-                path.parse(f.name).name.toLowerCase() ===
-                  item.name.toLowerCase() ||
-                path.parse(f.name).name.toLowerCase() === 'index')
-          )
-          .map(f => path.join(PATH, item.name, f.name));
-      })
-      .filter(f => f.endsWith('.js') || f.endsWith('.ts'));
+    return modules;
+  }
 
-    return FILES;
+  public async obtainMyFiles(
+    searchDirName = '',
+    complete = false
+  ): Promise<string[]> {
+    // __dirname + '../' = /src
+    const modules = this.obtainModules();
+
+    // Itera todas las carpetas de modulos y busca los archivos dentro de searchDirName, obtiene los archivos y los filtra, permitiendo la existencia de un 'comando' en archivo o carpeta. Pero de todas formas mapea todo en archivos consecutivos
+    const totalFiles = modules.flatMap(moduleDir => {
+      const PATH = path.join(__dirname, '../', moduleDir, searchDirName);
+
+      const files = fs
+        .readdirSync(PATH, {
+          withFileTypes: true,
+        })
+        .flatMap(item => {
+          if (item.isFile()) return path.join(PATH, item.name);
+
+          return fs
+            .readdirSync(path.join(PATH, item.name), {
+              withFileTypes: true,
+            })
+            .filter(
+              f =>
+                f.isFile() &&
+                (complete ||
+                  path.parse(f.name).name.toLowerCase() ===
+                    item.name.toLowerCase() ||
+                  path.parse(f.name).name.toLowerCase() === 'index')
+            )
+            .map(f => path.join(PATH, item.name, f.name));
+        })
+        .filter(f => f.endsWith('.js') || f.endsWith('.ts'));
+
+      return files;
+    });
+
+    return totalFiles;
   }
 
   public async refreshCachedFiles(dirName = ''): Promise<void> {
