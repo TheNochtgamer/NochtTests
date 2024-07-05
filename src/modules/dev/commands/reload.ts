@@ -1,6 +1,9 @@
 import type { IMySlashSubCommand } from '../../../types';
 import { SlashCommandSubcommandBuilder } from 'discord.js';
 import utils from '../../../lib/Utils';
+import SystemLog from '../../../lib/structures/SystemLog';
+
+const logger = new SystemLog('modules', 'dev', 'commands', 'reload');
 
 export default {
   data: new SlashCommandSubcommandBuilder()
@@ -23,7 +26,10 @@ export default {
       return;
     }
 
-    console.log(`${interaction.user.username} esta recargando los archivos...`);
+    logger.log(
+      'run',
+      `${interaction.user.username} esta recargando los archivos...`
+    );
     await interaction.editReply({
       content: `Recargando archivos, porfavor espera...`,
     });
@@ -44,5 +50,7 @@ export default {
     await interaction.editReply({
       content: `Recarga de archivos terminada.`,
     });
+
+    logger.log('run', `Recarga de archivos terminada.`);
   },
 } satisfies IMySlashSubCommand;

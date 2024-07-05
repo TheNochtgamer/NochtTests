@@ -186,7 +186,6 @@ class Utils {
     guildId = process.env.GUILDID
   ): Promise<0 | 1 | 2> {
     const _debug = false;
-    const _pref = '(checkSyncedCommands())';
 
     const clientCmds = client.commands.map(cmd => cmd.data);
     let serverCmds: Collection<string, ApplicationCommand> | null | undefined;
@@ -199,7 +198,10 @@ class Utils {
           : await client.application?.commands?.fetch();
       if (!serverCmds) throw new Error('No se encontraron los comandos');
     } catch (error) {
-      console.log('Error al intentar buscar los comandos', error);
+      logger.error(
+        'checkSyncedCommands',
+        'Error al intentar obtener los comandos'
+      );
       return 2;
     }
 
@@ -242,8 +244,8 @@ class Utils {
                     : true);
 
                 if (_debug)
-                  console.log(
-                    _pref,
+                  logger.log(
+                    'checkSyncedCommands',
                     // @ts-expect-error Discord js no lo definio correctamente, pero existe y funciona
                     `${cCmdOption.name} === ${sCmdOption.name} : ${res}`,
                     // @ts-expect-error Discord js no lo definio correctamente, pero existe y funciona
@@ -282,8 +284,8 @@ class Utils {
                     : true);
 
                 if (_debug)
-                  console.log(
-                    _pref,
+                  logger.log(
+                    'checkSyncedCommands',
                     // @ts-expect-error Discord js no lo definio correctamente, pero existe y funciona
                     `${sCmdOption.name} === ${cCmdOption.name} : ${res}`,
                     // @ts-expect-error Discord js no lo definio correctamente, pero existe y funciona
@@ -349,7 +351,7 @@ class Utils {
         : interaction.reply({ embeds: [embed], ephemeral: true }));
       return reply;
     } catch (error) {
-      console.log(`Error al responder una interaccion`, error);
+      logger.error('embedReply', 'Error al responder una interaccion', error);
       return null;
     }
   }

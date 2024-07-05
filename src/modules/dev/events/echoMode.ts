@@ -1,5 +1,8 @@
 import type { IMyBotEvent } from '../../../types';
 import UsersManager from '../../../services/UsersManager';
+import SystemLog from '../../../lib/structures/SystemLog';
+
+const logger = new SystemLog('modules', 'dev', 'events', 'echoMode');
 
 // EVENTO PARA EL MODO ECO
 export default {
@@ -19,7 +22,7 @@ export default {
         flags: 'SuppressNotifications',
       });
     } catch (error) {
-      console.log(error);
+      logger.error('run', 'Error al enviar el mensaje', error);
     }
   },
 } satisfies IMyBotEvent<'messageCreate'>;

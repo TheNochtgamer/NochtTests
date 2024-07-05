@@ -18,7 +18,7 @@ export const bot = new Bot({
 
 (async function init() {
   await Promise.all([bot.init(process.env.TOKEN ?? '')]);
-})().catch(console.error);
+})().catch(logger.error.bind(logger));
 
 if (process.env.NODE_ENV === 'production') {
   process.on('unhandledRejection', err => {

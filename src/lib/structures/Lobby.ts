@@ -1,5 +1,8 @@
 import { type ChatInputCommandInteraction } from 'discord.js';
 import utils from '../Utils';
+import SystemLog from './SystemLog';
+
+const logger = new SystemLog('lib', 'structures', 'Lobby');
 
 export default class Lobby {
   private readonly waitingTask: NodeJS.Timeout;
@@ -21,8 +24,6 @@ export default class Lobby {
   }
 
   private async _waitingLoop(): Promise<void> {
-    // const _pref = '(_waitingLoop())';
-
     if (this.usersInteractions.size === 0) {
       clearInterval(this.waitingTask);
       return;
@@ -51,7 +52,7 @@ export default class Lobby {
     try {
       await interaction.editReply({ content });
     } catch (error) {
-      console.error('Error al enviar el mensaje', error);
+      logger.error('sendShowMessage', 'Error al enviar el mensaje', error);
       this.disconnectUser(interaction);
     }
   }

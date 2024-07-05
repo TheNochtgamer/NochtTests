@@ -1,7 +1,8 @@
 import type { IMyBotEvent } from '../../../types';
 import Utils from '../../../lib/Utils';
+import SystemLog from '../../../lib/structures/SystemLog';
 
-const _pref = '(autoCompletes())';
+const logger = new SystemLog('modules', 'init', 'events', 'autoCompletes');
 
 // EVENTO PARA CUANDO SE EJECUTA UN AUTOCOMPLETE
 export default {
@@ -16,10 +17,8 @@ export default {
 
     if (interaction.responded) return;
     if (!command?.autoComplete) {
-      console.log(_pref, 'executed');
       if (Utils.everyXExecutions('autoCompleteSpam', 3))
-        console.log(
-          _pref,
+        logger.warn(
           `Se intento utilizar el autoComplete del comando ${interaction.commandName} pero no se detecto`
         );
       return;
@@ -30,8 +29,8 @@ export default {
 
       await interaction.respond(res);
     } catch (error) {
-      console.log(
-        _pref,
+      logger.error(
+        'run',
         `Ocurrio un error al intentar autoCompletar el comando ${interaction.commandName}:`,
         error
       );

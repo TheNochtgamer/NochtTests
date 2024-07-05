@@ -3,8 +3,9 @@ import { Embeds } from '../../../lib/Enums';
 import utils from '../../../lib/Utils';
 import UsersManager from '../../../services/UsersManager';
 import GuildsManager from '../../../services/GuildsManager';
+import SystemLog from '../../../lib/structures/SystemLog';
 
-const _pref = '(slashCommands())';
+const logger = new SystemLog('modules', 'init', 'events', 'slashCommands');
 
 // EVENTO PARA CUANDO SE EJECUTA UN COMANDO
 export default {
@@ -23,8 +24,8 @@ export default {
     // --/UserData--
 
     if (!command) {
-      console.log(
-        _pref,
+      logger.warn(
+        'run',
         `No se encontro el comando ${interaction.commandName}`
       );
       if (interaction.replied) return;
@@ -34,7 +35,7 @@ export default {
             'Hubo un error interno al intentar encontrar el comando\nPorfavor intenta mas tarde...',
           ephemeral: true,
         })
-        .catch(console.log);
+        .catch(logger.error.bind(logger, 'run', 'Error al responder'));
 
       return;
     }
@@ -47,9 +48,8 @@ export default {
     );
 
     if (disabledCommand && !utils.checkBotDev(interaction.user.id)) {
-      console.log(
-        _pref,
-        `${interaction.user.username} intento acceder al comando "${interaction.commandName}" el cual esta deshabilitado`
+      logger.warn(
+        `El comando "${interaction.commandName}" esta deshabilitado para el usuario ${interaction.user.username}`
       );
       void utils.embedReply(
         interaction,
@@ -65,9 +65,9 @@ export default {
 
     // --NCheckAuth--
     if (!(await utils.authorizationCheck(interaction, command))) {
-      console.log(
-        _pref,
-        `${interaction.user.username} intento acceder al comando "${interaction.commandName}" sin autorizacion`
+      logger.warn(
+        'run',
+        `El usuario ${interaction.user.username} intento acceder al comando ${interaction.commandName} sin autorizacion`
       );
       void utils.embedReply(
         interaction,
@@ -99,9 +99,9 @@ export default {
           )
         : undefined;
 
-      console.log(
-        _pref,
-        `${interaction.user.username} supero el limite del comando "${interaction.commandName}"`
+      logger.warn(
+        'run',
+        `El usuario ${interaction.user.username} supero el limite del comando ${interaction.commandName}`
       );
       void utils.embedReply(
         interaction,
@@ -112,8 +112,8 @@ export default {
     }
     // --RateLimiter--
 
-    console.log(
-      _pref,
+    logger.log(
+      'run',
       `${interaction.user.username} ejecuto el comando "${interaction.commandName}"`
     );
     // TODO crear un comando el cual sirva para eliminar mensajes del bot con el id, y para eso revise los permisos del miembro sobre el canal
@@ -131,8 +131,8 @@ export default {
     try {
       await command.run(interaction);
     } catch (error) {
-      console.log(
-        _pref,
+      logger.error(
+        'run',
         `Hubo un error ejecutando el comando ${interaction.commandName}:`,
         error
       );

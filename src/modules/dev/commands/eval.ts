@@ -2,6 +2,9 @@
 import type { IMySlashSubCommand } from '../../../types';
 import { SlashCommandSubcommandBuilder } from 'discord.js';
 import utils from '../../../lib/Utils';
+import SystemLog from '../../../lib/structures/SystemLog';
+
+const logger = new SystemLog('modules', 'dev', 'commands', 'eval');
 
 export default {
   data: new SlashCommandSubcommandBuilder()
@@ -22,7 +25,7 @@ export default {
     if (runme.match(/token/gi))
       runme = 'throw new Error("You cannot get the token");';
 
-    console.log(`${interaction.user.username} esta ejecutando codigo...`);
+    logger.log('run', `${interaction.user.username} esta ejecutando codigo...`);
 
     // shortcuts
     const client = interaction.client;
@@ -62,6 +65,9 @@ export default {
       });
     }
 
-    console.log(`${interaction.user.username} termino de ejecutar codigo.`);
+    logger.log(
+      'run',
+      `${interaction.user.username} termino de ejecutar codigo.`
+    );
   },
 } satisfies IMySlashSubCommand;
