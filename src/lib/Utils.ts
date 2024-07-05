@@ -70,7 +70,7 @@ class Utils {
         .readdirSync(PATH, {
           withFileTypes: true,
         })
-        .filter(f => f.isDirectory())
+        .filter(f => f.isDirectory() && f.name !== 'init')
         .map(f => path.join(PATH, f.name)),
     ].flat();
 
