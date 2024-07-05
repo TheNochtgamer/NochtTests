@@ -1,10 +1,13 @@
-import type { IMyBotEvent } from '../types';
+import type { IMySlashCommand } from '../types';
+import { SlashCommandBuilder } from 'discord.js';
 import utils from '../lib/Utils';
 
 export default {
-  name: '',
+  data: new SlashCommandBuilder()
+    .setName('')
+    .setDescription(''),
 
-  async run() {
+  async run(interaction) {
     
   },
-} satisfies IMyBotEvent<''>;
+} satisfies IMySlashCommand;
