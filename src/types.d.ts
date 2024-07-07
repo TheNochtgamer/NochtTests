@@ -94,6 +94,7 @@ declare interface IMySlashCommand {
   data:
     | Discord.SlashCommandOptionsOnlyBuilder
     | Discord.SlashCommandSubcommandsOnlyBuilder;
+  // | any;
   // | Omit<
   //     Discord.SlashCommandBuilder,
   //     | 'addBooleanOption'

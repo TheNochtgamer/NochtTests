@@ -1,0 +1,17 @@
+import type { IMySlashCommand } from '../../../types';
+import * as DS from 'discord.js';
+import utils from '../../../lib/Utils';
+
+export default {
+  data: {
+    name: 'pong',
+    description: 'Responde con pong!',
+    type: 1,
+    integration_types: [0, 1],
+    contexts: [0, 1, 2],
+  },
+
+  async run(interaction) {
+    await interaction.reply('Pong!');
+  },
+} satisfies IMySlashCommand;

@@ -14,6 +14,7 @@
     "@typescript-eslint/no-misused-promises": "off",
     "@typescript-eslint/restrict-template-expressions": "off",
     "@typescript-eslint/no-extraneous-class": "off",
-    "spaced-comment": "warn"
+    "spaced-comment": "warn",
+    "@typescript-eslint/no-unused-expressions": "warn"
   }
 }

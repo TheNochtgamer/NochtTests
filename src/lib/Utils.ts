@@ -221,39 +221,41 @@ class Utils {
         serverCmds?.some(
           sCmd =>
             cCmd.name === sCmd.name &&
-            cCmd.options.every(cCmdOption =>
-              sCmd.options.some(sCmdOption => {
-                const res =
-                  // @ts-expect-error Discord js no lo definio correctamente, pero existe y funciona
-                  sCmdOption.name === cCmdOption.name &&
-                  // @ts-expect-error Discord js no lo definio correctamente, pero existe y funciona
-                  (cCmdOption.options instanceof Array &&
-                  // @ts-expect-error Discord js no lo definio correctamente, pero existe y funciona
-                  sCmdOption.options instanceof Array
-                    ? // @ts-expect-error Discord js no lo definio correctamente, pero existe y funciona
-                      cCmdOption.options.length === sCmdOption.options.length &&
-                      // @ts-expect-error Discord js no lo definio correctamente, pero existe y funciona
-                      (cCmdOption.options as any[]).every(cCmdSubOption =>
-                        // @ts-expect-error Discord js no lo definio correctamente, pero existe y funciona
-                        sCmdOption.options.some(
+            cCmd.options?.every(
+              (
+                cCmdOption: any
+              ) /* Sacar una vez agreguen la compatibilidad con user commands */ =>
+                sCmd.options.some(sCmdOption => {
+                  const res =
+                    // Discord js no lo definio correctamente, pero existe y funciona
+                    sCmdOption.name === cCmdOption.name &&
+                    (cCmdOption.options instanceof Array &&
+                    // @ts-expect-error Discord js no lo definio correctamente, pero existe y funciona
+                    sCmdOption.options instanceof Array
+                      ? cCmdOption.options.length ===
                           // @ts-expect-error Discord js no lo definio correctamente, pero existe y funciona
-                          sCmdSubOption =>
-                            sCmdSubOption.name === cCmdSubOption.name
+                          sCmdOption.options.length &&
+                        (cCmdOption.options as any[]).every(cCmdSubOption =>
+                          // @ts-expect-error Discord js no lo definio correctamente, pero existe y funciona
+                          sCmdOption.options.some(
+                            // @ts-expect-error Discord js no lo definio correctamente, pero existe y funciona
+                            sCmdSubOption =>
+                              sCmdSubOption.name === cCmdSubOption.name
+                          )
                         )
-                      )
-                    : true);
+                      : true);
 
-                if (_debug)
-                  logger.log(
-                    'checkSyncedCommands',
-                    // @ts-expect-error Discord js no lo definio correctamente, pero existe y funciona
-                    `${cCmdOption.name} === ${sCmdOption.name} : ${res}`,
-                    // @ts-expect-error Discord js no lo definio correctamente, pero existe y funciona
-                    (cCmdOption.name === sCmdOption.name) === res ? '✅' : '❌'
-                  );
+                  if (_debug)
+                    logger.log(
+                      'checkSyncedCommands',
+                      `${cCmdOption.name} === ${sCmdOption.name} : ${res}`,
+                      (cCmdOption.name === sCmdOption.name) === res
+                        ? '✅'
+                        : '❌'
+                    );
 
-                return res;
-              })
+                  return res;
+                })
             )
         )
       ) ||
@@ -262,17 +264,14 @@ class Utils {
           cCmd =>
             cCmd.name === sCmd.name &&
             sCmd.options.every(sCmdOption =>
-              cCmd.options.some(cCmdOption => {
+              cCmd.options?.some((cCmdOption: any) => {
                 const res =
-                  // @ts-expect-error Discord js no lo definio correctamente, pero existe y funciona
                   sCmdOption.name === cCmdOption.name &&
-                  // @ts-expect-error Discord js no lo definio correctamente, pero existe y funciona
                   (cCmdOption.options instanceof Array &&
                   // @ts-expect-error Discord js no lo definio correctamente, pero existe y funciona
                   sCmdOption.options instanceof Array
                     ? // @ts-expect-error Discord js no lo definio correctamente, pero existe y funciona
                       cCmdOption.options.length === sCmdOption.options.length &&
-                      // @ts-expect-error Discord js no lo definio correctamente, pero existe y funciona
                       (cCmdOption.options as any[]).every(cCmdSubOption =>
                         // @ts-expect-error Discord js no lo definio correctamente, pero existe y funciona
                         sCmdOption.options.some(
@@ -286,9 +285,7 @@ class Utils {
                 if (_debug)
                   logger.log(
                     'checkSyncedCommands',
-                    // @ts-expect-error Discord js no lo definio correctamente, pero existe y funciona
                     `${sCmdOption.name} === ${cCmdOption.name} : ${res}`,
-                    // @ts-expect-error Discord js no lo definio correctamente, pero existe y funciona
                     (sCmdOption.name === cCmdOption.name) === res ? '✅' : '❌'
                   );
 
