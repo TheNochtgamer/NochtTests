@@ -145,14 +145,18 @@ class Utils {
       `Subiendo comandos${guildId ? ` (en el guild: ${guildId})` : ''}...`
     );
     try {
+      const cmdDatas = client.commands
+        .map(cmd =>
+          cmd.definition.kind !== 'ImSubCommand' ? cmd.definition.data : []
+        )
+        .flat();
+
       if (guildId && this.validateId(guildId)) {
         const GUILD = await client.guilds.fetch(guildId);
         if (!GUILD) throw new Error(`No se encontro el guild`);
-        cmds = await GUILD.commands.set(client.commands.map(cmd => cmd.data));
+        cmds = await GUILD.commands.set(cmdDatas);
       } else {
-        cmds = await client.application?.commands?.set(
-          client.commands.map(cmd => cmd.data)
-        );
+        cmds = await client.application?.commands?.set(cmdDatas);
       }
 
       // if (guildId) {
@@ -187,7 +191,7 @@ class Utils {
   ): Promise<0 | 1 | 2> {
     const _debug = false;
 
-    const clientCmds = client.commands.map(cmd => cmd.data);
+    const clientCmds = client.commands.map(cmd => cmd.definition.data);
     let serverCmds: Collection<string, ApplicationCommand> | null | undefined;
     if (!clientCmds.length) return 2;
 

@@ -1,54 +1,63 @@
-import type { IDisabledCommand, IMySlashSubCommand } from '../../../types';
+import type { IDisabledCommand, IMySlashCommand } from '../../../types';
 import { SlashCommandSubcommandBuilder } from 'discord.js';
 import utils from '../../../lib/Utils';
 import usersManager from '../../../services/UsersManager';
 import guildsManager from '../../../services/GuildsManager';
 
 export default {
-  data: new SlashCommandSubcommandBuilder()
-    .setName('cmdtoggle')
-    .setDescription('Habilita o deshabilita un comando')
-    .addStringOption(option =>
-      option
-        .setName('command')
-        .setDescription('Nombre del comando')
-        .setAutocomplete(true)
-        .setRequired(true)
-    )
-    .addStringOption(option =>
-      option
-        .setName('context')
-        .setDescription('Contexto de la deshabilitacion')
-        .setRequired(true)
-        .setChoices(
-          {
-            name: 'user',
-            value: 'user',
-          },
-          {
-            name: 'guild',
-            value: 'guild',
-          },
-          {
-            name: 'global',
-            value: 'global',
-          }
-        )
-    )
-    .addStringOption(option =>
-      option.setName('reason').setDescription('Razon de deshabilitacion')
-    )
-    .addStringOption(option =>
-      option.setName('id').setDescription('ID del usuario o guild')
-    ),
+  definition: {
+    kind: 'ImSubCommand',
+    data: new SlashCommandSubcommandBuilder()
+      .setName('cmdtoggle')
+      .setDescription('Habilita o deshabilita un comando')
+      .addStringOption(option =>
+        option
+          .setName('command')
+          .setDescription('Nombre del comando')
+          .setAutocomplete(true)
+          .setRequired(true)
+      )
+      .addStringOption(option =>
+        option
+          .setName('context')
+          .setDescription('Contexto de la deshabilitacion')
+          .setRequired(true)
+          .setChoices(
+            {
+              name: 'user',
+              value: 'user',
+            },
+            {
+              name: 'guild',
+              value: 'guild',
+            },
+            {
+              name: 'global',
+              value: 'global',
+            }
+          )
+      )
+      .addStringOption(option =>
+        option.setName('reason').setDescription('Razon de deshabilitacion')
+      )
+      .addStringOption(option =>
+        option.setName('id').setDescription('ID del usuario o guild')
+      ),
+  },
 
   autoComplete(interaction) {
     const bot = interaction.client;
 
-    return bot.commands.map(c => ({
-      name: c.data.name,
-      value: c.data.name,
-    }));
+    return bot.commands
+      .map(c =>
+        c.definition.kind !== 'ImSubCommand'
+          ? {
+              name: c.definition.data.name,
+              value: c.definition.data.name,
+            }
+          : []
+      )
+      .flat();
   },
 
   async run(interaction) {
@@ -169,4 +178,4 @@ export default {
       }
     }
   },
-} satisfies IMySlashSubCommand;
+} satisfies IMySlashCommand;

@@ -7,9 +7,12 @@ import {
 import utils from '../../../lib/Utils';
 
 export default {
-  data: new SlashCommandBuilder()
-    .setName('help')
-    .setDescription('Ver los comandos disponibles'),
+  definition: {
+    kind: 'OptionsOnly',
+    data: new SlashCommandBuilder()
+      .setName('help')
+      .setDescription('Ver los comandos disponibles'),
+  },
   deferIfToLate: {
     defer: true,
     ephemeral: false,

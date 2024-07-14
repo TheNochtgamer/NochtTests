@@ -42,7 +42,7 @@ export default {
 
     // --DisableCheck--
     const disabledCommand = utils.getDisabledCommand(
-      command.data.name,
+      command.definition.data.name,
       userData,
       guildData
     );
@@ -140,9 +140,9 @@ export default {
         const content = `Hubo un error interno al ejecutar el comando ${
           interaction.commandName
         }.
-        > </${command.data.name}${
-          command.data.options.some((opt: any) => opt.type === 1)
-            ? ` ${command.data.options
+        > </${command.definition.data.name}${
+          command.definition.data.options.some((opt: any) => opt.type === 1)
+            ? ` ${command.definition.data.options
                 .filter((opt: any) => opt.type === 1)
                 .map((sub: any) => `${sub.name}`)
                 .join(' ')}`

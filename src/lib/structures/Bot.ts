@@ -16,6 +16,9 @@ export default class Bot extends Client {
   // }
 
   async loadCommands(reload = false): Promise<void> {
+    let total = 0;
+    let success = 0;
+
     if (reload) {
       logger.log('loadCommands', 'Purgando comandos...');
       await utils.refreshCachedFiles('commands');
@@ -24,13 +27,19 @@ export default class Bot extends Client {
     const FILES = await utils.obtainMyFiles('commands');
     this.commands.clear();
 
-    let success = 0;
+    total = FILES.length;
     for (const commandFile of FILES) {
       try {
         const { default: command }: { default: IMySlashCommand } = await import(
           commandFile
         );
-        this.commands.set(command.data.name, command);
+
+        if (!!command._ignore || command.definition.kind === 'ImSubCommand') {
+          total--;
+          continue;
+        }
+
+        this.commands.set(command.definition.data.name, command);
         success++;
       } catch (error) {
         logger.error(
@@ -41,13 +50,13 @@ export default class Bot extends Client {
       }
     }
 
-    logger.log(
-      'loadCommands',
-      `[${success}/${FILES.length}] comandos cargados`
-    );
+    logger.log('loadCommands', `[${success}/${total}] comandos cargados`);
   }
 
   async loadEvents(reload = false): Promise<void> {
+    let success = 0;
+    let total = 0;
+
     if (reload) {
       logger.log('loadEvents', 'Purgando eventos...');
       await utils.refreshCachedFiles('events');
@@ -56,12 +65,17 @@ export default class Bot extends Client {
     const FILES = await utils.obtainMyFiles('events');
     this.removeAllListeners();
 
-    let success = 0;
+    total = FILES.length;
     for (const eventFile of FILES) {
       try {
         const { default: event }: { default: IMyBotEvent<any> } = await import(
           eventFile
         );
+
+        if (event._ignore) {
+          total--;
+          continue;
+        }
         if (event.name === 'ready' || event.once) {
           this.once(event.name, event.run);
         } else {
@@ -77,7 +91,7 @@ export default class Bot extends Client {
       }
     }
 
-    logger.log('loadEvents', `[${success}/${FILES.length}] eventos cargados`);
+    logger.log('loadEvents', `[${success}/${total}] eventos cargados`);
   }
 
   async init(token: string): Promise<void> {

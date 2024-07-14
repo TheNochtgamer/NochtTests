@@ -1,4 +1,4 @@
-import type { IMySlashSubCommand } from '../../../types';
+import type { IMySlashCommand } from '../../../types';
 import { SlashCommandSubcommandBuilder } from 'discord.js';
 import utils from '../../../lib/Utils';
 import SystemLog from '../../../lib/structures/SystemLog';
@@ -6,12 +6,17 @@ import SystemLog from '../../../lib/structures/SystemLog';
 const logger = new SystemLog('modules', 'dev', 'commands', 'reload');
 
 export default {
-  data: new SlashCommandSubcommandBuilder()
-    .setName('reloadall')
-    .setDescription('Recarga todos los comandos')
-    .addBooleanOption(option =>
-      option.setName('forceupload').setDescription('Forzar subida de comandos')
-    ),
+  definition: {
+    kind: 'ImSubCommand',
+    data: new SlashCommandSubcommandBuilder()
+      .setName('reloadall')
+      .setDescription('Recarga todos los comandos')
+      .addBooleanOption(option =>
+        option
+          .setName('forceupload')
+          .setDescription('Forzar subida de comandos')
+      ),
+  },
 
   async run(interaction) {
     const forceUpload = interaction.options.get('forceupload')?.value ?? false;
@@ -53,4 +58,4 @@ export default {
 
     logger.log('run', `Recarga de archivos terminada.`);
   },
-} satisfies IMySlashSubCommand;
+} satisfies IMySlashCommand;

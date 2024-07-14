@@ -99,25 +99,28 @@ async function vsMachine(interaction: MyChatInteraction): Promise<void> {
 async function vsUser(interaction: MyChatInteraction): Promise<void> {}
 
 export default {
-  data: new SlashCommandBuilder()
-    .setName('dados')
-    .setDescription('Tira los dados, el que tire el numero mas alto gana')
-    .addStringOption(opt =>
-      opt
-        .setName('vs')
-        .setDescription('Elige contra quien jugar')
-        .setRequired(true)
-        .setChoices(
-          {
-            name: 'Maquina',
-            value: 'maquina',
-          },
-          {
-            name: 'Usuario',
-            value: 'usuario',
-          }
-        )
-    ),
+  definition: {
+    kind: 'OptionsOnly',
+    data: new SlashCommandBuilder()
+      .setName('dados')
+      .setDescription('Tira los dados, el que tire el numero mas alto gana')
+      .addStringOption(opt =>
+        opt
+          .setName('vs')
+          .setDescription('Elige contra quien jugar')
+          .setRequired(true)
+          .setChoices(
+            {
+              name: 'Maquina',
+              value: 'maquina',
+            },
+            {
+              name: 'Usuario',
+              value: 'usuario',
+            }
+          )
+      ),
+  },
 
   async run(interaction) {
     const opcion = interaction.options.get('vs', true)?.value as

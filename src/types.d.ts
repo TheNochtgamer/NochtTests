@@ -34,6 +34,11 @@ declare interface IMyClientEvents extends ClientEvents {
 }
 
 declare interface IMyBotEvent<E extends keyof ClientEvents> {
+  /**
+   * En caso de necesitar desactivar la carga del evento
+   */
+  _ignore?: boolean;
+
   name: E;
 
   /**
@@ -47,7 +52,33 @@ declare interface IMyBotEvent<E extends keyof ClientEvents> {
   run: (...args: IMyClientEvents[E]) => void | Promise<void>;
 }
 
-declare interface IMySlashCommand {
+declare interface IMyCommandDataOnlyOptions {
+  kind: 'OptionsOnly';
+  data: Discord.SlashCommandOptionsOnlyBuilder;
+}
+
+declare interface IMyCommandDataSubcommandsOnly {
+  kind: 'SubsOnly';
+  data: Discord.SlashCommandSubcommandsOnlyBuilder;
+}
+
+declare interface IMyCommandDataImSubCommand {
+  kind: 'ImSubCommand';
+  data: Discord.SlashCommandSubcommandBuilder;
+}
+
+declare type MyCommandDataTypes = [
+  IMyCommandDataOnlyOptions,
+  IMyCommandDataSubcommandsOnly,
+  IMyCommandDataImSubCommand
+];
+
+declare interface IMySlashCommand<T = MyCommandDataTypes[T]> {
+  /**
+   * En caso de necesitar desactivar la carga del comando
+   */
+  _ignore?: boolean;
+
   /**
    * Lista de ids de roles requeridos para utilizar el comando
    */
@@ -91,23 +122,7 @@ declare interface IMySlashCommand {
   /**
    * Los datos del comando a cargar a discord
    */
-  data:
-    | Discord.SlashCommandOptionsOnlyBuilder
-    | Discord.SlashCommandSubcommandsOnlyBuilder;
-  // | any;
-  // | Omit<
-  //     Discord.SlashCommandBuilder,
-  //     | 'addBooleanOption'
-  //     | 'addUserOption'
-  //     | 'addChannelOption'
-  //     | 'addRoleOption'
-  //     | 'addAttachmentOption'
-  //     | 'addMentionableOption'
-  //     | 'addStringOption'
-  //     | 'addIntegerOption'
-  //     | 'addNumberOption'
-  //   >
-  // | Omit<Discord.SlashCommandBuilder, 'addSubcommand' | 'addSubcommandGroup'>;
+  definition: T;
 
   /**
    * La function que se ejecuta al necesitar auto completar una opcion del comando
@@ -124,31 +139,6 @@ declare interface IMySlashCommand {
    * La funcion principal del comando
    */
   run: (interaction: MyChatInteraction) => void | Promise<void>;
-}
-
-declare interface IMySlashSubCommand {
-  /**
-   * Los datos del comando a cargar a discord
-   */
-  data: Discord.SlashCommandSubcommandBuilder;
-
-  /**
-   * La function que se ejecuta al necesitar auto completar una opcion del sub comando
-   */
-  autoComplete?: (
-    interaction: Discord.AutocompleteInteraction & { client: Bot }
-  ) =>
-    | Array<Discord.ApplicationCommandOptionChoiceData<string | number>>
-    | Promise<
-        Array<Discord.ApplicationCommandOptionChoiceData<string | number>>
-      >;
-
-  /**
-   * La funcion principal del comando
-   */
-  run: (
-    interaction: Discord.ChatInputCommandInteraction & { client: Bot }
-  ) => void | Promise<void>;
 }
 
 declare interface IDisabledCommand {

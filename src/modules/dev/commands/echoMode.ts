@@ -3,9 +3,12 @@ import UsersManager from '../../../services/UsersManager';
 import { SlashCommandBuilder } from 'discord.js';
 
 export default {
-  data: new SlashCommandBuilder()
-    .setName('echo')
-    .setDescription('Activa o desactiva el modo eco'),
+  definition: {
+    kind: 'OptionsOnly',
+    data: new SlashCommandBuilder()
+      .setName('echo')
+      .setDescription('Activa o desactiva el modo eco'),
+  },
 
   async run(interaction) {
     const userData = UsersManager.getUserData(interaction.user.id);
