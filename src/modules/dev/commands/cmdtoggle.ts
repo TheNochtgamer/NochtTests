@@ -93,7 +93,7 @@ export default {
     switch (context) {
       case 'user': {
         if (!id) return;
-        const dC = usersManager.getUserData(id).disabledCommands;
+        const dC = (await usersManager.getUserData(id)).disabledCommands;
 
         if (dC.some(c => c.name === commandName)) {
           dC.splice(
@@ -110,6 +110,7 @@ export default {
 
         dC.push({
           name: commandName,
+          type: 'user',
           reason,
         } satisfies IDisabledCommand);
 
@@ -122,7 +123,7 @@ export default {
 
       case 'guild': {
         if (!id) return;
-        const dC = guildsManager.getGuildData(id).disabledCommands;
+        const dC = (await guildsManager.getGuildData(id)).disabledCommands;
 
         if (dC.some(c => c.name === commandName)) {
           dC.splice(
@@ -139,6 +140,7 @@ export default {
 
         dC.push({
           name: commandName,
+          type: 'guild',
           reason,
         } satisfies IDisabledCommand);
 
@@ -166,6 +168,7 @@ export default {
 
         dC.push({
           name: commandName,
+          type: 'global',
           reason,
         } satisfies IDisabledCommand);
 

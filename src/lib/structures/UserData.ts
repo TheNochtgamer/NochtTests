@@ -1,5 +1,7 @@
 import type { IDisabledCommand } from '../../types';
 
+type data = string | (Partial<UserData> & { id: string });
+
 export default class UserData {
   // data
   public readonly id: string;
@@ -8,9 +10,18 @@ export default class UserData {
   public disabledCommands: IDisabledCommand[] = [];
 
   // experimental
-  public echo: boolean = false;
+  public echoActivated: boolean = false;
 
-  constructor(id: string) {
-    this.id = id;
+  constructor(data: data) {
+    if (typeof data === 'string') {
+      this.id = data;
+      return;
+    }
+
+    this.id = data.id;
+    if (data.blocked) this.blocked = data.blocked;
+    if (data.blockedReason) this.blockedReason = data.blockedReason;
+    if (data.disabledCommands) this.disabledCommands = data.disabledCommands;
+    if (data.echoActivated) this.echoActivated = data.echoActivated;
   }
 }

@@ -4,31 +4,29 @@ import {
   type Model,
   type ModelStatic,
 } from 'sequelize';
-// import type { UserData as UserDataType } from '../types';
 
-export default function UserDataModel(
+export default function DisabledCommandsModel(
   sequelize: Sequelize
 ): ModelStatic<Model<any, any>> {
   return sequelize.define(
-    'User_data',
+    'Disabled_commands',
     {
+      name: {
+        type: DataTypes.STRING(30),
+        primaryKey: true,
+      },
       ds_id: {
         type: DataTypes.STRING(30),
         primaryKey: true,
       },
-      blocked: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: false,
+      type: {
+        type: DataTypes.ENUM,
+        values: ['user', 'guild', 'global'],
+        allowNull: false,
       },
-      blocked_reason: {
+      reason: {
         type: DataTypes.STRING(50),
         defaultValue: null,
-      },
-
-      // experimental
-      echo_activated: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: false,
       },
     },
     {

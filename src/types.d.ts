@@ -148,6 +148,11 @@ declare interface IDisabledCommand {
   name: string;
 
   /**
+   * El tipo de desactivacion
+   */
+  type: 'user' | 'guild' | 'global';
+
+  /**
    * La razon por la cual el comando esta desactivado
    */
   reason?: string;

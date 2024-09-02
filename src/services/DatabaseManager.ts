@@ -1,15 +1,19 @@
 import { Sequelize } from 'sequelize';
-import UserDataModelFn from '../lib/models/UserData.model';
 import SystemLog from '../lib/structures/SystemLog';
+import UserDataModelFactory from '../lib/models/UserData.model';
+import GuildDataModelFactory from '../lib/models/GuildData.model';
+import DisabledCommandsFactory from '../lib/models/DisabledCommands.model';
 
 const logger = new SystemLog('services', 'DatabaseManager');
 
 class Database {
-  private readonly sequelize: Sequelize;
+  public readonly sequelize: Sequelize;
   public _connected: boolean = false;
 
   // Models
   public readonly UserDataModel;
+  public readonly GuildDataModel;
+  public readonly DisabledCommandsModel;
 
   constructor() {
     this.sequelize = new Sequelize({
@@ -44,7 +48,9 @@ class Database {
       },
     });
 
-    this.UserDataModel = UserDataModelFn(this.sequelize);
+    this.UserDataModel = UserDataModelFactory(this.sequelize);
+    this.GuildDataModel = GuildDataModelFactory(this.sequelize);
+    this.DisabledCommandsModel = DisabledCommandsFactory(this.sequelize);
     //
   }
 

@@ -11,9 +11,9 @@ export default {
   async run(message) {
     if (message.author.bot || !message.content) return;
 
-    const userData = UsersManager.getUserData(message.author.id);
+    const userData = await UsersManager.getUserData(message.author.id);
 
-    if (!userData.echo) return;
+    if (!userData.echoActivated) return;
 
     try {
       await message.reply({

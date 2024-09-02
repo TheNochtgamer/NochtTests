@@ -16,13 +16,7 @@ export default {
     const client = interaction.client;
     const command = client.commands.get(interaction.commandName);
 
-    // --UserData--
-    const userData = UsersManager.getUserData(interaction.user.id);
-    const guildData = interaction.guildId
-      ? GuildsManager.getGuildData(interaction.guildId)
-      : undefined;
-    // --/UserData--
-
+    // --CommandNotFound--
     if (!command) {
       logger.warn(
         'run',
@@ -39,29 +33,7 @@ export default {
 
       return;
     }
-
-    // --DisableCheck--
-    const disabledCommand = utils.getDisabledCommand(
-      command.definition.data.name,
-      userData,
-      guildData
-    );
-
-    if (disabledCommand && !utils.checkBotDev(interaction.user.id)) {
-      logger.warn(
-        `El comando "${interaction.commandName}" esta deshabilitado para el usuario ${interaction.user.username}`
-      );
-      void utils.embedReply(
-        interaction,
-        Embeds.commandDisabled(
-          interaction.user.username,
-          disabledCommand.disabled.reason
-        )
-      );
-
-      return;
-    }
-    // --DisableCheck--
+    // --/CommandNotFound--
 
     // --NCheckAuth--
     if (!(await utils.authorizationCheck(interaction, command))) {
@@ -76,7 +48,7 @@ export default {
 
       return;
     }
-    // --NCheckAuth--
+    // --/NCheckAuth--
 
     // --RateLimiter--
     const identifier = `${interaction.commandName}-${interaction.user.id}`;
@@ -110,14 +82,9 @@ export default {
 
       return;
     }
-    // --RateLimiter--
+    // --/RateLimiter--
 
-    logger.log(
-      'run',
-      `${interaction.user.username} ejecuto el comando "${interaction.commandName}"`
-    );
-    // TODO crear un comando el cual sirva para eliminar mensajes del bot con el id, y para eso revise los permisos del miembro sobre el canal
-
+    // --AutomaticallyDefer--
     if (command.deferIfToLate?.defer)
       setTimeout(async () => {
         try {
@@ -126,7 +93,44 @@ export default {
             ephemeral: command.deferIfToLate?.ephemeral ?? true,
           });
         } catch (error) {}
-      }, 2 * 1300);
+      }, 2.5 * 1000);
+    // --/AutomaticallyDefer--
+
+    // --ObtainingData--
+    const userData = await UsersManager.getUserData(interaction.user.id);
+    const guildData = interaction.guildId
+      ? await GuildsManager.getGuildData(interaction.guildId)
+      : undefined;
+    // --/ObtainingData--
+
+    // --DisableCheck--
+    const disabledCommand = utils.getDisabledCommand(
+      command.definition.data.name,
+      userData,
+      guildData
+    );
+
+    if (disabledCommand && !utils.checkBotDev(interaction.user.id)) {
+      logger.warn(
+        `El comando "${interaction.commandName}" esta deshabilitado para el usuario ${interaction.user.username}`
+      );
+      void utils.embedReply(
+        interaction,
+        Embeds.commandDisabled(
+          interaction.user.username,
+          disabledCommand.disabled.reason
+        )
+      );
+
+      return;
+    }
+    // --/DisableCheck--
+
+    // --Run
+    logger.log(
+      'run',
+      `${interaction.user.username} ejecuto el comando "${interaction.commandName}"`
+    );
 
     try {
       await command.run(interaction);

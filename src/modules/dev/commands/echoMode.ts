@@ -11,13 +11,15 @@ export default {
   },
 
   async run(interaction) {
-    const userData = UsersManager.getUserData(interaction.user.id);
+    const userData = await UsersManager.getUserData(interaction.user.id);
 
-    userData.echo = !userData.echo;
+    userData.echoActivated = !userData.echoActivated;
 
     await interaction.reply({
       // ephemeral: true,
-      content: `Modo eco ${userData.echo ? 'activado' : 'desactivado'}`,
+      content: `Modo eco ${
+        userData.echoActivated ? 'activado' : 'desactivado'
+      }`,
     });
   },
 } satisfies IMySlashCommand;
