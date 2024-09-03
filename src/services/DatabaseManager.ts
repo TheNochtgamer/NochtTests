@@ -4,6 +4,7 @@ import {
   InferAttributes,
   InferCreationAttributes,
 } from 'sequelize';
+import { setTimeout as delay } from 'node:timers/promises';
 import SystemLog from '../lib/structures/SystemLog';
 import UsersModelBuilder from '../lib/structures/models/Users_model';
 import GuildsModelBuilder from '../lib/structures/models/Guilds_model';
@@ -220,7 +221,7 @@ class Database {
 
     while (!this._connected && tries < 5) {
       try {
-        this._myConnect();
+        await this._myConnect();
       } catch (error) {
         tries++;
         logger.error(
@@ -229,9 +230,7 @@ class Database {
           error
         );
         logger.log('connect', 'Reintentando conexion en 5s...');
-        setTimeout(async () => {
-          await this._myConnect();
-        }, 5 * 1000);
+        await delay(5000);
       }
     }
     if (!this._connected)

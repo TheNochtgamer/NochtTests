@@ -23,7 +23,7 @@ export const bot = new Bot({
     logger.error('init', 'Apagando el sistema...');
     process.exit(1);
   });
-  if ((process.env.BASE_ALWAYS_TRY_SYNC || '').toLowerCase() === 'true') {
+  if ((process.env.BASE_ALWAYS_TRY_SYNC ?? '').toLowerCase() === 'true') {
     await DatabaseManager.sync();
   }
   await Promise.all([bot.init(process.env.TOKEN ?? '')]);

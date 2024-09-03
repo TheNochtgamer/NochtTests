@@ -43,6 +43,7 @@ export default class UsersManager {
       echo_activated: data.echoActivated,
     });
 
+    // TODO - Utilizar https://stackoverflow.com/questions/48124949/nodejs-sequelize-bulk-upsert
     data.disabledCommands.forEach(dc => {
       if (!dc.name) return;
 
