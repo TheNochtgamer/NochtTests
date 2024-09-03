@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 import cacheMe from './cacheMe';
 import { CachePointers } from '../lib/Enums';
 import GuildData from '../lib/structures/GuildData';
@@ -10,22 +11,20 @@ export default class GuildsManager {
     return guild;
   }
 
+  private static getFromCache(id: string): GuildData | null {
+    return cacheMe.get(id + CachePointers.guild) as GuildData;
+  }
+
   private static async fetchGuildData(id: string): Promise<GuildData | null> {
-    const data = await DatabaseManager.GuildDataModel.findOne({
-      where: { ds_id: id },
-      include: [DatabaseManager.DisabledCommandsModel],
-    });
+    const data = await DatabaseManager.query<GuildData | null>(
+      `SELECT * FROM v_guild_data WHERE ds_id = ?`,
+      [id]
+    );
 
     if (!data) return null;
-    const rawData = data.get({ plain: true }) as any;
 
-    const parsedData = new GuildData({
-      id: rawData.ds_id,
-      prefix: rawData.prefix,
-      disabledCommands: rawData.Disabled_Commands,
-    });
-
-    return parsedData;
+    const guildData = new GuildData(data);
+    return guildData;
   }
 
   public static async updateGuildData(
@@ -34,28 +33,41 @@ export default class GuildsManager {
   ): Promise<void> {
     if (!utils.validateId(id)) throw new Error('Invalid id');
 
-    await DatabaseManager.GuildDataModel.upsert({
-      ds_id: id,
-      prefix: data.prefix,
-    });
+    await DatabaseManager.query(`CALL upsert_guild_data(?, ?)`, [
+      id,
+      data.prefix,
+    ]);
 
-    data.disabledCommands.forEach(dc => {
-      if (!dc.name) return;
+    for (const dc of data.disabledCommands) {
+      if (!dc.name) continue;
 
-      DatabaseManager.DisabledCommandsModel.upsert({
-        ds_id: id,
-        name: dc.name,
-        reason: dc.reason,
-        type: dc.type,
-      });
-    });
+      await DatabaseManager.query(`CALL upsert_disabled_command(?, ?, ?, ?)`, [
+        id,
+        dc.name,
+        dc.reason,
+        dc.type,
+      ]);
+    }
+
+    const allDisabledCommands = await DatabaseManager.query(
+      `SELECT * FROM v_disabled_commands`
+    );
+
+    for (const dc of allDisabledCommands) {
+      if (data.disabledCommands.some(d => d.name === dc.name)) continue;
+
+      await DatabaseManager.query(`CALL delete_disabled_command(?, ?)`, [
+        id,
+        dc.name,
+      ]);
+    }
   }
 
   public static async getGuildData(id: string): Promise<GuildData> {
     if (!utils.validateId(id)) throw new Error('Invalid id');
 
     const data =
-      (cacheMe.get(id + CachePointers.guild) as GuildData) ||
+      this.getFromCache(id) ||
       (await this.fetchGuildData(id)) ||
       this.createBlankGuildData(id);
 

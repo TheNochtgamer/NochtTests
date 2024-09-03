@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 import cacheMe from './cacheMe';
 import { CachePointers } from '../lib/Enums';
 import UserData from '../lib/structures/UserData';
@@ -10,24 +11,20 @@ export default class UsersManager {
     return userData;
   }
 
+  private static getFromCache(id: string): UserData | null {
+    return cacheMe.get(id + CachePointers.user) as UserData;
+  }
+
   private static async fetchUserData(id: string): Promise<UserData | null> {
-    const data = await DatabaseManager.UserDataModel.findOne({
-      where: { ds_id: id },
-      include: [DatabaseManager.DisabledCommandsModel],
-    });
+    const data = await DatabaseManager.query<UserData | null>(
+      `SELECT * FROM v_user_data WHERE ds_id = ?`,
+      [id]
+    );
 
     if (!data) return null;
-    const rawData = data.get({ plain: true }) as any;
 
-    const parsedData = new UserData({
-      id: rawData.ds_id,
-      blocked: rawData.blocked,
-      blockedReason: rawData.blocked_reason,
-      echoActivated: rawData.echo_activated,
-      disabledCommands: rawData.Disabled_Commands,
-    });
-
-    return parsedData;
+    const userData = new UserData(data);
+    return userData;
   }
 
   public static async updateUserData(
@@ -36,35 +33,47 @@ export default class UsersManager {
   ): Promise<void> {
     if (!utils.validateId(id)) throw new Error('Invalid id');
 
-    await DatabaseManager.UserDataModel.upsert({
-      ds_id: id,
-      blocked: data.blocked,
-      blocked_reason: data.blockedReason,
-      echo_activated: data.echoActivated,
-    });
+    await DatabaseManager.query(`CALL upsert_user_data(?, ?, ?, ?)`, [
+      id,
+      data.blocked,
+      data.blockedReason,
+      data.echoActivated,
+    ]);
 
-    // TODO - Utilizar https://stackoverflow.com/questions/48124949/nodejs-sequelize-bulk-upsert
-    data.disabledCommands.forEach(dc => {
-      if (!dc.name) return;
+    for (const dc of data.disabledCommands) {
+      if (!dc.name) continue;
 
-      DatabaseManager.DisabledCommandsModel.upsert({
-        ds_id: id,
-        name: dc.name,
-        reason: dc.reason,
-        type: dc.type,
-      });
-    });
+      await DatabaseManager.query(`CALL upsert_disabled_command(?, ?, ?, ?)`, [
+        id,
+        dc.name,
+        dc.reason,
+        dc.type,
+      ]);
+    }
+
+    const allDisabledCommands = await DatabaseManager.query(
+      `SELECT * FROM v_disabled_commands`
+    );
+
+    for (const dc of allDisabledCommands) {
+      if (data.disabledCommands.some(d => d.name === dc.name)) continue;
+
+      await DatabaseManager.query(`CALL delete_disabled_command(?, ?)`, [
+        id,
+        dc.name,
+      ]);
+    }
   }
 
   public static async getUserData(id: string): Promise<UserData> {
     if (!utils.validateId(id)) throw new Error('Invalid id');
 
-    const userData =
-      (cacheMe.get(id + CachePointers.user) as UserData) ||
+    const data =
+      this.getFromCache(id) ||
       (await this.fetchUserData(id)) ||
       this.createBlankUserData(id);
 
-    cacheMe.set(id + CachePointers.user, userData);
-    return userData;
+    cacheMe.set(id + CachePointers.user, data);
+    return data;
   }
 }
