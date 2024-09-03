@@ -2,6 +2,7 @@ import 'dotenv/config';
 import Bot from './lib/structures/Bot';
 import { IntentsBitField, Partials, PresenceUpdateStatus } from 'discord.js';
 import SystemLog from './lib/structures/SystemLog';
+import DatabaseManager from './services/DatabaseManager';
 
 const logger = new SystemLog('index');
 
@@ -17,6 +18,14 @@ export const bot = new Bot({
 });
 
 (async function init() {
+  await DatabaseManager.connect().catch(reason => {
+    logger.error('init', 'Error al conectar con la base de datos: ', reason);
+    logger.error('init', 'Apagando el sistema...');
+    process.exit(1);
+  });
+  if ((process.env.BASE_ALWAYS_TRY_SYNC || '').toLowerCase() === 'true') {
+    await DatabaseManager.sync();
+  }
   await Promise.all([bot.init(process.env.TOKEN ?? '')]);
 })().catch(logger.error.bind(logger));
 

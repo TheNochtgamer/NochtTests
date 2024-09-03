@@ -1,4 +1,3 @@
-import type { IDisabledCommand } from '../types';
 import cacheMe from './cacheMe';
 import { CachePointers } from '../lib/Enums';
 import UserData from '../lib/structures/UserData';
@@ -8,26 +7,26 @@ import DatabaseManager from './DatabaseManager';
 export default class UsersManager {
   private static createBlankUserData(id: string): UserData {
     const userData = new UserData(id);
-    cacheMe.set(id + CachePointers.user, userData);
     return userData;
   }
 
   private static async fetchUserData(id: string): Promise<UserData | null> {
     const data = await DatabaseManager.UserDataModel.findOne({
       where: { ds_id: id },
+      include: [DatabaseManager.DisabledCommandsModel],
     });
 
     if (!data) return null;
-    const rawData = data.get({ plain: true });
+    const rawData = data.get({ plain: true }) as any;
 
     const parsedData = new UserData({
       id: rawData.ds_id,
       blocked: rawData.blocked,
       blockedReason: rawData.blocked_reason,
       echoActivated: rawData.echo_activated,
+      disabledCommands: rawData.Disabled_Commands,
     });
 
-    cacheMe.set(id + CachePointers.user, parsedData);
     return parsedData;
   }
 
@@ -37,13 +36,22 @@ export default class UsersManager {
   ): Promise<void> {
     if (!utils.validateId(id)) throw new Error('Invalid id');
 
-    cacheMe.set(id + CachePointers.user, data);
-
     await DatabaseManager.UserDataModel.upsert({
       ds_id: id,
       blocked: data.blocked,
       blocked_reason: data.blockedReason,
       echo_activated: data.echoActivated,
+    });
+
+    data.disabledCommands.forEach(dc => {
+      if (!dc.name) return;
+
+      DatabaseManager.DisabledCommandsModel.upsert({
+        ds_id: id,
+        name: dc.name,
+        reason: dc.reason,
+        type: dc.type,
+      });
     });
   }
 
@@ -55,19 +63,7 @@ export default class UsersManager {
       (await this.fetchUserData(id)) ||
       this.createBlankUserData(id);
 
-    userData.disabledCommands = (
-      await DatabaseManager.DisabledCommandsModel.findAll({
-        where: { ds_id: id, type: 'user' },
-      })
-    ).map(dc => {
-      const raw = dc.get({ plain: true });
-      return {
-        name: raw.name,
-        reason: raw.reason,
-        type: raw.type,
-      } satisfies IDisabledCommand;
-    });
-
+    cacheMe.set(id + CachePointers.user, userData);
     return userData;
   }
 }
