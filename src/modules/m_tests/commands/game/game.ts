@@ -1,7 +1,7 @@
-import LobbiesManager from '../../../../services/LobbiesManager';
-import type { IMySlashCommand } from '../../../../types';
+import LobbiesManager from '@/services/LobbiesManager';
+import type { IMySlashCommand } from '@/types';
 import { SlashCommandBuilder } from 'discord.js';
-// import utils from '../lib/Utils';
+// import utils from '@/lib/Utils';
 
 export default {
   definition: {

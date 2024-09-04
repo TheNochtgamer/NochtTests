@@ -1,5 +1,5 @@
 import { type ChatInputCommandInteraction } from 'discord.js';
-import utils from '../Utils';
+import utils from '@/lib/Utils';
 import SystemLog from './SystemLog';
 
 const logger = new SystemLog('lib', 'structures', 'Lobby');

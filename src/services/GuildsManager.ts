@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 import cacheMe from './cacheMe';
-import { CachePointers } from '../lib/Enums';
-import GuildData from '../lib/structures/GuildData';
-import utils from '../lib/Utils';
+import { CachePointers } from '@/lib/Enums';
+import GuildData from '@/lib/structures/GuildData';
+import utils from '@/lib/Utils';
 import DatabaseManager from './DatabaseManager';
 
 export default class GuildsManager {

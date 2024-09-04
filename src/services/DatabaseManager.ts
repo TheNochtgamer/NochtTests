@@ -1,5 +1,5 @@
 import mysql from 'mysql2/promise';
-import SystemLog from '../lib/structures/SystemLog';
+import SystemLog from '@/lib/structures/SystemLog';
 import { setTimeout as delay } from 'node:timers/promises';
 
 const logger = new SystemLog('services', 'DatabaseManager');

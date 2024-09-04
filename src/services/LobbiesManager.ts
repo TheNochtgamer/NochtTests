@@ -1,5 +1,5 @@
 import { type ChatInputCommandInteraction } from 'discord.js';
-import Lobby from '../lib/structures/Lobby';
+import Lobby from '@/lib/structures/Lobby';
 import cacheMe from './cacheMe';
 
 export default class LobbiesManager {

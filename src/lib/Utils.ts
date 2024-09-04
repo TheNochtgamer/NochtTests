@@ -8,7 +8,7 @@ import type {
   IUserDisabledCommand,
   IGuildDisabledCommand,
   IGlobalDisabledCommand,
-} from '../types';
+} from '@/types';
 import {
   ActionRowBuilder,
   ButtonBuilder,
@@ -30,8 +30,8 @@ import type {
 import path from 'path';
 import fs from 'fs';
 import { CachePointers, CacheTts } from './Enums';
-import { bot } from '../index';
-import cacheMe from '../services/cacheMe';
+import { bot } from '@/index';
+import cacheMe from '@/services/cacheMe';
 import { setTimeout } from 'node:timers/promises';
 import SystemLog from './structures/SystemLog';
 

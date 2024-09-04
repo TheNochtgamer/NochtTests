@@ -1,7 +1,7 @@
-import type { IMySlashCommand } from '../../../types';
+import type { IMySlashCommand } from '@/types';
 import { SlashCommandSubcommandBuilder } from 'discord.js';
-import utils from '../../../lib/Utils';
-import SystemLog from '../../../lib/structures/SystemLog';
+import utils from '@/lib/Utils';
+import SystemLog from '@/lib/structures/SystemLog';
 
 const logger = new SystemLog('modules', 'dev', 'commands', 'reload');
 
