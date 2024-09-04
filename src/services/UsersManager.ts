@@ -17,7 +17,7 @@ export default class UsersManager {
   }
 
   private static async fetchUserData(id: string): Promise<UserData | null> {
-    const data = await DatabaseManager.query<UserData[] | null>(
+    const data = await DatabaseManager.query<UserData>(
       `SELECT * FROM users WHERE id = ?`,
       [id]
     );

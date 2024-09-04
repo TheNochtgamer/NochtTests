@@ -49,16 +49,26 @@ class Database {
       );
   }
 
-  async query<R = any>(query: string, values: any[] = []): Promise<R> {
+  private antiSqlInjection(value: any): any {
+    if (typeof value === 'string')
+      return value.replace(/'/g, "\\'").replace(/"/g, '\\"').replace(/;/g, '');
+
+    return value;
+  }
+
+  async query<R = any>(query: string, values: any[] = []): Promise<R[] | null> {
     try {
       const connection = await this.dbPool.getConnection();
-      const [rows] = await connection.query(query.replace('\n', ''), values);
+      const [rows] = await connection.query(
+        query.replace('\n', ''),
+        values.map(this.antiSqlInjection.bind(this))
+      );
       connection.release();
-      return rows as R;
+      return rows as R[];
     } catch (error) {
       if (error instanceof Error)
         logger.error('query', `Error on query: ${error.message}`);
-      return null as R;
+      return null;
     }
   }
 
@@ -112,7 +122,9 @@ class Database {
         ds_id VARCHAR(30),
         reference VARCHAR(30),
         token VARCHAR(255),
-        FOREIGN KEY (ds_id) REFERENCES users(id)
+        priority INT DEFAULT 0,
+        FOREIGN KEY (ds_id) REFERENCES users(id),
+        UNIQUE (ds_id, reference)
       );;
 
       CREATE TABLE IF NOT EXISTS ags_codes (

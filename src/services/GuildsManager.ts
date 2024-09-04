@@ -17,7 +17,7 @@ export default class GuildsManager {
   }
 
   private static async fetchGuildData(id: string): Promise<GuildData | null> {
-    const data = await DatabaseManager.query<GuildData[] | null>(
+    const data = await DatabaseManager.query<GuildData>(
       `SELECT * FROM guilds WHERE id = ?`,
       [id]
     );

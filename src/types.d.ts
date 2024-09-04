@@ -6,10 +6,12 @@ import type Discord, {
 import type _Bot from './lib/structures/Bot';
 import type _GuildData from './lib/structures/GuildData';
 import type _UserData from './lib/structures/UserData';
+import type _AgsTokensData from './lib/structures/AGS/AgsTokensData';
 
 declare type Bot = _Bot;
 declare type GuildData = _GuildData;
 declare type UserData = _UserData;
+declare type AgsTokensData = _AgsTokensData;
 
 declare type MyEmbedData = Omit<EmbedData, 'color'> & {
   color: ColorResolvable | number;
