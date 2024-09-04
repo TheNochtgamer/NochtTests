@@ -14,4 +14,6 @@ void (async function Main() {
   await DatabaseManager.migration();
 
   logger.log('migration', 'Migration completed');
+
+  process.exit(0);
 })();

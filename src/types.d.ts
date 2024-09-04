@@ -141,19 +141,22 @@ declare interface IMySlashCommand<T = MyCommandDataTypes[T]> {
   run: (interaction: MyChatInteraction) => void | Promise<void>;
 }
 
-declare interface IDisabledCommand {
-  /**
-   * El nombre del comando
-   */
-  name: string;
-
-  /**
-   * El tipo de desactivacion
-   */
-  type: 'user' | 'guild' | 'global';
-
-  /**
-   * La razon por la cual el comando esta desactivado
-   */
+declare interface IUserDisabledCommand {
+  cmd_name: string;
+  ds_id: string;
   reason?: string;
+  type: 'user';
+}
+
+declare interface IGuildDisabledCommand {
+  cmd_name: string;
+  ds_id: string;
+  reason?: string;
+  type: 'guild';
+}
+
+declare interface IGlobalDisabledCommand {
+  cmd_name: string;
+  reason?: string;
+  type: 'global';
 }

@@ -8,6 +8,7 @@ import DatabaseManager from './DatabaseManager';
 export default class UsersManager {
   private static createBlankUserData(id: string): UserData {
     const userData = new UserData(id);
+    void this.updateUserData(userData);
     return userData;
   }
 
@@ -16,53 +17,50 @@ export default class UsersManager {
   }
 
   private static async fetchUserData(id: string): Promise<UserData | null> {
-    const data = await DatabaseManager.query<UserData | null>(
-      `SELECT * FROM v_user_data WHERE ds_id = ?`,
+    const data = await DatabaseManager.query<UserData[] | null>(
+      `SELECT * FROM users WHERE id = ?`,
       [id]
     );
 
-    if (!data) return null;
+    if (!data || data.length === 0) return null;
 
-    const userData = new UserData(data);
+    const userData = new UserData(data[0]);
     return userData;
   }
 
-  public static async updateUserData(
-    id: string,
-    data: UserData
-  ): Promise<void> {
-    if (!utils.validateId(id)) throw new Error('Invalid id');
+  public static async updateUserData(data: UserData): Promise<void> {
+    if (!utils.validateId(data.id)) throw new Error('Invalid id');
 
     await DatabaseManager.query(`CALL upsert_user_data(?, ?, ?, ?)`, [
-      id,
+      data.id,
       data.blocked,
-      data.blockedReason,
-      data.echoActivated,
+      data.blocked_reason,
+      data.echo_activated,
     ]);
 
-    for (const dc of data.disabledCommands) {
-      if (!dc.name) continue;
+    // for (const dc of data.disabledCommands) {
+    //   if (!dc.name) continue;
 
-      await DatabaseManager.query(`CALL upsert_disabled_command(?, ?, ?, ?)`, [
-        id,
-        dc.name,
-        dc.reason,
-        dc.type,
-      ]);
-    }
+    //   await DatabaseManager.query(`CALL upsert_disabled_command(?, ?, ?, ?)`, [
+    //     id,
+    //     dc.name,
+    //     dc.reason,
+    //   ]);
+    // }
 
-    const allDisabledCommands = await DatabaseManager.query(
-      `SELECT * FROM v_disabled_commands`
-    );
+    // const allDisabledCommands = await DatabaseManager.query(
+    //   `SELECT * FROM user_disabled_commands WHERE ds_id = ?`,
+    //   [id]
+    // );
 
-    for (const dc of allDisabledCommands) {
-      if (data.disabledCommands.some(d => d.name === dc.name)) continue;
+    // for (const dc of allDisabledCommands) {
+    //   if (data.disabledCommands.some(d => d.name === dc.name)) continue;
 
-      await DatabaseManager.query(`CALL delete_disabled_command(?, ?)`, [
-        id,
-        dc.name,
-      ]);
-    }
+    //   await DatabaseManager.query(`CALL delete_disabled_command(?, ?)`, [
+    //     id,
+    //     dc.name,
+    //   ]);
+    // }
   }
 
   public static async getUserData(id: string): Promise<UserData> {

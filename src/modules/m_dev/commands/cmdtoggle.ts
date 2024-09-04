@@ -1,4 +1,9 @@
-import type { IDisabledCommand, IMySlashCommand } from '../../../types';
+import type {
+  IGlobalDisabledCommand,
+  IGuildDisabledCommand,
+  IMySlashCommand,
+  IUserDisabledCommand,
+} from '../../../types';
 import { SlashCommandSubcommandBuilder } from 'discord.js';
 import utils from '../../../lib/Utils';
 import usersManager from '../../../services/UsersManager';
@@ -93,11 +98,11 @@ export default {
     switch (context) {
       case 'user': {
         if (!id) return;
-        const dC = (await usersManager.getUserData(id)).disabledCommands;
+        const dC = (await usersManager.getUserData(id)).disabled_commands;
 
-        if (dC.some(c => c.name === commandName)) {
+        if (dC.some(c => c.cmd_name === commandName)) {
           dC.splice(
-            dC.findIndex(c => c.name === commandName),
+            dC.findIndex(c => c.cmd_name === commandName),
             1
           );
 
@@ -109,10 +114,11 @@ export default {
         }
 
         dC.push({
-          name: commandName,
+          ds_id: id,
+          cmd_name: commandName,
           type: 'user',
           reason,
-        } satisfies IDisabledCommand);
+        } satisfies IUserDisabledCommand);
 
         await interaction.reply({
           content: `El comando \`${commandName}\` ha sido deshabilitado para el usuario <@${id}>`,
@@ -123,11 +129,11 @@ export default {
 
       case 'guild': {
         if (!id) return;
-        const dC = (await guildsManager.getGuildData(id)).disabledCommands;
+        const dC = (await guildsManager.getGuildData(id)).disabled_commands;
 
-        if (dC.some(c => c.name === commandName)) {
+        if (dC.some(c => c.cmd_name === commandName)) {
           dC.splice(
-            dC.findIndex(c => c.name === commandName),
+            dC.findIndex(c => c.cmd_name === commandName),
             1
           );
 
@@ -139,10 +145,11 @@ export default {
         }
 
         dC.push({
-          name: commandName,
+          ds_id: id,
+          cmd_name: commandName,
           type: 'guild',
           reason,
-        } satisfies IDisabledCommand);
+        } satisfies IGuildDisabledCommand);
 
         await interaction.reply({
           content: `El comando \`${commandName}\` ha sido deshabilitado en el servidor <@${id}>`,
@@ -152,10 +159,10 @@ export default {
       }
 
       default: {
-        const dC = interaction.client.settings.disabledCommands;
-        if (dC.some(c => c.name === commandName)) {
+        const dC = interaction.client.settings.disabled_commands;
+        if (dC.some(c => c.cmd_name === commandName)) {
           dC.splice(
-            dC.findIndex(c => c.name === commandName),
+            dC.findIndex(c => c.cmd_name === commandName),
             1
           );
 
@@ -167,10 +174,10 @@ export default {
         }
 
         dC.push({
-          name: commandName,
+          cmd_name: commandName,
           type: 'global',
           reason,
-        } satisfies IDisabledCommand);
+        } satisfies IGlobalDisabledCommand);
 
         await interaction.reply({
           content: `El comando \`${commandName}\` ha sido deshabilitado en el contexto global`,

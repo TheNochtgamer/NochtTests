@@ -97,10 +97,13 @@ export default {
     // --/AutomaticallyDefer--
 
     // --ObtainingData--
-    const userData = await UsersManager.getUserData(interaction.user.id);
-    const guildData = interaction.guildId
-      ? await GuildsManager.getGuildData(interaction.guildId)
-      : undefined;
+    const [userData, guildData] = await Promise.all([
+      UsersManager.getUserData(interaction.user.id),
+      (async () =>
+        interaction.guildId
+          ? await GuildsManager.getGuildData(interaction.guildId)
+          : undefined)(),
+    ]);
     // --/ObtainingData--
 
     // --DisableCheck--
@@ -118,7 +121,7 @@ export default {
         interaction,
         Embeds.commandDisabled(
           interaction.user.username,
-          disabledCommand.disabled.reason
+          disabledCommand.reason
         )
       );
 

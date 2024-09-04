@@ -1,23 +1,24 @@
-import type { IDisabledCommand } from '../../types';
+import type { IGuildDisabledCommand } from '../../types';
 
-type data = string | (Partial<GuildData> & { ds_id: string });
+type data = string | (Partial<GuildData> & { id: string });
 
 export default class GuildData {
   // data
-  public readonly ds_id: string;
+  public readonly id: string;
   public prefix: string = '>';
-  public disabledCommands: IDisabledCommand[] = [];
+  public disabled_commands: IGuildDisabledCommand[] = [];
 
   // experimental
 
   constructor(data: data) {
     if (typeof data === 'string') {
-      this.ds_id = data;
+      this.id = data;
       return;
     }
 
-    this.ds_id = data.ds_id;
-    if (data.prefix) this.prefix = data.prefix;
-    if (data.disabledCommands) this.disabledCommands = data.disabledCommands;
+    this.id = data.id;
+    if (data.prefix !== undefined) this.prefix = data.prefix;
+    if (data.disabled_commands !== undefined)
+      this.disabled_commands = data.disabled_commands;
   }
 }

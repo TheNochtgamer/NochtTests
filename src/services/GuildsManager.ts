@@ -7,8 +7,9 @@ import DatabaseManager from './DatabaseManager';
 
 export default class GuildsManager {
   private static createBlankGuildData(id: string): GuildData {
-    const guild = new GuildData(id);
-    return guild;
+    const guildData = new GuildData(id);
+    void this.updateGuildData(guildData);
+    return guildData;
   }
 
   private static getFromCache(id: string): GuildData | null {
@@ -16,51 +17,48 @@ export default class GuildsManager {
   }
 
   private static async fetchGuildData(id: string): Promise<GuildData | null> {
-    const data = await DatabaseManager.query<GuildData | null>(
-      `SELECT * FROM v_guild_data WHERE ds_id = ?`,
+    const data = await DatabaseManager.query<GuildData[] | null>(
+      `SELECT * FROM guilds WHERE id = ?`,
       [id]
     );
 
-    if (!data) return null;
+    if (!data || data.length === 0) return null;
 
-    const guildData = new GuildData(data);
+    const guildData = new GuildData(data[0]);
     return guildData;
   }
 
-  public static async updateGuildData(
-    id: string,
-    data: GuildData
-  ): Promise<void> {
-    if (!utils.validateId(id)) throw new Error('Invalid id');
+  public static async updateGuildData(data: GuildData): Promise<void> {
+    if (!utils.validateId(data.id)) throw new Error('Invalid id');
 
     await DatabaseManager.query(`CALL upsert_guild_data(?, ?)`, [
-      id,
+      data.id,
       data.prefix,
     ]);
 
-    for (const dc of data.disabledCommands) {
-      if (!dc.name) continue;
+    // for (const dc of data.disabledCommands) {
+    //   if (!dc.name) continue;
 
-      await DatabaseManager.query(`CALL upsert_disabled_command(?, ?, ?, ?)`, [
-        id,
-        dc.name,
-        dc.reason,
-        dc.type,
-      ]);
-    }
+    //   await DatabaseManager.query(`CALL upsert_disabled_command(?, ?, ?, ?)`, [
+    //     id,
+    //     dc.name,
+    //     dc.reason,
+    //     dc.type,
+    //   ]);
+    // }
 
-    const allDisabledCommands = await DatabaseManager.query(
-      `SELECT * FROM v_disabled_commands`
-    );
+    // const allDisabledCommands = await DatabaseManager.query(
+    //   `SELECT * FROM v_disabled_commands`
+    // );
 
-    for (const dc of allDisabledCommands) {
-      if (data.disabledCommands.some(d => d.name === dc.name)) continue;
+    // for (const dc of allDisabledCommands) {
+    //   if (data.disabledCommands.some(d => d.name === dc.name)) continue;
 
-      await DatabaseManager.query(`CALL delete_disabled_command(?, ?)`, [
-        id,
-        dc.name,
-      ]);
-    }
+    //   await DatabaseManager.query(`CALL delete_disabled_command(?, ?)`, [
+    //     id,
+    //     dc.name,
+    //   ]);
+    // }
   }
 
   public static async getGuildData(id: string): Promise<GuildData> {

@@ -4,8 +4,10 @@ import type {
   MyEmbedData,
   UserData,
   GuildData,
-  IDisabledCommand,
   Bot,
+  IUserDisabledCommand,
+  IGuildDisabledCommand,
+  IGlobalDisabledCommand,
 } from '../types';
 import {
   ActionRowBuilder,
@@ -470,24 +472,28 @@ class Utils {
     commandName: string,
     userData?: UserData,
     guildData?: GuildData
-  ): null | { type: 'user' | 'guild' | 'global'; disabled: IDisabledCommand } {
-    let disabledCommand = bot.settings.disabledCommands.find(
-      cmd => cmd.name === commandName
+  ):
+    | null
+    | IUserDisabledCommand
+    | IGuildDisabledCommand
+    | IGlobalDisabledCommand {
+    const globalDisabledCommand = bot.settings.disabled_commands.find(
+      cmd => cmd.cmd_name === commandName
     );
-    if (disabledCommand) return { type: 'global', disabled: disabledCommand };
+    if (globalDisabledCommand) return globalDisabledCommand;
 
     if (userData) {
-      disabledCommand = userData.disabledCommands.find(
-        cmd => cmd.name === commandName
+      const disabledCommand = userData.disabled_commands.find(
+        cmd => cmd.cmd_name === commandName
       );
-      if (disabledCommand) return { type: 'user', disabled: disabledCommand };
+      if (disabledCommand) return disabledCommand;
     }
 
     if (guildData) {
-      disabledCommand = guildData.disabledCommands.find(
-        cmd => cmd.name === commandName
+      const disabledCommand = guildData.disabled_commands.find(
+        cmd => cmd.cmd_name === commandName
       );
-      if (disabledCommand) return { type: 'guild', disabled: disabledCommand };
+      if (disabledCommand) return disabledCommand;
     }
 
     return null;

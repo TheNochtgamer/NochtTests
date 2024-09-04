@@ -13,12 +13,13 @@ export default {
   async run(interaction) {
     const userData = await UsersManager.getUserData(interaction.user.id);
 
-    userData.echoActivated = !userData.echoActivated;
+    userData.echo_activated = !userData.echo_activated;
+    await UsersManager.updateUserData(userData);
 
     await interaction.reply({
       // ephemeral: true,
       content: `Modo eco ${
-        userData.echoActivated ? 'activado' : 'desactivado'
+        userData.echo_activated ? 'activado' : 'desactivado'
       }`,
     });
   },

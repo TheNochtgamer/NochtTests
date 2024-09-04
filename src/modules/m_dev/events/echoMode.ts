@@ -13,7 +13,7 @@ export default {
 
     const userData = await UsersManager.getUserData(message.author.id);
 
-    if (!userData.echoActivated) return;
+    if (!userData.echo_activated) return;
 
     try {
       await message.reply({

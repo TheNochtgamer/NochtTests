@@ -1,8 +1,9 @@
-import type { IDisabledCommand } from '../../types';
+import type { IGlobalDisabledCommand } from '../../types';
 
 export default class BotSettings {
   // data
-  public disabledCommands: IDisabledCommand[] = [];
+  public maintenance: boolean = false;
+  public disabled_commands: IGlobalDisabledCommand[] = [];
   // experimental
 
   // constructor() {}

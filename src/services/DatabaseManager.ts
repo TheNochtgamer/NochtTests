@@ -73,17 +73,17 @@ class Database {
         blocked BOOLEAN DEFAULT FALSE,
         blocked_reason TEXT,
         echo_activated BOOLEAN DEFAULT FALSE
-      );
+      );;
 
       CREATE TABLE IF NOT EXISTS guilds (
         id VARCHAR(30) PRIMARY KEY,
         prefix VARCHAR(5) DEFAULT '>'
-      );
+      );;
 
       CREATE TABLE IF NOT EXISTS bot_settings (
         name VARCHAR(30) PRIMARY KEY,
         maintenance BOOLEAN DEFAULT FALSE
-      );
+      );;
 
       CREATE TABLE IF NOT EXISTS user_disabled_commands (
         ds_id VARCHAR(30),
@@ -91,7 +91,7 @@ class Database {
         reason VARCHAR(64),
         PRIMARY KEY (ds_id, name),
         FOREIGN KEY (ds_id) REFERENCES users(id)
-      );
+      );;
       
       CREATE TABLE IF NOT EXISTS guild_disabled_commands (
         ds_id VARCHAR(30),
@@ -99,12 +99,12 @@ class Database {
         reason VARCHAR(64),
         PRIMARY KEY (ds_id, name),
         FOREIGN KEY (ds_id) REFERENCES guilds(id)
-      );
+      );;
       
       CREATE TABLE IF NOT EXISTS global_disabled_commands (
         name VARCHAR(30) PRIMARY KEY,
         reason VARCHAR(64)
-      );
+      );;
       `,
       `
       CREATE TABLE IF NOT EXISTS ags_user_tokens (
@@ -113,12 +113,12 @@ class Database {
         reference VARCHAR(30),
         token VARCHAR(255),
         FOREIGN KEY (ds_id) REFERENCES users(id)
-      );
+      );;
 
       CREATE TABLE IF NOT EXISTS ags_codes (
         code_id INT PRIMARY KEY AUTO_INCREMENT,
         code VARCHAR(255)
-        );
+        );;
 
       CREATE TABLE IF NOT EXISTS ags_exchanges (
         user_id INT,
@@ -128,7 +128,7 @@ class Database {
         PRIMARY KEY (user_id, code_id), 
         FOREIGN KEY (code_id) REFERENCES ags_codes(code_id),
         FOREIGN KEY (user_id) REFERENCES ags_user_tokens(user_id)
-      );
+      );;
       `,
       // VIEWS
       `
@@ -136,15 +136,41 @@ class Database {
       `,
       // PROCEDURES
       `
+      DROP PROCEDURE IF EXISTS upsert_user_data;;
+      CREATE PROCEDURE upsert_user_data(
+        IN _id VARCHAR(30),
+        IN _blocked BOOLEAN,
+        IN _blocked_reason TEXT,
+        IN _echo_activated BOOLEAN
+      )
+      BEGIN
+        IF EXISTS (SELECT * FROM users WHERE id = _id) THEN
+          UPDATE users SET blocked = _blocked, blocked_reason = _blocked_reason, echo_activated = _echo_activated WHERE id = _id;
+        ELSE
+          INSERT INTO users (id, blocked, blocked_reason, echo_activated) VALUES (_id, _blocked, _blocked_reason, _echo_activated);
+        END IF;
+      END;;
 
+      DROP PROCEDURE IF EXISTS upsert_guild_data;;
+      CREATE PROCEDURE upsert_guild_data(
+        IN _id VARCHAR(30),
+        IN _prefix VARCHAR(5)
+      )
+      BEGIN
+        IF EXISTS (SELECT * FROM guilds WHERE id = _id) THEN
+          UPDATE guilds SET prefix = _prefix WHERE id = _id;
+        ELSE
+          INSERT INTO guilds (id, prefix) VALUES (_id, _prefix);
+        END IF;
+      END;;
       `,
     ];
 
     for (const queryGruop of queries) {
-      for (const query of queryGruop.split(';')) {
+      for (const query of queryGruop.split(';;')) {
         const _query = query.replace('\n', '').trim();
         if (!_query) continue;
-        await connection.query(_query);
+        await connection.query(_query + ';');
       }
     }
     connection.release();
