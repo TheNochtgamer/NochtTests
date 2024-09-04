@@ -4,7 +4,7 @@ import AgsTokensData from '../lib/structures/AGS/AgsTokensData';
 import DatabaseManager from './DatabaseManager';
 
 export default class AgsTokensManager {
-  public static createAgsTokens(data: Partial<TAgsTokensData>): TAgsTokensData {
+  public static createAgsTokens(data: Partial<TAgsTokensData> & {user_id: string}): TAgsTokensData {
     const newData = new AgsTokensData(data);
     void this.updateAgsTokens(newData);
     return newData;

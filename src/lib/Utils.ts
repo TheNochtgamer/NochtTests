@@ -532,10 +532,12 @@ class Utils {
       interaction.replied || interaction.deferred
         ? await interaction.editReply({
             content: message,
+            // @ts-ignore
             components: [row],
           })
         : await interaction.reply({
             content: message,
+            // @ts-ignore
             components: [row],
             ephemeral: true,
           });
