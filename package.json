@@ -9,6 +9,7 @@
     "watch": "tsc --watch",
     "start": "node ./dist/index.js",
     "test": "ts-node ./src/index.ts",
+    "migration": "ts-node ./src/migration.ts",
     "lint": "eslint . --ext .ts"
   },
   "keywords": [],
