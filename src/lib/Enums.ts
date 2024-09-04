@@ -69,3 +69,8 @@ export const Embeds = {
     };
   },
 };
+
+export const AgsPages = Object.freeze({
+  reward: 'https://app.argentinagameshow.com/custom/ags/ajax/rew.php',
+  login: 'https://app.argentinagameshow.com/ags/ajax/actions_public.php',
+});
