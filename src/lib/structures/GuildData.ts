@@ -1,4 +1,4 @@
-import type { IGuildDisabledCommand } from '../../types';
+import type { IGuildDisabledCommand } from '@/types';
 
 type data = string | (Partial<GuildData> & { id: string });
 

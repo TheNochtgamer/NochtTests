@@ -1,6 +1,6 @@
-import type { IMyBotEvent } from '../../../types';
-import Utils from '../../../lib/Utils';
-import SystemLog from '../../../lib/structures/SystemLog';
+import type { IMyBotEvent } from '@/types';
+import Utils from '@/lib/Utils';
+import SystemLog from '@/lib/structures/SystemLog';
 
 const logger = new SystemLog('modules', 'init', 'events', 'autoCompletes');
 

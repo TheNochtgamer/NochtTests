@@ -1,10 +1,10 @@
-import type { IMySlashCommand } from '../../../types';
+import type { IMySlashCommand } from '@/types';
 import {
   type ApplicationCommandSubCommand,
   EmbedBuilder,
   SlashCommandBuilder,
 } from 'discord.js';
-import utils from '../../../lib/Utils';
+import utils from '@/lib/Utils';
 
 export default {
   definition: {
