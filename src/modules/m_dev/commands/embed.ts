@@ -1,4 +1,4 @@
-import type { IMySlashCommand } from '../../../types';
+import type { IMySlashCommand } from '@/types';
 import {
   ChannelType,
   type ColorResolvable,

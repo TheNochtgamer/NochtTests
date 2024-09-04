@@ -1,6 +1,6 @@
-import type { IMyBotEvent, IMySlashCommand } from '../../types';
+import type { IMyBotEvent, IMySlashCommand } from '@/types';
 // import type { ClientOptions } from 'discord.js';
-import utils from '../Utils';
+import utils from '@/lib/Utils';
 import { Client, Collection } from 'discord.js';
 import BotSettings from './BotSettings';
 import SystemLog from './SystemLog';

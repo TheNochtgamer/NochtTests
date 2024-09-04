@@ -1,4 +1,4 @@
-import type { IGlobalDisabledCommand } from '../../types';
+import type { IGlobalDisabledCommand } from '@/types';
 
 export default class BotSettings {
   // data

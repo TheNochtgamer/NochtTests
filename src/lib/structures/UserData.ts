@@ -1,4 +1,4 @@
-import type { IUserDisabledCommand } from '../../types';
+import type { IUserDisabledCommand } from '@/types';
 
 type data = string | (Partial<UserData> & { id: string });
 

@@ -1,4 +1,5 @@
 import 'dotenv/config';
+import 'module-alias/register';
 import Bot from './lib/structures/Bot';
 import { IntentsBitField, Partials, PresenceUpdateStatus } from 'discord.js';
 import SystemLog from './lib/structures/SystemLog';
