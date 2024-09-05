@@ -550,7 +550,7 @@ class Utils {
 
     const response = await reply.awaitMessageComponent({ idle: timeout });
 
-    await interaction.editReply({ components: [] });
+    await interaction.editReply({ content: '_ _', components: [] });
 
     if (response.customId === 'accept') return 0;
     if (response.customId === 'deny') return 1;
