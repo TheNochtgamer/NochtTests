@@ -67,7 +67,10 @@ class Database {
       return rows as R[];
     } catch (error) {
       if (error instanceof Error)
-        logger.error('query', `Error on query: ${error.message}`);
+        logger.error(
+          'query',
+          `Error on query: ${error.message}\nQuery: ${query}`
+        );
       return null;
     }
   }
@@ -119,12 +122,11 @@ class Database {
       `
       CREATE TABLE IF NOT EXISTS ags_user_tokens (
         user_id INT PRIMARY KEY AUTO_INCREMENT,
-        ds_id VARCHAR(30),
+        ds_id VARCHAR(30) UNIQUE,
         reference VARCHAR(30),
         token VARCHAR(255),
         priority INT DEFAULT 0,
-        FOREIGN KEY (ds_id) REFERENCES users(id),
-        UNIQUE (ds_id, reference)
+        FOREIGN KEY (ds_id) REFERENCES users(id)
       );;
 
       CREATE TABLE IF NOT EXISTS ags_codes (
@@ -176,8 +178,8 @@ class Database {
         END IF;
       END;;
 
-      DROP PROCEDURE IF EXISTS upsert_ags_users_tokens;;
-      CREATE PROCEDURE upsert_ags_users_tokens(
+      DROP PROCEDURE IF EXISTS update_ags_user_tokens;;
+      CREATE PROCEDURE update_ags_user_tokens(
         IN _user_id INT,
         IN _ds_id VARCHAR(30),
         IN _reference VARCHAR(30),
@@ -185,12 +187,21 @@ class Database {
         IN _token VARCHAR(255)
       ) 
       BEGIN
-        IF EXISTS (SELECT * FROM ags_user_tokens WHERE user_id = _user_id) THEN
           UPDATE ags_user_tokens SET ds_id = _ds_id, reference = _reference, priority = _priority, token = _token WHERE user_id = _user_id;
-        ELSE
-          INSERT INTO ags_user_tokens (ds_id, reference, priority, token) VALUES (_ds_id, _reference, _priority, _token);
-        END IF;
       END;;
+
+      DROP PROCEDURE IF EXISTS create_ags_user_tokens;;
+      CREATE PROCEDURE create_ags_user_tokens(
+        IN _ds_id VARCHAR(30),
+        IN _reference VARCHAR(30),
+        IN _priority INT,
+        IN _token VARCHAR(255)
+      )
+      BEGIN
+        INSERT INTO ags_user_tokens (ds_id, reference, priority, token) VALUES (_ds_id, _reference, _priority, _token);
+        SELECT * FROM ags_user_tokens WHERE user_id = LAST_INSERT_ID();
+      END;;
+      
       `,
     ];
 

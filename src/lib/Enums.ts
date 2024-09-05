@@ -83,4 +83,5 @@ export const ResponseTypes = Object.freeze({
   noSufficientData: 'Es necesario completar tu DNI y',
   toMuchRequests: 'Por favor, probá de<br>',
   toMuchRequestsRegExp: /nuevo en ([0-9]+) minutos/i,
+  invalidToken: 'Tenes que estar logeado para poder canjear un código.',
 });

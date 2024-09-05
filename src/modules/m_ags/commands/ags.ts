@@ -1,30 +1,27 @@
+import type { IMyCommandDataImSubCommand, IMySlashCommand } from '@/types';
 import { SlashCommandBuilder } from 'discord.js';
-import type { IMySlashCommand, IMyCommandDataImSubCommand } from '@/types';
-// import utils from '@/lib/Utils';
-//
-import evaluate from './eval';
-import reload from './reload';
-import cmdtoggle from './cmdtoggle';
+
+import linkme from './linkme';
 
 const subs = new Map<string, IMySlashCommand<IMyCommandDataImSubCommand>>([
-  ['eval', evaluate],
-  ['reloadall', reload],
-  ['cmdtoggle', cmdtoggle],
+  ['linkme', linkme],
 ]);
 
 export default {
-  // data: (() => {
-  //   const cmd = new SlashCommandBuilder()
-  //     .setName('dev')
-  //     .setDescription('Comandos de desarrollador');
-  //   subs.forEach(sub => cmd.addSubcommand(sub.definition.data));
-
-  //   return cmd;
-  // })(),
+  // definition: {
+  //   kind: 'SubsOnly',
+  //   data: new SlashCommandBuilder()
+  //     .setName('ags')
+  //     .setDescription('Comandos relacionados a la AGS')
+  //     .addSubcommandGroup(group => {
+  //       subs.forEach(sub => group.addSubcommand(sub.definition.data));
+  //       return group;
+  //     }),
+  // },
   definition: (() => {
     const cmd = new SlashCommandBuilder()
-      .setName('dev')
-      .setDescription('Comandos de desarrollador');
+      .setName('ags')
+      .setDescription('Comandos relacionados a la AGS');
     subs.forEach(sub => cmd.addSubcommand(sub.definition.data));
 
     return {
@@ -32,18 +29,6 @@ export default {
       data: cmd,
     };
   })(),
-
-  // definition: {
-  //   kind: 'SubsOnly',
-  //   data: new SlashCommandBuilder()
-  //     .setName('dev')
-  //     .setDescription('Comandos de desarrollador')
-  //     .addSubcommandGroup(group => {
-  //       subs.forEach(sub => group.addSubcommand(sub.definition.data));
-  //       return group;
-  //     }),
-  // },
-  onlyOwners: true,
 
   async autoComplete(interaction) {
     const subCommand = interaction.options.getSubcommand(true);

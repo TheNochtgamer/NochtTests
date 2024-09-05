@@ -8,11 +8,9 @@ import Utils from '@/lib/Utils';
 const logger = new SystemLog('services', 'AgsCodesService');
 
 class AgsCodesService {
-  private async fetchReward(
-    token: string,
-    code?: string
-  ): Promise<IAgsRewardPageResponse> {
-    const { data } = await axios.get<IAgsRewardPageResponse>(AgsPages.reward, {
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+  private async fetchReward(token: string, code?: string) {
+    const response = await axios.get<IAgsRewardPageResponse>(AgsPages.reward, {
       headers: {
         accept: 'application/json, text/plain, */*',
         'sec-ch-ua':
@@ -31,7 +29,23 @@ class AgsCodesService {
         : null,
     });
 
-    return data;
+    return response;
+  }
+
+  public async testToken(token: string): Promise<0 | 1 | string> {
+    try {
+      const { data } = await this.fetchReward(token);
+      if (data.text === '') return 0;
+      if (
+        Utils.compareTwoStrings(data.text || '', ResponseTypes.invalidToken) >=
+        90
+      )
+        return '<Tu token es invalido>';
+      return data.text;
+    } catch (error) {
+      logger.error('testToken', 'No se obtuvo respuesta de la pagina:', error);
+      return 1;
+    }
   }
 
   public async loadCodeForOne(
@@ -41,7 +55,8 @@ class AgsCodesService {
     let tries = 0;
     while (tries < 3) {
       try {
-        return await this.fetchReward(user.token, code);
+        const { data } = await this.fetchReward(user.token, code);
+        return data;
       } catch (error) {
         logger.error(
           'loadOneCode',
@@ -80,8 +95,6 @@ class AgsCodesService {
 
       if (
         !firstResponse ||
-        // (firstResponse.text.includes(ResponseTypes.invalidCode) &&
-        //   firstResponse.text.includes(ResponseTypes.alreadyExchange))
         (Utils.compareTwoStrings(
           firstResponse.text || '',
           ResponseTypes.invalidCode

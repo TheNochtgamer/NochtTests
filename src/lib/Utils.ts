@@ -144,7 +144,9 @@ class Utils {
 
     logger.log(
       'summitCommands',
-      `Subiendo comandos${guildId ? ` (en el guild: ${guildId})` : ''}...`
+      `Subiendo comandos${
+        guildId ? ` (en el guild: ${guildId})` : '(globalmente)'
+      }...`
     );
     try {
       const cmdDatas = client.commands
@@ -172,7 +174,11 @@ class Utils {
       // }
       if (!cmds) throw new Error('No se subio ningun comando');
     } catch (error) {
-      logger.error('summitCommands', 'Error al intentar subir los comandos');
+      logger.error(
+        'summitCommands',
+        'Error al intentar subir los comandos:',
+        error
+      );
       return;
     }
     logger.log('summitCommands', `${cmds.size} comandos subidos`);
@@ -592,10 +598,11 @@ class Utils {
   }
 
   public async getRandomSleep<T = undefined>(
-    min = 10,
-    max = 50,
+    min = 1000,
+    max?: number,
     toReturn?: T
   ): Promise<T | undefined> {
+    if (max === undefined) max = min;
     const sleepTime = Math.floor(Math.random() * (max - min + 1)) + min;
     await this.sleep(sleepTime);
     return toReturn;
