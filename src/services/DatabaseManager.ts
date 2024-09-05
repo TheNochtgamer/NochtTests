@@ -49,16 +49,29 @@ class Database {
       );
   }
 
-  async query<R = any>(query: string, values: any[] = []): Promise<R> {
+  private antiSqlInjection(value: any): any {
+    if (typeof value === 'string')
+      return value.replace(/'/g, "\\'").replace(/"/g, '\\"').replace(/;/g, '');
+
+    return value;
+  }
+
+  async query<R = any>(query: string, values: any[] = []): Promise<R[] | null> {
     try {
       const connection = await this.dbPool.getConnection();
-      const [rows] = await connection.query(query.replace('\n', ''), values);
+      const [rows] = await connection.query(
+        query.replace('\n', ''),
+        values.map(this.antiSqlInjection.bind(this))
+      );
       connection.release();
-      return rows as R;
+      return rows as R[];
     } catch (error) {
       if (error instanceof Error)
-        logger.error('query', `Error on query: ${error.message}`);
-      return null as R;
+        logger.error(
+          'query',
+          `Error on query: ${error.message}\nQuery: ${query}`
+        );
+      return null;
     }
   }
 
@@ -109,9 +122,10 @@ class Database {
       `
       CREATE TABLE IF NOT EXISTS ags_user_tokens (
         user_id INT PRIMARY KEY AUTO_INCREMENT,
-        ds_id VARCHAR(30),
+        ds_id VARCHAR(30) UNIQUE,
         reference VARCHAR(30),
         token VARCHAR(255),
+        priority INT DEFAULT 0,
         FOREIGN KEY (ds_id) REFERENCES users(id)
       );;
 
@@ -163,6 +177,31 @@ class Database {
           INSERT INTO guilds (id, prefix) VALUES (_id, _prefix);
         END IF;
       END;;
+
+      DROP PROCEDURE IF EXISTS update_ags_user_tokens;;
+      CREATE PROCEDURE update_ags_user_tokens(
+        IN _user_id INT,
+        IN _ds_id VARCHAR(30),
+        IN _reference VARCHAR(30),
+        IN _priority INT,
+        IN _token VARCHAR(255)
+      ) 
+      BEGIN
+          UPDATE ags_user_tokens SET ds_id = _ds_id, reference = _reference, priority = _priority, token = _token WHERE user_id = _user_id;
+      END;;
+
+      DROP PROCEDURE IF EXISTS create_ags_user_tokens;;
+      CREATE PROCEDURE create_ags_user_tokens(
+        IN _ds_id VARCHAR(30),
+        IN _reference VARCHAR(30),
+        IN _priority INT,
+        IN _token VARCHAR(255)
+      )
+      BEGIN
+        INSERT INTO ags_user_tokens (ds_id, reference, priority, token) VALUES (_ds_id, _reference, _priority, _token);
+        SELECT * FROM ags_user_tokens WHERE user_id = LAST_INSERT_ID();
+      END;;
+      
       `,
     ];
 

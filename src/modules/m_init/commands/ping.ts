@@ -6,10 +6,7 @@ export default {
     kind: 'OptionsOnly',
     data: new SlashCommandBuilder()
       .setName('ping')
-      .setDescription('Un comando que hace ping')
-      .setDescriptionLocalizations({
-        'es-ES': 'Un comando que hace ping',
-      }),
+      .setDescription('Un comando que hace ping'),
   },
 
   async run(interaction) {

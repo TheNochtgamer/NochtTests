@@ -69,3 +69,19 @@ export const Embeds = {
     };
   },
 };
+
+export const AgsPages = Object.freeze({
+  reward: 'https://app.argentinagameshow.com/custom/ags/ajax/rew.php',
+  login: 'https://app.argentinagameshow.com/ags/ajax/actions_public.php',
+});
+
+export const ResponseTypes = Object.freeze({
+  alreadyExchange: 'Ya canjeaste este código.',
+  exchangeSuccess: '¡Canjeaste tu logro ',
+  invalidCode: 'El código no es válido.',
+  codeLimit: 'Este código llegó a su límite de usos.',
+  noSufficientData: 'Es necesario completar tu DNI y',
+  toMuchRequests: 'Por favor, probá de<br>',
+  toMuchRequestsRegExp: /nuevo en ([0-9]+) minutos/i,
+  invalidToken: 'Tenes que estar logeado para poder canjear un código.',
+});
