@@ -1,9 +1,9 @@
-import type { IAgsRewardPageResponse } from '@/types';
+import type { IAgsRewardPageResponse, AgsUserData } from '@/types';
 import { AgsPages, ResponseTypes } from '@/lib/Enums';
-import AgsUserData from '@/lib/structures/AGS/AgsUserData';
 import axios from 'axios';
 import SystemLog from '@/lib/structures/SystemLog';
 import Utils from '@/lib/Utils';
+import { bot } from '..';
 
 const logger = new SystemLog('services', 'AgsCodesService');
 
@@ -56,6 +56,17 @@ class AgsCodesService {
     while (tries < 3) {
       try {
         const { data } = await this.fetchReward(user.token, code);
+
+        logger.debug(
+          'loadOneCode',
+          `user_${user.user_id}:${
+            user.ds_id
+              ? bot.users.cache.get(user.ds_id)?.displayName ??
+                bot.users.cache.get(user.ds_id)?.username ??
+                user.ds_id
+              : user.reference
+          } >\n${JSON.stringify(data, null, 2)}`
+        );
         return data;
       } catch (error) {
         logger.error(
@@ -93,21 +104,28 @@ class AgsCodesService {
       responses.push(firstResponse);
       if (cb) void cb(firstUser, firstResponse);
 
+      if (!firstResponse) return responses;
+
       if (
-        !firstResponse ||
-        (Utils.compareTwoStrings(
+        Utils.compareTwoStrings(
           firstResponse.text || '',
-          ResponseTypes.invalidCode
-        ) >= 90 &&
-          Utils.compareTwoStrings(
-            firstResponse.text || '',
-            ResponseTypes.alreadyExchange
-          ) >= 90)
+          ResponseTypes.codeLimit
+        ) >= 90
       ) {
         logger.log(
           'loadCodeForAll',
-          'Abortando... Codigo invalido o ya canjeado...'
+          'Abortando... El codigo llego a su limite...'
         );
+        return responses;
+      }
+
+      if (
+        Utils.compareTwoStrings(
+          firstResponse.text || '',
+          ResponseTypes.invalidCode
+        ) >= 90
+      ) {
+        logger.log('loadCodeForAll', 'Abortando... Codigo invalido...');
         return responses;
       }
     }
