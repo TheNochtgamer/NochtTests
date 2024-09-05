@@ -20,14 +20,13 @@ export default class AgsUsersManager {
     return newData;
   }
 
-  public static async updateUserToken(data: AgsUserData): Promise<void> {
-    await DatabaseManager.query(`CALL update_ags_user_tokens(?, ?, ?, ?, ?)`, [
-      data.user_id,
-      data.ds_id,
-      data.reference,
-      data.priority,
-      data.token,
-    ]);
+  public static async updateUserToken(
+    data: AgsUserData
+  ): Promise<any[] | null> {
+    return await DatabaseManager.query(
+      `CALL update_ags_user_tokens(?, ?, ?, ?, ?)`,
+      [data.user_id, data.ds_id, data.reference, data.priority, data.token]
+    );
   }
 
   public static async getUserToken(tableData: {
