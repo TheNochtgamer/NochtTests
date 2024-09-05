@@ -41,7 +41,7 @@ const webhookLog = new (class {
   private async testWebhook(): Promise<void> {
     if (!process.env.LOG_WEBHOOK_URL) return;
     try {
-      await this.sendLog('```\n' + `${this.now()} Iniciando sistema.` + '```');
+      await this.sendLog(`${this.now()} Iniciando sistema.`);
       this._logWebhookExist = true;
     } catch (error) {
       console.error(`${this.now()} Error en el webhook de logs: `, error);
@@ -50,7 +50,7 @@ const webhookLog = new (class {
   }
 
   private async logLoop(): Promise<void> {
-    const content = '```\n' + this.toLog.join('\n');
+    const content = this.toLog.join('\n');
 
     this.toLog.length = 0;
     try {
@@ -60,12 +60,18 @@ const webhookLog = new (class {
     }
   }
 
-  private async sendLog(content: string): Promise<void> {
+  private async sendLog(_content: string): Promise<void> {
     if (!this._logWebhookExist) return;
 
+    const content =
+      '```\n' +
+      _content.slice(0, 1991) +
+      (_content.length >= 1991 ? '++' : '') +
+      '```';
+
     await this.logHook.send({
-      content:
-        content.slice(0, 1995) + (content.length > 1995 ? '++' : '') + '```',
+      content,
+
       ...sendOptions,
     });
   }
