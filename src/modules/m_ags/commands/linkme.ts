@@ -20,7 +20,7 @@ export default {
   },
 
   async run(interaction) {
-    const token = interaction.options.getString('token', true);
+    const token = interaction.options.getString('token', true).toLowerCase();
     await interaction.deferReply({ ephemeral: true });
 
     const userToken = await AgsUsersManager.getUserToken({
