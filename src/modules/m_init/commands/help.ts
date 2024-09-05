@@ -19,6 +19,7 @@ export default {
   },
 
   async run(interaction) {
+    // FIXME
     const embed = new EmbedBuilder().setColor('Random').setTitle('Comandos');
     const commands = process.env.GUILDID
       ? await interaction.guild?.commands.fetch()
@@ -69,7 +70,7 @@ export default {
       })
       .join('\n');
 
-    embed.setDescription(str);
+    embed.setDescription(str || null);
 
     // await interaction.reply({
     //   embeds: [embed],

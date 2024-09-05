@@ -538,19 +538,17 @@ class Utils {
       interaction.replied || interaction.deferred
         ? await interaction.editReply({
             content: message,
-            // @ts-ignore
             components: [row],
           })
         : await interaction.reply({
             content: message,
-            // @ts-ignore
             components: [row],
             ephemeral: true,
           });
 
     const response = await reply.awaitMessageComponent({ idle: timeout });
 
-    await interaction.editReply({ content: '_ _', components: [] });
+    await interaction.editReply({ content: null, components: [] });
 
     if (response.customId === 'accept') return 0;
     if (response.customId === 'deny') return 1;

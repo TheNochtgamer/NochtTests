@@ -90,7 +90,7 @@ export default {
           }
 
           async function updateEmbed(end = false): Promise<void> {
-            resultsEmbed.setDescription(resultTxt);
+            resultsEmbed.setDescription(resultTxt || null);
             if (end) {
               resultsEmbed.setTitle('Codigo cargado');
               resultsEmbed.setColor('Green');
