@@ -34,7 +34,10 @@ const webhookLog = new (class {
       .replace(/[0-9]+(\/| )/g, match => match.padStart(3, '0'))}]`;
   }
 
-  public addToLog(type: 'info' | 'error' | 'warn', content: string): void {
+  public addToLog(
+    type: 'info' | 'error' | 'warn' | 'debug',
+    content: string
+  ): void {
     this.toLog.push(`**[${type.toUpperCase()}]** ${content}`);
   }
 
@@ -117,6 +120,14 @@ export default class SystemLog {
     console.error(this.now(), `<${this.getPath()}:${functionName}()>`, ...args);
     webhookLog.addToLog(
       'error',
+      `${this.now()} <${this.getPath()}:${functionName}()> ${args.join(' ')}`
+    );
+  }
+
+  public debug(functionName: string, ...args: any[]): void {
+    console.log(this.now(), `<${this.getPath()}:${functionName}()>`, ...args);
+    webhookLog.addToLog(
+      'debug',
       `${this.now()} <${this.getPath()}:${functionName}()> ${args.join(' ')}`
     );
   }

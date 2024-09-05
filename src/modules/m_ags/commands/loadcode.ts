@@ -34,7 +34,7 @@ export default {
       .addBooleanOption(option =>
         option
           .setName('force')
-          .setDescription('Fuerza la carga del codigo (NO REVISA SI ANDA)')
+          .setDescription('Fuerza la carga del codigo (SALTEA LOS CHEQUEOS)')
           .setRequired(false)
       )
       .addUserOption(option =>
@@ -56,11 +56,12 @@ export default {
     const _user = interaction.options.getUser('user', false);
 
     const resultsEmbed = new EmbedBuilder()
-      .setTitle('Cargando codigo...')
+      .setTitle(`Cargando codigo...${_force ? ' (Forzado)' : ''}`)
       .setAuthor({ name: _code })
       .setFooter({ text: 'AgsCodeSniper' })
       .setColor('DarkRed')
-      .setDescription('...');
+      .setDescription('...')
+      .setTimestamp();
 
     if (_para === 'user' && !_user) {
       void Utils.embedReply(interaction, {
@@ -105,6 +106,13 @@ export default {
 
           const updateEmbedInterval = setInterval(updateEmbed, 3000);
 
+          logger.debug(
+            'run',
+            `Cargando codigo "${_code}" para todos los usuarios ${
+              _force ? '(Forzado)' : ''
+            }`
+          );
+
           await AgsService.loadCodeForAll(
             allUsersData,
             _code,
@@ -143,6 +151,13 @@ export default {
             return;
           }
 
+          logger.debug(
+            'run',
+            `Cargando codigo "${_code}" para el usuario "${
+              _para === 'me' ? interaction.user.id : _user?.id
+            }" ${_force ? '(Forzado)' : ''}`
+          );
+
           const response = await AgsService.loadCodeForOne(userToken, _code);
 
           if (!response) {
@@ -156,7 +171,7 @@ export default {
           }
 
           void Utils.embedReply(interaction, {
-            title: 'Codigo cargado',
+            title: `Codigo cargado correctamente${_force ? ' (Forzado)' : ''}`,
             description: response.text,
             color: 'Green',
             footer: { text: 'AgsCodeSniper' },

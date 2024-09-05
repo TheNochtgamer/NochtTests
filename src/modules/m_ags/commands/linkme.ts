@@ -81,7 +81,8 @@ export default {
 
     void Utils.embedReply(interaction, {
       title: 'Exito',
-      description: 'Token vinculado correctamente',
+      description:
+        'Token vinculado correctamente\nMuchas gracias por usar mi sistema, si me queres dar una mano monetariamente, podes hacerlo en https://cafecito.app/thenochtgamer.',
       color: 'Green',
       footer: { text: 'AgsCodeSniper' },
     });
