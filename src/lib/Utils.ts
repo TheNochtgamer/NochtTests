@@ -590,6 +590,62 @@ class Utils {
 
     return false;
   }
+
+  public async getRandomSleep<T = undefined>(
+    min = 10,
+    max = 50,
+    toReturn?: T
+  ): Promise<T | undefined> {
+    const sleepTime = Math.floor(Math.random() * (max - min + 1)) + min;
+    await this.sleep(sleepTime);
+    return toReturn;
+  }
+
+  public compareTwoStrings(a: string, b: string): number {
+    const similarity = this.similarity(a, b);
+    const percentage = similarity * 100;
+    return percentage;
+  }
+
+  private similarity(a: string, b: string): number {
+    const longer = a.length > b.length ? a : b;
+    const shorter = a.length > b.length ? b : a;
+    const longerLength = longer.length;
+
+    if (longerLength === 0) {
+      return 1.0;
+    }
+
+    return (longerLength - this.editDistance(longer, shorter)) / longerLength;
+  }
+
+  private editDistance(a: string, b: string): number {
+    a = a.toLowerCase();
+    b = b.toLowerCase();
+
+    const costs = new Array<number>(b.length + 1);
+    for (let i = 0; i <= a.length; i++) {
+      let lastValue = i;
+      for (let j = 0; j <= b.length; j++) {
+        if (i === 0) {
+          costs[j] = j;
+        } else {
+          if (j > 0) {
+            let newValue = costs[j - 1];
+            if (a.charAt(i - 1) !== b.charAt(j - 1)) {
+              newValue = Math.min(Math.min(newValue, lastValue), costs[j]) + 1;
+            }
+            costs[j - 1] = lastValue;
+            lastValue = newValue;
+          }
+        }
+      }
+      if (i > 0) {
+        costs[b.length] = lastValue;
+      }
+    }
+    return costs[b.length];
+  }
 }
 
 export default new Utils();

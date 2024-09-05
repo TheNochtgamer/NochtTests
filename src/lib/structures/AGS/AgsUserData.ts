@@ -1,6 +1,6 @@
-type data = string | (Partial<AgsTokens> & { user_id: string });
+type data = string | (Partial<AgsUserData> & { user_id: string });
 
-export default class AgsTokens {
+export default class AgsUserData {
   public readonly user_id: string;
   public ds_id: string | null = null;
   public refence: string | null = null;

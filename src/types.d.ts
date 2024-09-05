@@ -6,12 +6,12 @@ import type Discord, {
 import type _Bot from './lib/structures/Bot';
 import type _GuildData from './lib/structures/GuildData';
 import type _UserData from './lib/structures/UserData';
-import type _AgsTokensData from './lib/structures/AGS/AgsTokensData';
+import type _AgsUserData from './lib/structures/AGS/AgsUserData';
 
 declare type Bot = _Bot;
 declare type GuildData = _GuildData;
 declare type UserData = _UserData;
-declare type AgsTokensData = _AgsTokensData;
+declare type AgsUserData = _AgsUserData;
 
 declare type MyEmbedData = Omit<EmbedData, 'color'> & {
   color: ColorResolvable | number;
@@ -161,4 +161,14 @@ declare interface IGlobalDisabledCommand {
   cmd_name: string;
   reason?: string;
   type: 'global';
+}
+
+export interface IAgsRewardPageResponse {
+  text: string;
+  code: number;
+  extra: string | null;
+  extra2: string | null;
+  moreimg?: string;
+  more?: number;
+  morename?: string;
 }

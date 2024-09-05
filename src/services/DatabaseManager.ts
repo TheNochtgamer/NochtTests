@@ -175,6 +175,22 @@ class Database {
           INSERT INTO guilds (id, prefix) VALUES (_id, _prefix);
         END IF;
       END;;
+
+      DROP PROCEDURE IF EXISTS upsert_ags_users_tokens;;
+      CREATE PROCEDURE upsert_ags_users_tokens(
+        IN _user_id INT,
+        IN _ds_id VARCHAR(30),
+        IN _reference VARCHAR(30),
+        IN _priority INT,
+        IN _token VARCHAR(255)
+      ) 
+      BEGIN
+        IF EXISTS (SELECT * FROM ags_user_tokens WHERE user_id = _user_id) THEN
+          UPDATE ags_user_tokens SET ds_id = _ds_id, reference = _reference, priority = _priority, token = _token WHERE user_id = _user_id;
+        ELSE
+          INSERT INTO ags_user_tokens (ds_id, reference, priority, token) VALUES (_ds_id, _reference, _priority, _token);
+        END IF;
+      END;;
       `,
     ];
 
