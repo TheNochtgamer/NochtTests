@@ -21,7 +21,7 @@ const webhookLog = new (class {
     void this.testWebhook();
     this._sendLoopInterval = setInterval(() => {
       if (this.toLog.length === 0) return;
-      void this.sendLog();
+      void this.logLoop();
     }, 1000 * 3);
   }
 
@@ -41,9 +41,7 @@ const webhookLog = new (class {
   private async testWebhook(): Promise<void> {
     if (!process.env.LOG_WEBHOOK_URL) return;
     try {
-      await this.logHook.send({
-        content: '```\n' + `${this.now()} Iniciando sistema.` + '```',
-      });
+      await this.sendLog('```\n' + `${this.now()} Iniciando sistema.` + '```');
       this._logWebhookExist = true;
     } catch (error) {
       console.error(`${this.now()} Error en el webhook de logs: `, error);
@@ -51,20 +49,25 @@ const webhookLog = new (class {
     }
   }
 
-  private async sendLog(): Promise<void> {
-    if (!this._logWebhookExist) return;
-
+  private async logLoop(): Promise<void> {
     const content = '```\n' + this.toLog.join('\n');
+
     this.toLog.length = 0;
     try {
-      await this.logHook.send({
-        content:
-          content.slice(0, 1995) + (content.length > 1995) ? '++' : '' + '```',
-        ...sendOptions,
-      });
+      await this.sendLog(content);
     } catch (error) {
       console.error(`${this.now()} Error al enviar logs: `, error);
     }
+  }
+
+  private async sendLog(content: string): Promise<void> {
+    if (!this._logWebhookExist) return;
+
+    await this.logHook.send({
+      content:
+        content.slice(0, 1995) + (content.length > 1995 ? '++' : '') + '```',
+      ...sendOptions,
+    });
   }
 })();
 
