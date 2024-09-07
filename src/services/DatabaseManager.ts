@@ -122,7 +122,7 @@ class Database {
       `
       CREATE TABLE IF NOT EXISTS ags_user_tokens (
         user_id INT PRIMARY KEY AUTO_INCREMENT,
-        ds_id VARCHAR(30) UNIQUE,
+        ds_id VARCHAR(30),
         reference VARCHAR(30),
         token VARCHAR(255),
         priority INT DEFAULT 0,
@@ -202,6 +202,26 @@ class Database {
         SELECT * FROM ags_user_tokens WHERE user_id = LAST_INSERT_ID();
       END;;
       
+      DROP PROCEDURE IF EXISTS create_ags_code;;
+      CREATE PROCEDURE create_ags_code(
+        IN _code VARCHAR(255)
+      )
+      BEGIN
+        INSERT INTO ags_codes (code) VALUES (_code);
+        SELECT * FROM ags_codes WHERE code_id = LAST_INSERT_ID();
+      END;;
+
+      DROP PROCEDURE IF EXISTS create_ags_exchange;;
+      CREATE PROCEDURE create_ags_exchange(
+        IN _user_id INT,
+        IN _code VARCHAR(255),
+        IN _response TEXT
+      )
+      BEGIN
+        SET @code_id = (SELECT code_id FROM ags_codes WHERE code = _code);
+        INSERT INTO ags_exchanges (user_id, code_id, response) VALUES (_user_id, @code_id, _response);
+        SELECT * FROM ags_exchanges WHERE user_id = _user_id AND code_id = @code_id;        
+      END;;
       `,
     ];
 

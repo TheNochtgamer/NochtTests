@@ -1,9 +1,12 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import type { IAgsRewardPageResponse, AgsUserData } from '@/types';
-import { AgsPages, ResponseTypes } from '@/lib/Enums';
+import { AgsPages, CachePointers, ResponseTypes } from '@/lib/Enums';
 import axios from 'axios';
 import SystemLog from '@/lib/structures/SystemLog';
 import Utils from '@/lib/Utils';
 import { bot } from '..';
+import DatabaseManager from './DatabaseManager';
+import cacheMe from './cacheMe';
 
 const logger = new SystemLog('services', 'AgsCodesService');
 
@@ -52,6 +55,8 @@ class AgsCodesService {
     user: AgsUserData,
     code: string
   ): Promise<IAgsRewardPageResponse | null> {
+    void this.saveCode(code);
+
     let tries = 0;
     while (tries < 3) {
       try {
@@ -67,6 +72,8 @@ class AgsCodesService {
               : user.reference
           } >\n${JSON.stringify(data, null, 2)}`
         );
+
+        void this.saveExchange(user.user_id, code, data);
         return data;
       } catch (error) {
         logger.error(
@@ -83,6 +90,8 @@ class AgsCodesService {
       'loadOneCode',
       `user_${user.user_id} > Demasiados intentos fallidos`
     );
+
+    void this.saveExchange(user.user_id, code, null);
     return null;
   }
 
@@ -140,6 +149,34 @@ class AgsCodesService {
     await Promise.all(promises);
 
     return responses;
+  }
+
+  public parseResponseText(response: IAgsRewardPageResponse | null): string {
+    if (!response?.text) return '<La pagina no dio respuesta>';
+    let text = response.text || '';
+
+    // TODO Añadir a futuro un parseo mas clean y preciso (necesitamos más data de respuesta)
+    if (text.includes('agsSuper')) text = text.slice(text.indexOf('agsSuper'));
+
+    return text;
+  }
+
+  private async saveCode(code: string): Promise<void> {
+    if (cacheMe.has(code + CachePointers.agsCode)) return;
+    cacheMe.set(code + CachePointers.agsCode, code);
+
+    await DatabaseManager.query(`
+      CALL create_ags_code ('${code}');`);
+  }
+
+  private async saveExchange(
+    user_id: string,
+    code: string,
+    response: IAgsRewardPageResponse | null
+  ): Promise<void> {
+    const responseText = response === null ? null : JSON.stringify(response);
+    await DatabaseManager.query(`
+      CALL create_ags_exchange ('${user_id}', '${code}', '${responseText}');`);
   }
 }
 

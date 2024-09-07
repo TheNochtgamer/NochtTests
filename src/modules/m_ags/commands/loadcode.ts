@@ -81,6 +81,7 @@ export default {
         {
           const allUsersData = await AgsUsersManager.getUsersTokens();
           const allResults: string[] = [];
+          const resultFields: APIEmbedField[] = [];
 
           if (!allUsersData || allUsersData.length === 0) {
             void Utils.embedReply(interaction, {
@@ -93,7 +94,6 @@ export default {
           }
 
           async function updateEmbed(end = false): Promise<void> {
-            const resultFields: APIEmbedField[] = [];
             let fieldContent = '';
 
             for (const result of allResults) {
@@ -103,11 +103,22 @@ export default {
                     resultFields.length ? ` ${resultFields.length + 1}` : ''
                   }`,
                   value: fieldContent,
+                  inline: false,
                 });
                 fieldContent = '';
               }
 
               fieldContent += `${result}\n`;
+            }
+
+            if (fieldContent) {
+              resultFields.push({
+                name: `Resultado${
+                  resultFields.length ? ` ${resultFields.length + 1}` : ''
+                }`,
+                value: fieldContent,
+                inline: false,
+              });
             }
 
             try {
@@ -143,15 +154,16 @@ export default {
                 agsUserData.ds_id
                   ? `<@${agsUserData.ds_id}>`
                   : agsUserData.reference
-              } > ${response?.text ?? '<La pagina no dio respuesta>'}`;
+              } > ${AgsService.parseResponseText(response)}`;
 
               allResults.push(format); // += `${format}\n`;
             }
           );
 
+          await Utils.getRandomSleep(2000);
+          clearInterval(updateEmbedInterval);
           await Utils.getRandomSleep(3000);
 
-          clearInterval(updateEmbedInterval);
           await updateEmbed(true);
         }
         break;
@@ -181,21 +193,10 @@ export default {
 
           const response = await AgsService.loadCodeForOne(userToken, _code);
 
-          if (!response) {
-            void Utils.embedReply(interaction, {
-              author: { name: _code },
-              title: 'Error',
-              description: '<La pagina no dio respuesta>',
-              color: 'Red',
-              footer: { text: 'AgsCodeSniper' },
-            });
-            return;
-          }
-
           void Utils.embedReply(interaction, {
             author: { name: _code },
             title: `Codigo cargado correctamente${_force ? ' (Forzado)' : ''}`,
-            description: response.text,
+            description: AgsService.parseResponseText(response),
             color: 'Green',
             footer: { text: 'AgsCodeSniper' },
           });
