@@ -10,7 +10,7 @@ const sendOptions: WebhookMessageCreateOptions = {
 
 const webhookLog = new (class {
   private readonly logHook: WebhookClient;
-  private readonly toLog: string[] = [];
+  private readonly logBlocks: string[] = [];
   private readonly _sendLoopInterval;
   private _logWebhookExist = false;
 
@@ -20,7 +20,7 @@ const webhookLog = new (class {
     });
     void this.testWebhook();
     this._sendLoopInterval = setInterval(() => {
-      if (this.toLog.length === 0) return;
+      if (this.logBlocks.length === 0 || !this._logWebhookExist) return;
       void this.logLoop();
     }, 1000 * 3);
   }
@@ -34,11 +34,22 @@ const webhookLog = new (class {
       .replace(/[0-9]+(\/| )/g, match => match.padStart(3, '0'))}]`;
   }
 
+  public parseToLog(_content: unknown): any {
+    if (typeof _content === 'string') return _content;
+
+    if (typeof _content === 'object') return JSON.stringify(_content, null, 2);
+
+    if (_content instanceof Error)
+      return `<Name>${_content.name}</Name> <Error>${_content.message}</Error>\n<Stack> ${_content.stack} </Stack>`;
+
+    return _content;
+  }
+
   public addToLog(
     type: 'info' | 'error' | 'warn' | 'debug',
-    content: string
+    _content: string
   ): void {
-    this.toLog.push(`**[${type.toUpperCase()}]** ${content}`);
+    this.logBlocks.push(`**[${type.toUpperCase()}]** ${_content}`);
   }
 
   private async testWebhook(): Promise<void> {
@@ -53,18 +64,28 @@ const webhookLog = new (class {
   }
 
   private async logLoop(): Promise<void> {
-    const content = this.toLog.join('\n');
+    const logBlocksLength = this.logBlocks.length;
+    const content: string[] = [];
 
-    this.toLog.length = 0;
+    for (let index = 0; index < logBlocksLength; index++) {
+      if (content.join('\n').length + (this.logBlocks[0]?.length || 0) >= 1991)
+        break;
+
+      const logBlock = this.logBlocks.shift();
+      if (!logBlock) break;
+
+      content.push(logBlock);
+    }
+
     try {
-      await this.sendLog(content);
+      await this.sendLog(content.join('\n'));
     } catch (error) {
       console.error(`${this.now()} Error al enviar logs: `, error);
     }
   }
 
   private async sendLog(_content: string): Promise<void> {
-    if (!this._logWebhookExist) return;
+    if (!_content) return;
 
     const content =
       '```\n' +
@@ -72,11 +93,15 @@ const webhookLog = new (class {
       (_content.length >= 1991 ? '++' : '') +
       '```';
 
-    await this.logHook.send({
-      content,
+    try {
+      await this.logHook.send({
+        content,
 
-      ...sendOptions,
-    });
+        ...sendOptions,
+      });
+    } catch (error) {
+      console.error(`${this.now()} Error al enviar logs: `, error);
+    }
   }
 })();
 
