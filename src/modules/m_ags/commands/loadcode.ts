@@ -3,7 +3,11 @@ import Utils from '@/lib/Utils';
 import AgsService from '@/services/AgsService';
 import AgsUsersManager from '@/services/AgsUsersManager';
 import type { IMySlashCommand } from '@/types';
-import { EmbedBuilder, SlashCommandSubcommandBuilder } from 'discord.js';
+import {
+  type APIEmbedField,
+  EmbedBuilder,
+  SlashCommandSubcommandBuilder,
+} from 'discord.js';
 
 const logger = new SystemLog('modules', 'm_ags', 'commands', 'loadcode');
 
@@ -60,7 +64,6 @@ export default {
       .setAuthor({ name: _code })
       .setFooter({ text: 'AgsCodeSniper' })
       .setColor('DarkRed')
-      .setDescription('...')
       .setTimestamp();
 
     if (_para === 'user' && !_user) {
@@ -77,7 +80,7 @@ export default {
       case 'all':
         {
           const allUsersData = await AgsUsersManager.getUsersTokens();
-          let resultTxt = '';
+          const allResults: string[] = [];
 
           if (!allUsersData || allUsersData.length === 0) {
             void Utils.embedReply(interaction, {
@@ -90,17 +93,35 @@ export default {
           }
 
           async function updateEmbed(end = false): Promise<void> {
-            resultsEmbed.setDescription(resultTxt || null);
-            if (end) {
-              resultsEmbed.setTitle('Codigo cargado');
-              resultsEmbed.setColor('Green');
+            const resultFields: APIEmbedField[] = [];
+            let fieldContent = '';
+
+            for (const result of allResults) {
+              if (fieldContent.length + result.length >= 4000) {
+                resultFields.push({
+                  name: `Resultado${
+                    resultFields.length ? ` ${resultFields.length + 1}` : ''
+                  }`,
+                  value: fieldContent,
+                });
+                fieldContent = '';
+              }
+
+              fieldContent += `${result}\n`;
             }
+
             try {
+              resultsEmbed.setFields(resultFields);
+
+              if (end) {
+                resultsEmbed.setTitle('Codigo cargado');
+                resultsEmbed.setColor('Green');
+              }
               await interaction.editReply({
                 embeds: [resultsEmbed],
               });
             } catch (error) {
-              logger.error('Error al editar el mensaje', error);
+              logger.error('run', 'Error al editar el mensaje', error);
             }
           }
 
@@ -117,14 +138,14 @@ export default {
             allUsersData,
             _code,
             _force,
-            async (agsUserData, response): Promise<void> => {
+            async function loadCallBack(agsUserData, response): Promise<void> {
               const format = `- < ${
                 agsUserData.ds_id
                   ? `<@${agsUserData.ds_id}>`
                   : agsUserData.reference
               } > ${response?.text ?? '<La pagina no dio respuesta>'}`;
 
-              resultTxt += `${format}\n`;
+              allResults.push(format); // += `${format}\n`;
             }
           );
 
@@ -162,6 +183,7 @@ export default {
 
           if (!response) {
             void Utils.embedReply(interaction, {
+              author: { name: _code },
               title: 'Error',
               description: '<La pagina no dio respuesta>',
               color: 'Red',
@@ -171,6 +193,7 @@ export default {
           }
 
           void Utils.embedReply(interaction, {
+            author: { name: _code },
             title: `Codigo cargado correctamente${_force ? ' (Forzado)' : ''}`,
             description: response.text,
             color: 'Green',

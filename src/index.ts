@@ -29,9 +29,9 @@ export const bot = new Bot({
 
 if (process.env.NODE_ENV === 'production') {
   process.on('unhandledRejection', err => {
-    logger.error('errorHandling', err);
+    logger.error('<index unhandledRejection>', err);
   });
   process.on('uncaughtException', err => {
-    logger.error('errorHandling', err);
+    logger.error('<index uncaughtException>', err);
   });
 }
