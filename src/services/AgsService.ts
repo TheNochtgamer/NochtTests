@@ -141,6 +141,16 @@ class AgsCodesService {
 
     return responses;
   }
+
+  public parseResponseText(response: IAgsRewardPageResponse | null): string {
+    if (!response?.text) return '<La pagina no dio respuesta>';
+    let text = response.text || '';
+
+    // TODO Añadir a futuro un parseo mas clean y preciso (necesitamos más data de respuesta)
+    if (text.includes('agsSuper')) text = text.slice(text.indexOf('agsSuper'));
+
+    return text;
+  }
 }
 
 export default new AgsCodesService();
