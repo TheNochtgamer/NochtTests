@@ -2,9 +2,13 @@ import type { IMyCommandDataImSubCommand, IMySlashCommand } from '@/types';
 import { PermissionsBitField, SlashCommandBuilder } from 'discord.js';
 
 import loadcode from './loadcode';
+import link_other from './link_other';
+import link_someone from './link_someone';
 
 const subs = new Map<string, IMySlashCommand<IMyCommandDataImSubCommand>>([
   ['loadcode', loadcode],
+  ['link_other', link_other],
+  ['link_someone', link_someone],
 ]);
 
 export default {
@@ -41,7 +45,7 @@ export default {
     if (!subs.get(subCommand)?.autoComplete)
       return [{ name: 'error', value: 'error' }];
     return (
-      // @ts-ignore Ya se hace el correspondiente chequeo
+      // @ts-expect-error Ya se hace el correspondiente chequeo
       (await subs.get(subCommand)?.autoComplete(interaction)) ?? [
         {
           name: 'error',
