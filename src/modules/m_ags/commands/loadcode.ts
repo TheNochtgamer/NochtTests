@@ -3,7 +3,11 @@ import Utils from '@/lib/Utils';
 import AgsService from '@/services/AgsService';
 import AgsUsersManager from '@/services/AgsUsersManager';
 import type { IMySlashCommand } from '@/types';
-import { EmbedBuilder, SlashCommandSubcommandBuilder } from 'discord.js';
+import {
+  type APIEmbedField,
+  EmbedBuilder,
+  SlashCommandSubcommandBuilder,
+} from 'discord.js';
 
 const logger = new SystemLog('modules', 'm_ags', 'commands', 'loadcode');
 
@@ -60,7 +64,6 @@ export default {
       .setAuthor({ name: _code })
       .setFooter({ text: 'AgsCodeSniper' })
       .setColor('DarkRed')
-      .setDescription('...')
       .setTimestamp();
 
     if (_para === 'user' && !_user) {
@@ -77,7 +80,8 @@ export default {
       case 'all':
         {
           const allUsersData = await AgsUsersManager.getUsersTokens();
-          let resultTxt = '';
+          const allResults: string[] = [];
+          const resultFields: APIEmbedField[] = [];
 
           if (!allUsersData || allUsersData.length === 0) {
             void Utils.embedReply(interaction, {
@@ -90,17 +94,45 @@ export default {
           }
 
           async function updateEmbed(end = false): Promise<void> {
-            resultsEmbed.setDescription(resultTxt || null);
-            if (end) {
-              resultsEmbed.setTitle('Codigo cargado');
-              resultsEmbed.setColor('Green');
+            let fieldContent = '';
+
+            for (const result of allResults) {
+              if (fieldContent.length + result.length >= 4000) {
+                resultFields.push({
+                  name: `Resultado${
+                    resultFields.length ? ` ${resultFields.length + 1}` : ''
+                  }`,
+                  value: fieldContent,
+                  inline: false,
+                });
+                fieldContent = '';
+              }
+
+              fieldContent += `${result}\n`;
             }
+
+            if (fieldContent) {
+              resultFields.push({
+                name: `Resultado${
+                  resultFields.length ? ` ${resultFields.length + 1}` : ''
+                }`,
+                value: fieldContent,
+                inline: false,
+              });
+            }
+
             try {
+              resultsEmbed.setFields(resultFields);
+
+              if (end) {
+                resultsEmbed.setTitle('Codigo cargado');
+                resultsEmbed.setColor('Green');
+              }
               await interaction.editReply({
                 embeds: [resultsEmbed],
               });
             } catch (error) {
-              logger.error('Error al editar el mensaje', error);
+              logger.error('run', 'Error al editar el mensaje', error);
             }
           }
 
@@ -117,20 +149,21 @@ export default {
             allUsersData,
             _code,
             _force,
-            async (agsUserData, response): Promise<void> => {
+            async function loadCallBack(agsUserData, response): Promise<void> {
               const format = `- < ${
                 agsUserData.ds_id
                   ? `<@${agsUserData.ds_id}>`
                   : agsUserData.reference
-              } > ${response?.text ?? '<La pagina no dio respuesta>'}`;
+              } > ${AgsService.parseResponseText(response)}`;
 
-              resultTxt += `${format}\n`;
+              allResults.push(format); // += `${format}\n`;
             }
           );
 
+          await Utils.getRandomSleep(2000);
+          clearInterval(updateEmbedInterval);
           await Utils.getRandomSleep(3000);
 
-          clearInterval(updateEmbedInterval);
           await updateEmbed(true);
         }
         break;
@@ -160,19 +193,10 @@ export default {
 
           const response = await AgsService.loadCodeForOne(userToken, _code);
 
-          if (!response) {
-            void Utils.embedReply(interaction, {
-              title: 'Error',
-              description: '<La pagina no dio respuesta>',
-              color: 'Red',
-              footer: { text: 'AgsCodeSniper' },
-            });
-            return;
-          }
-
           void Utils.embedReply(interaction, {
+            author: { name: _code },
             title: `Codigo cargado correctamente${_force ? ' (Forzado)' : ''}`,
-            description: response.text,
+            description: AgsService.parseResponseText(response),
             color: 'Green',
             footer: { text: 'AgsCodeSniper' },
           });

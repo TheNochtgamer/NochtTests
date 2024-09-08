@@ -520,8 +520,9 @@ class Utils {
       | ButtonInteraction
       | ModalSubmitInteraction
       | ChatInputCommandInteraction,
-    message: string,
-    timeout: number = 30 * 1000
+    text: string,
+    timeout: number = 30 * 1000,
+    savePreviousState = true
   ): Promise<0 | 1 | 2> {
     const row = new ActionRowBuilder<ButtonBuilder>().setComponents(
       new ButtonBuilder()
@@ -534,26 +535,44 @@ class Utils {
         .setLabel('❌')
     );
 
+    if (text.trim().length === 0)
+      throw new Error('El texto no puede estar vacio');
+
+    const previousState =
+      savePreviousState && interaction.isMessageComponent()
+        ? {
+            embeds: interaction.message.embeds,
+            components: interaction.message.components,
+            content: interaction.message.content || undefined,
+          }
+        : null;
+
     const reply =
       interaction.replied || interaction.deferred
         ? await interaction.editReply({
-            content: message,
             // @ts-ignore
             components: [row],
+            embeds: [],
+            content: text,
           })
         : await interaction.reply({
-            content: message,
             // @ts-ignore
             components: [row],
+            embeds: [],
+            content: text,
             ephemeral: true,
           });
 
-    const response = await reply.awaitMessageComponent({ idle: timeout });
+    try {
+      const response = await reply.awaitMessageComponent({ idle: timeout });
 
-    await interaction.editReply({ content: null, components: [] });
+      await interaction.editReply(
+        previousState ?? { components: [], embeds: [] }
+      );
+      if (response.customId === 'accept') return 0;
+      if (response.customId === 'deny') return 1;
+    } catch (error) {}
 
-    if (response.customId === 'accept') return 0;
-    if (response.customId === 'deny') return 1;
     return 2;
   }
 
