@@ -154,9 +154,25 @@ class AgsCodesService {
   public parseResponseText(response: IAgsRewardPageResponse | null): string {
     if (!response?.text) return '<La pagina no dio respuesta>';
     let text = response.text || '';
+    const regex = /([<][a-z][^<]*>)|([<][/][a-z]*>)/g;
 
-    // TODO Añadir a futuro un parseo mas clean y preciso (necesitamos más data de respuesta)
-    if (text.includes('agsSuper')) text = text.slice(text.indexOf('agsSuper'));
+    if (
+      (typeof response.extra === 'number' && response.extra > 4) ||
+      (typeof response.code === 'string' && response.code.length > 8)
+    )
+      text = text
+        .replaceAll(/[\w]+agsSuper/g, '')
+        .replaceAll('\n', '')
+        .replaceAll('</', ' </')
+        .replaceAll('<br> ', '\n')
+        .replaceAll(regex, '')
+        .replaceAll('  ', ' ')
+        .replaceAll('\n ', '\n')
+        .replaceAll('\r', '')
+        .replaceAll(/^\s*/g, '')
+        .replaceAll('!', '! ')
+        .replaceAll(' Continuar', '')
+        .replaceAll(':', ': ');
 
     return text;
   }
