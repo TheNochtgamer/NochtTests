@@ -129,7 +129,9 @@ export default class SystemLog {
     console.log(this.now(), `<${this.getPath()}:${functionName}()>`, ...args);
     webhookLog.addToLog(
       'info',
-      `${this.now()} <${this.getPath()}:${functionName}()> ${args.join(' ')}`
+      `${this.now()} <${this.getPath()}:${functionName}()> ${args
+        .map(arg => webhookLog.parseToLog(arg))
+        .join(' ')}`
     );
   }
 
@@ -137,7 +139,9 @@ export default class SystemLog {
     console.warn(this.now(), `<${this.getPath()}:${functionName}()>`, ...args);
     webhookLog.addToLog(
       'warn',
-      `${this.now()} <${this.getPath()}:${functionName}()> ${args.join(' ')}`
+      `${this.now()} <${this.getPath()}:${functionName}()> ${args
+        .map(arg => webhookLog.parseToLog(arg))
+        .join(' ')}`
     );
   }
 
@@ -145,7 +149,9 @@ export default class SystemLog {
     console.error(this.now(), `<${this.getPath()}:${functionName}()>`, ...args);
     webhookLog.addToLog(
       'error',
-      `${this.now()} <${this.getPath()}:${functionName}()> ${args.join(' ')}`
+      `${this.now()} <${this.getPath()}:${functionName}()> ${args
+        .map(arg => webhookLog.parseToLog(arg))
+        .join(' ')}`
     );
   }
 
@@ -153,7 +159,9 @@ export default class SystemLog {
     console.log(this.now(), `<${this.getPath()}:${functionName}()>`, ...args);
     webhookLog.addToLog(
       'debug',
-      `${this.now()} <${this.getPath()}:${functionName}()> ${args.join(' ')}`
+      `${this.now()} <${this.getPath()}:${functionName}()> ${args
+        .map(arg => webhookLog.parseToLog(arg))
+        .join(' ')}`
     );
   }
 }
