@@ -10,16 +10,16 @@ export default {
     kind: 'ImSubCommand',
     data: new SlashCommandSubcommandBuilder()
       .setName('reloadall')
-      .setDescription('Recarga todos los comandos')
-      .addBooleanOption(option =>
-        option
-          .setName('forceupload')
-          .setDescription('Forzar subida de comandos')
-      ),
+      .setDescription('Recarga todos los comandos'),
+    // .addBooleanOption(option =>
+    //   option
+    //     .setName('forceupload')
+    //     .setDescription('Forzar subida de comandos')
+    // ),
   },
 
   async run(interaction) {
-    const forceUpload = interaction.options.get('forceupload')?.value ?? false;
+    // const forceUpload = interaction.options.get('forceupload')?.value ?? false;
 
     const confirm = await utils.confirmationForm(
       interaction,
@@ -46,11 +46,11 @@ export default {
 
     // utils.deleteMyRequire();
 
-    if (
-      forceUpload ||
-      (await utils.checkSyncedCommands(interaction.client)) === 0
-    )
-      await utils.summitCommands(interaction.client);
+    // if (
+    //   forceUpload ||
+    //   (await utils.checkSyncedCommands(interaction.client)) === 0
+    // )
+    //   await utils.summitCommands(interaction.client);
 
     await interaction.editReply({
       content: `Recarga de archivos terminada.`,

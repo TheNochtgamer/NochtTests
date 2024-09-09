@@ -18,8 +18,8 @@ export default {
       'servidores.'
     );
 
-    if (process.env.CHECK_COMMANDS?.toLowerCase() !== 'true') return;
-    if ((await utils.checkSyncedCommands(client)) > 0) return;
-    void utils.summitCommands(client);
+    // if (process.env.CHECK_COMMANDS?.toLowerCase() !== 'true') return;
+    // if ((await utils.checkSyncedCommands(client)) > 0) return;
+    // void utils.summitCommands(client);
   },
 } satisfies IMyBotEvent<'ready'>;

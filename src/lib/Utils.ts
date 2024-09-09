@@ -142,12 +142,6 @@ class Utils {
     if (!client.commands.size) return;
     let cmds = null;
 
-    logger.log(
-      'summitCommands',
-      `Subiendo comandos${
-        guildId ? ` (en el guild: ${guildId})` : '(globalmente)'
-      }...`
-    );
     try {
       const cmdDatas = client.commands
         .map(cmd =>
