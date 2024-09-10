@@ -19,4 +19,8 @@ export default class AgsUserData {
     if (data.priority !== undefined) this.priority = data.priority;
     if (data.token !== undefined) this.token = data.token;
   }
+
+  me(): string {
+    return (this.ds_id ? `<@${this.ds_id}>` : this.reference) ?? this.user_id;
+  }
 }

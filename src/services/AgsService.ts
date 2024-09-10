@@ -156,23 +156,31 @@ class AgsCodesService {
     let text = response.text || '';
     const regex = /([<][a-z][^<]*>)|([<][/][a-z]*>)/g;
 
-    if (
-      (typeof response.extra === 'number' && response.extra > 4) ||
-      (typeof response.code === 'string' && response.code.length > 8)
-    )
-      text = text
-        .replaceAll(/[\w]+agsSuper/g, '')
-        .replaceAll('\n', '')
-        .replaceAll('</', ' </')
-        .replaceAll('<br> ', '\n')
-        .replaceAll(regex, '')
-        .replaceAll('  ', ' ')
-        .replaceAll('\n ', '\n')
-        .replaceAll('\r', '')
-        .replaceAll(/^\s*/g, '')
-        .replaceAll('!', '! ')
-        .replaceAll(' Continuar', '')
-        .replaceAll(':', ': ');
+    try {
+      if (
+        (typeof response.extra === 'number' && response.extra > 4) ||
+        (typeof response.code === 'string' && response.code.length > 8)
+      )
+        text = text
+          .replaceAll(/[\w]+agsSuper/g, '')
+          .replaceAll('\n', '')
+          .replaceAll('</', ' </')
+          .replaceAll('<br> ', '\n')
+          .replaceAll(regex, '')
+          .replaceAll('  ', ' ')
+          .replaceAll('\n ', '\n')
+          .replaceAll('\r', '')
+          .replaceAll(/^\s*/g, '')
+          .replaceAll('!', '! ')
+          .replaceAll(' Continuar', '')
+          .replaceAll(':', ': ');
+    } catch (error) {
+      logger.error(
+        'parseResponseText',
+        'Error al parsear la respuesta:',
+        error
+      );
+    }
 
     return text;
   }

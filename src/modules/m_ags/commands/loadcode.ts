@@ -81,7 +81,6 @@ export default {
         {
           const allUsersData = await AgsUsersManager.getUsersTokens();
           const allResults: string[] = [];
-          const resultFields: APIEmbedField[] = [];
 
           if (!allUsersData || allUsersData.length === 0) {
             void Utils.embedReply(interaction, {
@@ -94,38 +93,17 @@ export default {
           }
 
           async function updateEmbed(end = false): Promise<void> {
-            let fieldContent = '';
-
-            for (const result of allResults) {
-              if (fieldContent.length + result.length >= 4000) {
-                resultFields.push({
-                  name: `Resultado${
-                    resultFields.length ? ` ${resultFields.length + 1}` : ''
-                  }`,
-                  value: fieldContent,
-                  inline: false,
-                });
-                fieldContent = '';
-              }
-
-              fieldContent += `${result}\n`;
-            }
-
-            if (fieldContent) {
-              resultFields.push({
-                name: `Resultado${
-                  resultFields.length ? ` ${resultFields.length + 1}` : ''
-                }`,
-                value: fieldContent,
-                inline: false,
-              });
-            }
-
             try {
-              resultsEmbed.setFields(resultFields);
+              const theResult = allResults.join('\n');
+              resultsEmbed.setDescription(
+                theResult.slice(0, 4090) +
+                  (theResult.length > 4090 ? '...' : '')
+              );
 
               if (end) {
-                resultsEmbed.setTitle('Codigo cargado');
+                resultsEmbed.setTitle(
+                  `Codigo cargado correctamente${_force ? ' (Forzado)' : ''}`
+                );
                 resultsEmbed.setColor('Green');
               }
               await interaction.editReply({
@@ -150,11 +128,9 @@ export default {
             _code,
             _force,
             async function loadCallBack(agsUserData, response): Promise<void> {
-              const format = `- < ${
-                agsUserData.ds_id
-                  ? `<@${agsUserData.ds_id}>`
-                  : agsUserData.reference
-              } > ${AgsService.parseResponseText(response)}`;
+              const format = `- < ${agsUserData.me()} > ${AgsService.parseResponseText(
+                response
+              )}`;
 
               allResults.push(format); // += `${format}\n`;
             }
@@ -170,11 +146,11 @@ export default {
       case 'user':
       case 'me':
         {
-          const userToken = await AgsUsersManager.getUserToken({
+          const agsUserData = await AgsUsersManager.getUserToken({
             ds_id: _para === 'me' ? interaction.user.id : _user?.id,
           });
 
-          if (!userToken) {
+          if (!agsUserData) {
             void Utils.embedReply(interaction, {
               title: 'Error',
               description: 'No se encontro el usuario',
@@ -191,12 +167,15 @@ export default {
             }" ${_force ? '(Forzado)' : ''}`
           );
 
-          const response = await AgsService.loadCodeForOne(userToken, _code);
+          const response = await AgsService.loadCodeForOne(agsUserData, _code);
+          const format = `- < ${agsUserData.me()} > ${AgsService.parseResponseText(
+            response
+          )}`;
 
           void Utils.embedReply(interaction, {
             author: { name: _code },
             title: `Codigo cargado correctamente${_force ? ' (Forzado)' : ''}`,
-            description: AgsService.parseResponseText(response),
+            description: format,
             color: 'Green',
             footer: { text: 'AgsCodeSniper' },
           });
