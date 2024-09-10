@@ -4,7 +4,7 @@ import { SlashCommandSubcommandBuilder } from 'discord.js';
 import utils from '@/lib/Utils';
 import SystemLog from '@/lib/structures/SystemLog';
 
-const logger = new SystemLog('modules', 'dev', 'commands', 'eval');
+const logger = new SystemLog('modules', 'm_dev', 'commands', 'eval');
 
 export default {
   definition: {

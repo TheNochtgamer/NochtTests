@@ -8,9 +8,9 @@ import { bot } from '..';
 import DatabaseManager from './DatabaseManager';
 import cacheMe from './cacheMe';
 
-const logger = new SystemLog('services', 'AgsCodesService');
+const logger = new SystemLog('services', 'AgsService');
 
-class AgsCodesService {
+class AgsService {
   // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   private async fetchReward(token: string, code?: string) {
     const response = await axios.get<IAgsRewardPageResponse>(AgsPages.reward, {
@@ -204,4 +204,4 @@ class AgsCodesService {
   }
 }
 
-export default new AgsCodesService();
+export default new AgsService();
