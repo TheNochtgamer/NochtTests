@@ -1,14 +1,14 @@
 import globals from 'globals';
 import pluginJs from '@eslint/js';
 import tseslint from 'typescript-eslint';
-import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
+import eslintConfigPrettier from 'eslint-config-prettier';
 
 export default [
   { files: ['**/*.{js,mjs,cjs,ts}'] },
   { languageOptions: { globals: globals.node } },
   pluginJs.configs.recommended,
   ...tseslint.configs.recommended,
-  eslintPluginPrettierRecommended,
+  eslintConfigPrettier,
   {
     rules: {
       '@typescript-eslint/strict-boolean-expressions': 'off',
@@ -21,7 +21,9 @@ export default [
       '@typescript-eslint/ban-ts-comment': 'off',
       '@typescript-eslint/prefer-ts-expect-error': 'warn',
       '@typescript-eslint/consistent-type-imports': 'warn',
-    },
+      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/no-empty': 'off'
+    }
   },
   // {
   //   parserOptions: {
@@ -29,6 +31,6 @@ export default [
   //   },
   // },
   {
-    ignores: ['**/node_modules/**', '**/dist/**', '**/out/**', '**.n.**'],
-  },
+    ignores: ['**/node_modules/**', '**/dist/**', '**/out/**', '**.n.**']
+  }
 ];

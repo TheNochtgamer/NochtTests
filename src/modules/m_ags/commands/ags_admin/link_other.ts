@@ -4,37 +4,45 @@ import Utils from '@/lib/Utils';
 import AgsUsersManager from '@/services/AgsUsersManager';
 import AgsService from '@/services/AgsService';
 import SystemLog from '@/lib/structures/SystemLog';
+import UsersManager from '@/services/UsersManager';
 
-const logger = new SystemLog('modules', 'm_ags', 'commands', 'linkme');
+const logger = new SystemLog('modules', 'm_ags', 'commands', 'link_other');
 
 export default {
   definition: {
     kind: 'ImSubCommand',
     data: new SlashCommandSubcommandBuilder()
-      .setName('linkme')
-      .setDescription('Linkea tu token de la pagina con el bot')
+      .setName('link_other')
+      .setDescription('Linkea otro usuario con un token al bot')
       .addStringOption(option =>
         option
           .setName('token')
           .setDescription('El token que te da el script (NO COMPARTIR)')
           .setRequired(true)
           .setMinLength(10)
+      )
+      .addUserOption(option =>
+        option
+          .setName('user')
+          .setDescription('El usuario al que se le vinculara el token')
+          .setRequired(true)
       ),
   },
 
   async run(interaction) {
     const token = interaction.options.getString('token', true).toLowerCase();
+    const user = interaction.options.getUser('user', true);
     await interaction.deferReply({ ephemeral: true });
 
     const userToken = await AgsUsersManager.getUserToken({
-      ds_id: interaction.user.id,
+      ds_id: user.id,
       reference: 'self',
     });
 
     if (userToken) {
       const action = await Utils.confirmationForm(
         interaction,
-        'Ya tienes un token vinculado, deseas reemplazarlo?'
+        `<@${user.id}> > Ya tiene un token vinculado, deseas reemplazarlo?`,
       );
       if (action) {
         await interaction.deleteReply();
@@ -47,7 +55,7 @@ export default {
     if (testResult === 1) {
       logger.debug(
         'run',
-        `${interaction.user.id} > Error al intentar vincular token, la pagina no respondio`
+        `${user.id} > Error al intentar vincular token, la pagina no respondio`,
       );
 
       void Utils.embedReply(interaction, {
@@ -62,7 +70,7 @@ export default {
     if (typeof testResult === 'string') {
       logger.debug(
         'run',
-        `${interaction.user.id} > Error al intentar vincular token, la pagina respondio con: ${testResult}`
+        `${user.id} > Error al intentar vincular token, la pagina respondio con: ${testResult}`,
       );
       void Utils.embedReply(interaction, {
         title: 'Error',
@@ -73,18 +81,21 @@ export default {
       return;
     }
 
+    // Esto debido a la foreing key, una vez se utiliza, crea un record en la tabla de usuarios
+    await UsersManager.getUserData(user.id);
+
     let res;
     if (userToken) {
       res = await AgsUsersManager.updateUserToken({
         user_id: userToken.user_id,
-        ds_id: interaction.user.id,
+        ds_id: user.id,
         token,
         reference: 'self',
         priority: 0,
       });
     } else {
       res = await AgsUsersManager.createUserToken({
-        ds_id: interaction.user.id,
+        ds_id: user.id,
         reference: 'self',
         priority: 0,
         token,
@@ -94,14 +105,11 @@ export default {
     if (!res) {
       logger.error(
         'run',
-        `${interaction.user.id} > Error al intentar almacenar token, no se guardo el nuevo token`
+        `${user.id} > Error al intentar almacenar token, no se guardo el nuevo token`,
       );
     }
 
-    logger.debug(
-      'run',
-      `${interaction.user.id} > Token vinculado correctamente`
-    );
+    logger.debug('run', `${user.id} > Token vinculado correctamente`);
     void Utils.embedReply(interaction, {
       title: `Exito${!res ? ' (A medias)' : ''}`,
       description: `Token vinculado correctamente${
