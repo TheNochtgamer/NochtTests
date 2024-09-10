@@ -5,7 +5,7 @@ import UsersManager from '@/services/UsersManager';
 import GuildsManager from '@/services/GuildsManager';
 import SystemLog from '@/lib/structures/SystemLog';
 
-const logger = new SystemLog('modules', 'init', 'events', 'slashCommands');
+const logger = new SystemLog('modules', 'm_init', 'events', 'slashCommands');
 
 // EVENTO PARA CUANDO SE EJECUTA UN COMANDO
 export default {
@@ -109,12 +109,14 @@ export default {
     // --DisableCheck--
     const disabledCommand = utils.getDisabledCommand(
       command.definition.data.name,
+      interaction.client,
       userData,
       guildData
     );
 
     if (disabledCommand && !utils.checkBotDev(interaction.user.id)) {
       logger.warn(
+        'run',
         `El comando "${interaction.commandName}" esta deshabilitado para el usuario ${interaction.user.username}`
       );
       void utils.embedReply(

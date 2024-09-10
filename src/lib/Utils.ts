@@ -30,7 +30,6 @@ import type {
 import path from 'path';
 import fs from 'fs';
 import { CachePointers, CacheTts } from './Enums';
-import { bot } from '@/index';
 import cacheMe from '@/services/cacheMe';
 import { setTimeout } from 'node:timers/promises';
 import SystemLog from './structures/SystemLog';
@@ -142,12 +141,6 @@ class Utils {
     if (!client.commands.size) return;
     let cmds = null;
 
-    logger.log(
-      'summitCommands',
-      `Subiendo comandos${
-        guildId ? ` (en el guild: ${guildId})` : '(globalmente)'
-      }...`
-    );
     try {
       const cmdDatas = client.commands
         .map(cmd =>
@@ -476,6 +469,7 @@ class Utils {
    */
   getDisabledCommand(
     commandName: string,
+    bot: Bot,
     userData?: UserData,
     guildData?: GuildData
   ):

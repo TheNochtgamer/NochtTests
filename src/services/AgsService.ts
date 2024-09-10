@@ -8,9 +8,9 @@ import { bot } from '..';
 import DatabaseManager from './DatabaseManager';
 import cacheMe from './cacheMe';
 
-const logger = new SystemLog('services', 'AgsCodesService');
+const logger = new SystemLog('services', 'AgsService');
 
-class AgsCodesService {
+class AgsService {
   // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   private async fetchReward(token: string, code?: string) {
     const response = await axios.get<IAgsRewardPageResponse>(AgsPages.reward, {
@@ -139,12 +139,14 @@ class AgsCodesService {
       }
     }
 
-    const promises = users.map(async user => {
-      if (!force && firstUser?.user_id === user.user_id) return;
-      const response = await this.loadCodeForOne(user, code);
-      responses.push(response);
-      if (cb) void cb(user, response);
-    });
+    const promises = users
+      .sort((a, b) => b.priority - a.priority)
+      .map(async user => {
+        if (!force && firstUser?.user_id === user.user_id) return;
+        const response = await this.loadCodeForOne(user, code);
+        responses.push(response);
+        if (cb) void cb(user, response);
+      });
 
     await Promise.all(promises);
 
@@ -154,9 +156,33 @@ class AgsCodesService {
   public parseResponseText(response: IAgsRewardPageResponse | null): string {
     if (!response?.text) return '<La pagina no dio respuesta>';
     let text = response.text || '';
+    const regex = /([<][a-z][^<]*>)|([<][/][a-z]*>)/g;
 
-    // TODO Añadir a futuro un parseo mas clean y preciso (necesitamos más data de respuesta)
-    if (text.includes('agsSuper')) text = text.slice(text.indexOf('agsSuper'));
+    try {
+      if (
+        (typeof response.extra === 'number' && response.extra > 4) ||
+        (typeof response.code === 'string' && response.code.length > 8)
+      )
+        text = text
+          .replaceAll(/[\w]+agsSuper/g, '')
+          .replaceAll('\n', '')
+          .replaceAll('</', ' </')
+          .replaceAll('<br> ', '\n')
+          .replaceAll(regex, '')
+          .replaceAll('  ', ' ')
+          .replaceAll('\n ', '\n')
+          .replaceAll('\r', '')
+          .replaceAll(/^\s*/g, '')
+          .replaceAll('!', '! ')
+          .replaceAll(' Continuar', '')
+          .replaceAll(':', ': ');
+    } catch (error) {
+      logger.error(
+        'parseResponseText',
+        'Error al parsear la respuesta:',
+        error
+      );
+    }
 
     return text;
   }
@@ -180,4 +206,4 @@ class AgsCodesService {
   }
 }
 
-export default new AgsCodesService();
+export default new AgsService();

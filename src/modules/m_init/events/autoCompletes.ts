@@ -2,7 +2,7 @@ import type { IMyBotEvent } from '@/types';
 import Utils from '@/lib/Utils';
 import SystemLog from '@/lib/structures/SystemLog';
 
-const logger = new SystemLog('modules', 'init', 'events', 'autoCompletes');
+const logger = new SystemLog('modules', 'm_init', 'events', 'autoCompletes');
 
 // EVENTO PARA CUANDO SE EJECUTA UN AUTOCOMPLETE
 export default {
@@ -19,6 +19,7 @@ export default {
     if (!command?.autoComplete) {
       if (Utils.everyXExecutions('autoCompleteSpam', 3))
         logger.warn(
+          'run',
           `Se intento utilizar el autoComplete del comando ${interaction.commandName} pero no se detecto`
         );
       return;

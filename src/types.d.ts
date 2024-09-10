@@ -165,8 +165,8 @@ declare interface IGlobalDisabledCommand {
 
 export interface IAgsRewardPageResponse {
   text: string;
-  code: number;
-  extra: string | null;
+  code: number | string;
+  extra: string | number | null;
   extra2: string | null;
   moreimg?: string;
   more?: number;

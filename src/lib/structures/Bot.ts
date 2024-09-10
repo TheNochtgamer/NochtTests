@@ -94,12 +94,15 @@ export default class Bot extends Client {
     logger.log('loadEvents', `[${success}/${total}] eventos cargados`);
   }
 
-  async init(token: string): Promise<void> {
+  async init(token: string, eventLess: boolean = false): Promise<void> {
     if (this.user?.id) return;
-    await Promise.all([this.loadEvents(), this.loadCommands()]);
+    await Promise.all([
+      eventLess ? null : this.loadEvents(),
+      this.loadCommands(),
+    ]);
 
     // console.log(['lib', 'structures', 'bot'], 'Login in...');
-    logger.log('init', 'Login in...');
+    logger.log('init', `Login in${eventLess ? ' (eventLessMode)' : ''}...`);
 
     await this.login(token);
   }

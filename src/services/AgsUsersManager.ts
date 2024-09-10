@@ -4,7 +4,7 @@ import DatabaseManager from './DatabaseManager';
 
 export default class AgsUsersManager {
   public static async createUserToken(
-    data: Omit<AgsUserData, 'user_id'>
+    data: Partial<Omit<AgsUserData, 'user_id'>>
   ): Promise<AgsUserData | null> {
     const res = await DatabaseManager.query(
       `
@@ -21,7 +21,7 @@ export default class AgsUsersManager {
   }
 
   public static async updateUserToken(
-    data: AgsUserData
+    data: Partial<AgsUserData>
   ): Promise<any[] | null> {
     return await DatabaseManager.query(
       `CALL update_ags_user_tokens(?, ?, ?, ?, ?)`,
