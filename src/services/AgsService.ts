@@ -139,12 +139,14 @@ class AgsService {
       }
     }
 
-    const promises = users.map(async user => {
-      if (!force && firstUser?.user_id === user.user_id) return;
-      const response = await this.loadCodeForOne(user, code);
-      responses.push(response);
-      if (cb) void cb(user, response);
-    });
+    const promises = users
+      .sort((a, b) => b.priority - a.priority)
+      .map(async user => {
+        if (!force && firstUser?.user_id === user.user_id) return;
+        const response = await this.loadCodeForOne(user, code);
+        responses.push(response);
+        if (cb) void cb(user, response);
+      });
 
     await Promise.all(promises);
 
