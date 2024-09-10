@@ -109,6 +109,7 @@ export default {
     // --DisableCheck--
     const disabledCommand = utils.getDisabledCommand(
       command.definition.data.name,
+      interaction.client,
       userData,
       guildData
     );

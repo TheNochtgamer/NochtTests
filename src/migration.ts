@@ -1,9 +1,11 @@
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
 import 'dotenv/config';
 import 'module-alias/register';
 import DatabaseManager from './services/DatabaseManager';
 import Bot from './lib/structures/Bot';
 import SystemLog from './lib/structures/SystemLog';
 import Utils from './lib/Utils';
+import { IntentsBitField, Partials } from 'discord.js';
 
 const logger = new SystemLog('migration');
 const args = process.argv.slice(2).map(arg => arg.toLowerCase());
@@ -31,8 +33,12 @@ async function migrateCmds() {
   }
 
   const bot = new Bot({
-    intents: [],
-    partials: [],
+    intents: [
+      IntentsBitField.Flags.Guilds,
+      IntentsBitField.Flags.GuildMessages,
+      IntentsBitField.Flags.MessageContent,
+    ],
+    partials: [Partials.Message],
     presence: { status: 'invisible' },
   });
 
@@ -48,9 +54,9 @@ async function migrateCmds() {
 }
 
 void (async function Main() {
-  const firstArg = args[0];
+  const firstArg = args[0] || '';
 
-  if (firstArg.includes('command') || firstArg.includes('commands')) {
+  if (firstArg.includes('command') || firstArg.includes('cmd')) {
     logger.log('Main', 'Migrating commands...');
     await migrateCmds();
     logger.log('Main', 'Commands migration completed');
@@ -67,7 +73,7 @@ void (async function Main() {
     // No arguments provided
     logger.log(
       'Main',
-      'No arguments provided. Please provide one of the following arguments: \n- db\n- command (global: DEFAULT | guild) (guildID)\n- all'
+      'No arguments provided. Please provide one of the following arguments: \n- db\n- commands (global: DEFAULT | guild) (guildID)\n- all'
     );
   }
 
