@@ -22,7 +22,7 @@ export default {
           .setName('code')
           .setDescription('El codigo a cargar')
           .setRequired(true)
-          .setMinLength(5)
+          .setMinLength(5),
       )
       .addStringOption(option =>
         option
@@ -33,19 +33,19 @@ export default {
             { name: 'Todos', value: 'all' },
             { name: 'Un usuario (usar opcion "user")', value: 'user' },
             { name: 'yo', value: 'me' },
-          ])
+          ]),
       )
       .addBooleanOption(option =>
         option
           .setName('force')
           .setDescription('Fuerza la carga del codigo (SALTEA LOS CHEQUEOS)')
-          .setRequired(false)
+          .setRequired(false),
       )
       .addUserOption(option =>
         option
           .setName('user')
           .setDescription('El usuario al que se le cargara el codigo')
-          .setRequired(false)
+          .setRequired(false),
       ),
   },
 
@@ -97,12 +97,12 @@ export default {
               const theResult = allResults.join('\n');
               resultsEmbed.setDescription(
                 theResult.slice(0, 4090) +
-                  (theResult.length > 4090 ? '...' : '')
+                  (theResult.length > 4090 ? '...' : ''),
               );
 
               if (end) {
                 resultsEmbed.setTitle(
-                  `Codigo cargado correctamente${_force ? ' (Forzado)' : ''}`
+                  `Codigo cargado correctamente${_force ? ' (Forzado)' : ''}`,
                 );
                 resultsEmbed.setColor('Green');
               }
@@ -120,7 +120,7 @@ export default {
             'run',
             `Cargando codigo "${_code}" para todos los usuarios ${
               _force ? '(Forzado)' : ''
-            }`
+            }`,
           );
 
           await AgsService.loadCodeForAll(
@@ -129,11 +129,11 @@ export default {
             _force,
             async function loadCallBack(agsUserData, response): Promise<void> {
               const format = `- < ${agsUserData.me()} > ${AgsService.parseResponseText(
-                response
+                response,
               )}`;
 
               allResults.push(format); // += `${format}\n`;
-            }
+            },
           );
 
           await Utils.getRandomSleep(2000);
@@ -164,12 +164,12 @@ export default {
             'run',
             `Cargando codigo "${_code}" para el usuario "${
               _para === 'me' ? interaction.user.id : _user?.id
-            }" ${_force ? '(Forzado)' : ''}`
+            }" ${_force ? '(Forzado)' : ''}`,
           );
 
           const response = await AgsService.loadCodeForOne(agsUserData, _code);
           const format = `- < ${agsUserData.me()} > ${AgsService.parseResponseText(
-            response
+            response,
           )}`;
 
           void Utils.embedReply(interaction, {

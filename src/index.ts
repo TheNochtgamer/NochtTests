@@ -11,11 +11,11 @@ export const bot = new Bot({
   intents: [
     IntentsBitField.Flags.Guilds,
     IntentsBitField.Flags.GuildMessages,
-    IntentsBitField.Flags.MessageContent,
+    IntentsBitField.Flags.MessageContent
   ],
   partials: [Partials.Message],
   presence: { status: PresenceUpdateStatus.DoNotDisturb },
-  allowedMentions: { parse: ['users'] },
+  allowedMentions: { parse: ['users'] }
 });
 
 (async function init() {
