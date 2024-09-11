@@ -1,6 +1,11 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import type { IAgsRewardPageResponse, AgsUserData } from '@/types';
-import { AgsPages, CachePointers, ResponseTypes } from '@/lib/Enums';
+import {
+  AgsPages,
+  CachePointers,
+  AgsResponseTypes,
+  AgsPrizes
+} from '@/lib/Enums';
 import axios from 'axios';
 import SystemLog from '@/lib/structures/SystemLog';
 import Utils from '@/lib/Utils';
@@ -11,7 +16,6 @@ import cacheMe from './cacheMe';
 const logger = new SystemLog('services', 'AgsService');
 
 class AgsService {
-  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   private async fetchReward(token: string, code?: string) {
     const response = await axios.get<IAgsRewardPageResponse>(AgsPages.reward, {
       headers: {
@@ -22,14 +26,14 @@ class AgsService {
         'sec-ch-ua-platform': '"Windows"',
         Referer: 'https://app.argentinagameshow.com/reward',
         'Referrer-Policy': 'strict-origin-when-cross-origin',
-        Cookie: `PHPSESSID=${token}`,
+        Cookie: `PHPSESSID=${token}`
       },
       params: code
         ? {
             action: 'code',
-            code,
+            code
           }
-        : null,
+        : null
     });
 
     return response;
@@ -40,8 +44,10 @@ class AgsService {
       const { data } = await this.fetchReward(token);
       if (data.text === '') return 0;
       if (
-        Utils.compareTwoStrings(data.text || '', ResponseTypes.invalidToken) >=
-        90
+        Utils.compareTwoStrings(
+          data.text || '',
+          AgsResponseTypes.invalidToken
+        ) >= 90
       )
         return '<Tu token es invalido>';
       return data.text;
@@ -118,7 +124,7 @@ class AgsService {
       if (
         Utils.compareTwoStrings(
           firstResponse.text || '',
-          ResponseTypes.codeLimit
+          AgsResponseTypes.codeLimit
         ) >= 90
       ) {
         logger.log(
@@ -131,7 +137,7 @@ class AgsService {
       if (
         Utils.compareTwoStrings(
           firstResponse.text || '',
-          ResponseTypes.invalidCode
+          AgsResponseTypes.invalidCode
         ) >= 90
       ) {
         logger.log('loadCodeForAll', 'Abortando... Codigo invalido...');
@@ -156,26 +162,42 @@ class AgsService {
   public parseResponseText(response: IAgsRewardPageResponse | null): string {
     if (!response?.text) return '<La pagina no dio respuesta>';
     let text = response.text || '';
-    const regex = /([<][a-z][^<]*>)|([<][/][a-z]*>)/g;
+    // const regex = /([<][a-z][^<]*>)|([<][/][a-z]*>)/g;
 
     try {
       if (
         (typeof response.extra === 'number' && response.extra > 4) ||
         (typeof response.code === 'string' && response.code.length > 8)
-      )
-        text = text
-          .replaceAll(/[\w]+agsSuper/g, '')
-          .replaceAll('\n', '')
-          .replaceAll('</', ' </')
-          .replaceAll('<br> ', '\n')
-          .replaceAll(regex, '')
-          .replaceAll('  ', ' ')
-          .replaceAll('\n ', '\n')
-          .replaceAll('\r', '')
-          .replaceAll(/^\s*/g, '')
-          .replaceAll('!', '! ')
-          .replaceAll(' Continuar', '')
-          .replaceAll(':', ': ');
+      ) {
+        // text = text
+        //   .replaceAll(/[\w]+agsSuper/g, '')
+        //   .replaceAll('\n', '')
+        //   .replaceAll('</', ' </')
+        //   .replaceAll('<br> ', '\n')
+        //   .replaceAll(regex, '')
+        //   .replaceAll('  ', ' ')
+        //   .replaceAll('\n ', '\n')
+        //   .replaceAll('\r', '')
+        //   .replaceAll(/^\s*/g, '')
+        //   .replaceAll('!', '! ')
+        //   .replaceAll(' Continuar', '')
+        //   .replaceAll(':', ': ');
+
+        let parsed = false;
+        for (const prize in AgsPrizes) {
+          const value = AgsPrizes[prize as keyof typeof AgsPrizes];
+
+          if (text.includes(value)) {
+            text = 'Codigo canjeado, premio: ' + prize;
+            parsed = true;
+            break;
+          }
+        }
+
+        if (!parsed) {
+          text = '<Premio desconocido (Revisar en la App)>';
+        }
+      }
     } catch (error) {
       logger.error(
         'parseResponseText',
