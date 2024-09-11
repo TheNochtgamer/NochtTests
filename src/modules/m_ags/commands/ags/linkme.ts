@@ -54,7 +54,7 @@ export default {
         title: 'Error',
         description: 'La pagina no respondio, intenta de nuevo mas tarde',
         color: 'Red',
-        footer: { text: 'AgsCodeSniper' }
+        footer: { text: 'NochtTests' }
       });
       return;
     }
@@ -68,7 +68,7 @@ export default {
         title: 'Error',
         description: `La pagina respondio con: \`${testResult}\``,
         color: 'Red',
-        footer: { text: 'AgsCodeSniper' }
+        footer: { text: 'NochtTests' }
       });
       return;
     }
@@ -110,7 +110,7 @@ export default {
           : ''
       }\nMuchas gracias por usar mi sistema, si me queres dar una mano monetariamente, podes hacerlo en https://cafecito.app/thenochtgamer.`,
       color: 'Green',
-      footer: { text: 'AgsCodeSniper' }
+      footer: { text: 'NochtTests' }
     });
   }
 } satisfies IMySlashCommand;

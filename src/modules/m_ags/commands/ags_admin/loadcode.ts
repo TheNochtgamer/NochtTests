@@ -6,7 +6,7 @@ import type { IMySlashCommand } from '@/types';
 import {
   type APIEmbedField,
   EmbedBuilder,
-  SlashCommandSubcommandBuilder,
+  SlashCommandSubcommandBuilder
 } from 'discord.js';
 
 const logger = new SystemLog('modules', 'm_ags', 'commands', 'loadcode');
@@ -22,7 +22,7 @@ export default {
           .setName('code')
           .setDescription('El codigo a cargar')
           .setRequired(true)
-          .setMinLength(5),
+          .setMinLength(5)
       )
       .addStringOption(option =>
         option
@@ -32,21 +32,21 @@ export default {
           .addChoices([
             { name: 'Todos', value: 'all' },
             { name: 'Un usuario (usar opcion "user")', value: 'user' },
-            { name: 'yo', value: 'me' },
-          ]),
+            { name: 'yo', value: 'me' }
+          ])
       )
       .addBooleanOption(option =>
         option
           .setName('force')
           .setDescription('Fuerza la carga del codigo (SALTEA LOS CHEQUEOS)')
-          .setRequired(false),
+          .setRequired(false)
       )
       .addUserOption(option =>
         option
           .setName('user')
           .setDescription('El usuario al que se le cargara el codigo')
-          .setRequired(false),
-      ),
+          .setRequired(false)
+      )
   },
 
   async run(interaction) {
@@ -62,7 +62,7 @@ export default {
     const resultsEmbed = new EmbedBuilder()
       .setTitle(`Cargando codigo...${_force ? ' (Forzado)' : ''}`)
       .setAuthor({ name: _code })
-      .setFooter({ text: 'AgsCodeSniper' })
+      .setFooter({ text: 'NochtTests' })
       .setColor('DarkRed')
       .setTimestamp();
 
@@ -71,7 +71,7 @@ export default {
         title: 'Error',
         description: 'Debes especificar un usuario con la opcion "user"',
         color: 'Red',
-        footer: { text: 'AgsCodeSniper' },
+        footer: { text: 'NochtTests' }
       });
       return;
     }
@@ -87,7 +87,7 @@ export default {
               title: 'Error',
               description: 'No hay usuarios registrados',
               color: 'Red',
-              footer: { text: 'AgsCodeSniper' },
+              footer: { text: 'NochtTests' }
             });
             return;
           }
@@ -97,17 +97,17 @@ export default {
               const theResult = allResults.join('\n');
               resultsEmbed.setDescription(
                 theResult.slice(0, 4090) +
-                  (theResult.length > 4090 ? '...' : ''),
+                  (theResult.length > 4090 ? '...' : '')
               );
 
               if (end) {
                 resultsEmbed.setTitle(
-                  `Codigo cargado correctamente${_force ? ' (Forzado)' : ''}`,
+                  `Codigo cargado correctamente${_force ? ' (Forzado)' : ''}`
                 );
                 resultsEmbed.setColor('Green');
               }
               await interaction.editReply({
-                embeds: [resultsEmbed],
+                embeds: [resultsEmbed]
               });
             } catch (error) {
               logger.error('run', 'Error al editar el mensaje', error);
@@ -120,7 +120,7 @@ export default {
             'run',
             `Cargando codigo "${_code}" para todos los usuarios ${
               _force ? '(Forzado)' : ''
-            }`,
+            }`
           );
 
           await AgsService.loadCodeForAll(
@@ -129,11 +129,11 @@ export default {
             _force,
             async function loadCallBack(agsUserData, response): Promise<void> {
               const format = `- < ${agsUserData.me()} > ${AgsService.parseResponseText(
-                response,
+                response
               )}`;
 
               allResults.push(format); // += `${format}\n`;
-            },
+            }
           );
 
           await Utils.getRandomSleep(2000);
@@ -147,7 +147,7 @@ export default {
       case 'me':
         {
           const agsUserData = await AgsUsersManager.getUserToken({
-            ds_id: _para === 'me' ? interaction.user.id : _user?.id,
+            ds_id: _para === 'me' ? interaction.user.id : _user?.id
           });
 
           if (!agsUserData) {
@@ -155,7 +155,7 @@ export default {
               title: 'Error',
               description: 'No se encontro el usuario',
               color: 'Red',
-              footer: { text: 'AgsCodeSniper' },
+              footer: { text: 'NochtTests' }
             });
             return;
           }
@@ -164,12 +164,12 @@ export default {
             'run',
             `Cargando codigo "${_code}" para el usuario "${
               _para === 'me' ? interaction.user.id : _user?.id
-            }" ${_force ? '(Forzado)' : ''}`,
+            }" ${_force ? '(Forzado)' : ''}`
           );
 
           const response = await AgsService.loadCodeForOne(agsUserData, _code);
           const format = `- < ${agsUserData.me()} > ${AgsService.parseResponseText(
-            response,
+            response
           )}`;
 
           void Utils.embedReply(interaction, {
@@ -177,10 +177,10 @@ export default {
             title: `Codigo cargado correctamente${_force ? ' (Forzado)' : ''}`,
             description: format,
             color: 'Green',
-            footer: { text: 'AgsCodeSniper' },
+            footer: { text: 'NochtTests' }
           });
         }
         break;
     }
-  },
+  }
 } satisfies IMySlashCommand;
