@@ -10,7 +10,7 @@
     "start": "node ./dist/index.js",
     "test": "ts-node ./src/index.ts",
     "migration": "ts-node ./src/migration.ts",
-    "lint": "eslint 'src/**/*.{ts,tsx}'"
+    "lint": "eslint src/**/*.{ts,tsx}"
   },
   "keywords": [],
   "author": "TheNochtgamer",

@@ -35,7 +35,7 @@ export default class UsersManager {
       data.id,
       data.blocked,
       data.blocked_reason,
-      data.echo_activated,
+      data.echo_activated
     ]);
 
     // for (const dc of data.disabledCommands) {
