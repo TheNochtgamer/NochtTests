@@ -70,4 +70,27 @@ export default class AgsUsersManager {
 
     return data.map(d => new AgsUserData(d));
   }
+
+  public static async getOnlyUsers(
+    kind: 'all' | 'ds_users' | 'references' = 'all'
+  ): Promise<AgsUserData[] | null> {
+    const data = await DatabaseManager.query<AgsUserData>(
+      `SELECT * FROM ags_user_tokens ${
+        kind === 'all'
+          ? ''
+          : `WHERE ${
+              kind === 'ds_users'
+                ? `'self' = ags_user_tokens.reference`
+                : 'ags_user_tokens.ds_id IS NULL'
+            }`
+      }`
+    );
+
+    if (!data || data.length === 0) return null;
+
+    return data.map(d => {
+      d.token = '';
+      return new AgsUserData(d);
+    });
+  }
 }

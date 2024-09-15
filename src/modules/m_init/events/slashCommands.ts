@@ -15,6 +15,9 @@ export default {
     if (!interaction.isChatInputCommand()) return;
     const client = interaction.client;
     const command = client.commands.get(interaction.commandName);
+    const subCommand =
+      interaction.options.getSubcommand() ||
+      interaction.options.getSubcommandGroup();
 
     // --CommandNotFound--
     if (!command) {
@@ -27,7 +30,7 @@ export default {
         .reply({
           content:
             'Hubo un error interno al intentar encontrar el comando\nPorfavor intenta mas tarde...',
-          ephemeral: true,
+          ephemeral: true
         })
         .catch(logger.error.bind(logger, 'run', 'Error al responder'));
 
@@ -90,7 +93,7 @@ export default {
         try {
           if (interaction.deferred || interaction.replied) return;
           await interaction.deferReply({
-            ephemeral: command.deferIfToLate?.ephemeral ?? true,
+            ephemeral: command.deferIfToLate?.ephemeral ?? true
           });
         } catch (error) {}
       }, 2.5 * 1000);
@@ -102,7 +105,7 @@ export default {
       (async () =>
         interaction.guildId
           ? await GuildsManager.getGuildData(interaction.guildId)
-          : undefined)(),
+          : undefined)()
     ]);
     // --/ObtainingData--
 
@@ -134,7 +137,9 @@ export default {
     // --Run
     logger.log(
       'run',
-      `${interaction.user.username} ejecuto el comando "${interaction.commandName}"`
+      `${interaction.user.username} ejecuto el comando "${
+        interaction.commandName
+      }${(subCommand ? ' ' : '') + subCommand}"`
     );
 
     try {
@@ -150,25 +155,20 @@ export default {
           interaction.commandName
         }.
         > </${command.definition.data.name}${
-          command.definition.data.options.some((opt: any) => opt.type === 1)
-            ? ` ${command.definition.data.options
-                .filter((opt: any) => opt.type === 1)
-                .map((sub: any) => `${sub.name}`)
-                .join(' ')}`
-            : ''
+          (subCommand ? ' ' : '') + subCommand
         }:${interaction.command?.id}>`;
 
         if (interaction.replied || interaction.deferred) {
           await interaction.editReply({
-            content,
+            content
           });
         } else {
           await interaction.reply({
             content,
-            ephemeral: true,
+            ephemeral: true
           });
         }
       } catch (error) {}
     }
-  },
+  }
 } satisfies IMyBotEvent<'interactionCreate'>;

@@ -5,7 +5,7 @@ import { WebhookClient, type WebhookMessageCreateOptions } from 'discord.js';
 const sendOptions: WebhookMessageCreateOptions = {
   username: 'MyLogs',
   avatarURL:
-    'https://cdn.discordapp.com/avatars/940033648772648981/a3d656b2e9782aa4a291263af3b26097.png',
+    'https://cdn.discordapp.com/avatars/940033648772648981/a3d656b2e9782aa4a291263af3b26097.png'
 };
 
 const webhookLog = new (class {
@@ -16,8 +16,11 @@ const webhookLog = new (class {
 
   constructor() {
     this.logHook = new WebhookClient({
-      url: process.env.LOG_WEBHOOK_URL ?? '',
+      url: process.env.LOG_WEBHOOK_URL ?? ''
     });
+
+    if (process.argv[1].includes('migration')) return;
+
     void this.testWebhook();
     this._sendLoopInterval = setInterval(() => {
       if (this.logBlocks.length === 0 || !this._logWebhookExist) return;
@@ -28,7 +31,7 @@ const webhookLog = new (class {
   public now(): string {
     return `[${new Date()
       .toLocaleString('es-AR', {
-        timeZone: 'America/Argentina/Buenos_Aires',
+        timeZone: 'America/Argentina/Buenos_Aires'
       })
       .replace(/\/[0-9]+,/, '')
       .replace(/[0-9]+(\/| )/g, match => match.padStart(3, '0'))}]`;
@@ -97,7 +100,7 @@ const webhookLog = new (class {
       await this.logHook.send({
         content,
 
-        ...sendOptions,
+        ...sendOptions
       });
     } catch (error) {
       console.error(`${this.now()} Error al enviar logs: `, error);
@@ -115,7 +118,7 @@ export default class SystemLog {
   public now(): string {
     return `[${new Date()
       .toLocaleString('es-AR', {
-        timeZone: 'America/Argentina/Buenos_Aires',
+        timeZone: 'America/Argentina/Buenos_Aires'
       })
       .replace(/\/[0-9]+,/, '')
       .replace(/[0-9]+(\/| )/g, match => match.padStart(3, '0'))}]`;

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import type { IAgsRewardPageResponse, AgsUserData } from '@/types';
+import type { IAgsRewardPageResponse, AgsUserData, Bot } from '@/types';
 import {
   AgsPages,
   CachePointers,
@@ -9,13 +9,14 @@ import {
 import axios from 'axios';
 import SystemLog from '@/lib/structures/SystemLog';
 import Utils from '@/lib/Utils';
-import { bot } from '..';
 import DatabaseManager from './DatabaseManager';
 import cacheMe from './cacheMe';
 
 const logger = new SystemLog('services', 'AgsService');
 
 class AgsService {
+  public bot: Bot | undefined;
+
   private async fetchReward(token: string, code?: string) {
     const response = await axios.get<IAgsRewardPageResponse>(AgsPages.reward, {
       headers: {
@@ -68,12 +69,12 @@ class AgsService {
       try {
         const { data } = await this.fetchReward(user.token, code);
 
-        logger.debug(
+        logger.log(
           'loadOneCode',
           `user_${user.user_id}:${
             user.ds_id
-              ? bot.users.cache.get(user.ds_id)?.displayName ??
-                bot.users.cache.get(user.ds_id)?.username ??
+              ? this.bot?.users.cache.get(user.ds_id)?.displayName ??
+                this.bot?.users.cache.get(user.ds_id)?.username ??
                 user.ds_id
               : user.reference
           } >\n${JSON.stringify(data, null, 2)}`

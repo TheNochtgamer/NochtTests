@@ -26,7 +26,7 @@ export default {
           .setName('user')
           .setDescription('El usuario al que se le vinculara el token')
           .setRequired(true)
-      ),
+      )
   },
 
   async run(interaction) {
@@ -36,13 +36,13 @@ export default {
 
     const userToken = await AgsUsersManager.getUserToken({
       ds_id: user.id,
-      reference: 'self',
+      reference: 'self'
     });
 
     if (userToken) {
       const action = await Utils.confirmationForm(
         interaction,
-        `<@${user.id}> > Ya tiene un token vinculado, deseas reemplazarlo?`,
+        `<@${user.id}> > Ya tiene un token vinculado, deseas reemplazarlo?`
       );
       if (action) {
         await interaction.deleteReply();
@@ -55,14 +55,14 @@ export default {
     if (testResult === 1) {
       logger.debug(
         'run',
-        `${user.id} > Error al intentar vincular token, la pagina no respondio`,
+        `${user.id} > Error al intentar vincular token, la pagina no respondio`
       );
 
       void Utils.embedReply(interaction, {
         title: 'Error',
         description: 'La pagina no respondio, intenta de nuevo mas tarde',
         color: 'Red',
-        footer: { text: 'AgsCodeSniper' },
+        footer: { text: 'NochtTests' }
       });
       return;
     }
@@ -70,13 +70,13 @@ export default {
     if (typeof testResult === 'string') {
       logger.debug(
         'run',
-        `${user.id} > Error al intentar vincular token, la pagina respondio con: ${testResult}`,
+        `${user.id} > Error al intentar vincular token, la pagina respondio con: ${testResult}`
       );
       void Utils.embedReply(interaction, {
         title: 'Error',
         description: `La pagina respondio con: \`${testResult}\``,
         color: 'Red',
-        footer: { text: 'AgsCodeSniper' },
+        footer: { text: 'NochtTests' }
       });
       return;
     }
@@ -91,21 +91,21 @@ export default {
         ds_id: user.id,
         token,
         reference: 'self',
-        priority: 0,
+        priority: 0
       });
     } else {
       res = await AgsUsersManager.createUserToken({
         ds_id: user.id,
         reference: 'self',
         priority: 0,
-        token,
+        token
       });
     }
 
     if (!res) {
       logger.error(
         'run',
-        `${user.id} > Error al intentar almacenar token, no se guardo el nuevo token`,
+        `${user.id} > Error al intentar almacenar token, no se guardo el nuevo token`
       );
     }
 
@@ -118,7 +118,7 @@ export default {
           : ''
       }\nMuchas gracias por usar mi sistema, si me queres dar una mano monetariamente, podes hacerlo en https://cafecito.app/thenochtgamer.`,
       color: 'Green',
-      footer: { text: 'AgsCodeSniper' },
+      footer: { text: 'NochtTests' }
     });
-  },
+  }
 } satisfies IMySlashCommand;

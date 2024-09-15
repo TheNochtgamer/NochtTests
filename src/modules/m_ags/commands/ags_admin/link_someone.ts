@@ -29,7 +29,7 @@ export default {
             'Una referencia para el token (ej: nombre de la persona)'
           )
           .setRequired(true)
-      ),
+      )
   },
 
   async run(interaction) {
@@ -42,13 +42,13 @@ export default {
         title: 'Error',
         description: 'No puedes usar "self" como referencia',
         color: 'Red',
-        footer: { text: 'AgsCodeSniper' },
+        footer: { text: 'NochtTests' }
       });
       return;
     }
 
     const userToken = await AgsUsersManager.getUserToken({
-      reference,
+      reference
     });
 
     if (userToken) {
@@ -74,7 +74,7 @@ export default {
         title: 'Error',
         description: 'La pagina no respondio, intenta de nuevo mas tarde',
         color: 'Red',
-        footer: { text: 'AgsCodeSniper' },
+        footer: { text: 'NochtTests' }
       });
       return;
     }
@@ -88,7 +88,7 @@ export default {
         title: 'Error',
         description: `La pagina respondio con: \`${testResult}\``,
         color: 'Red',
-        footer: { text: 'AgsCodeSniper' },
+        footer: { text: 'NochtTests' }
       });
       return;
     }
@@ -100,14 +100,14 @@ export default {
         ds_id: null,
         token,
         reference,
-        priority: 0,
+        priority: 0
       });
     } else {
       res = await AgsUsersManager.createUserToken({
         ds_id: null,
         reference,
         priority: 0,
-        token,
+        token
       });
     }
 
@@ -127,7 +127,7 @@ export default {
           : ''
       }\nMuchas gracias por usar mi sistema, si **no** me queres dar una mano monetariamente, no lo hagas y listo capo, que mierda seguis leyendo???.`,
       color: 'Green',
-      footer: { text: 'AgsCodeSniper' },
+      footer: { text: 'NochtTests' }
     });
-  },
+  }
 } satisfies IMySlashCommand;

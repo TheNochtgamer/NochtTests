@@ -6,7 +6,7 @@ import type { IMySlashCommand } from '@/types';
 import {
   type APIEmbedField,
   EmbedBuilder,
-  SlashCommandSubcommandBuilder,
+  SlashCommandSubcommandBuilder
 } from 'discord.js';
 
 const logger = new SystemLog('modules', 'm_ags', 'commands', 'loadcode');
@@ -22,165 +22,144 @@ export default {
           .setName('code')
           .setDescription('El codigo a cargar')
           .setRequired(true)
-          .setMinLength(5),
-      )
-      .addStringOption(option =>
-        option
-          .setName('para')
-          .setDescription('Para quien es el codigo')
-          .setRequired(true)
-          .addChoices([
-            { name: 'Todos', value: 'all' },
-            { name: 'Un usuario (usar opcion "user")', value: 'user' },
-            { name: 'yo', value: 'me' },
-          ]),
+          .setMinLength(5)
       )
       .addBooleanOption(option =>
         option
           .setName('force')
           .setDescription('Fuerza la carga del codigo (SALTEA LOS CHEQUEOS)')
-          .setRequired(false),
+          .setRequired(false)
       )
       .addUserOption(option =>
         option
           .setName('user')
           .setDescription('El usuario al que se le cargara el codigo')
-          .setRequired(false),
-      ),
+          .setRequired(false)
+      )
+      .addStringOption(option =>
+        option
+          .setName('reference')
+          .setDescription('La referencia a cargarle el codigo')
+          .setRequired(false)
+          .setAutocomplete(true)
+      )
   },
 
   async run(interaction) {
     await interaction.deferReply({ ephemeral: false });
     const _code = interaction.options.getString('code', true);
-    const _para = interaction.options.getString('para', true) as
-      | 'all'
-      | 'user'
-      | 'me';
     const _force = interaction.options.getBoolean('force', false) ?? false;
     const _user = interaction.options.getUser('user', false);
+    const _reference = interaction.options.getString('reference', false);
 
     const resultsEmbed = new EmbedBuilder()
       .setTitle(`Cargando codigo...${_force ? ' (Forzado)' : ''}`)
       .setAuthor({ name: _code })
-      .setFooter({ text: 'AgsCodeSniper' })
+      .setFooter({ text: 'NochtTests' })
       .setColor('DarkRed')
       .setTimestamp();
 
-    if (_para === 'user' && !_user) {
-      void Utils.embedReply(interaction, {
-        title: 'Error',
-        description: 'Debes especificar un usuario con la opcion "user"',
-        color: 'Red',
-        footer: { text: 'AgsCodeSniper' },
-      });
-      return;
-    }
+    // Cargar codigo para TODAS LAS CUENTAS
+    if (!_user && !_reference) {
+      const allUsersData = await AgsUsersManager.getUsersTokens();
+      const allResults: string[] = [];
 
-    switch (_para) {
-      case 'all':
-        {
-          const allUsersData = await AgsUsersManager.getUsersTokens();
-          const allResults: string[] = [];
+      if (!allUsersData || allUsersData.length === 0) {
+        void Utils.embedReply(interaction, {
+          title: 'Error',
+          description: 'No hay usuarios registrados',
+          color: 'Red',
+          footer: { text: 'NochtTests' }
+        });
+        return;
+      }
 
-          if (!allUsersData || allUsersData.length === 0) {
-            void Utils.embedReply(interaction, {
-              title: 'Error',
-              description: 'No hay usuarios registrados',
-              color: 'Red',
-              footer: { text: 'AgsCodeSniper' },
-            });
-            return;
-          }
-
-          async function updateEmbed(end = false): Promise<void> {
-            try {
-              const theResult = allResults.join('\n');
-              resultsEmbed.setDescription(
-                theResult.slice(0, 4090) +
-                  (theResult.length > 4090 ? '...' : ''),
-              );
-
-              if (end) {
-                resultsEmbed.setTitle(
-                  `Codigo cargado correctamente${_force ? ' (Forzado)' : ''}`,
-                );
-                resultsEmbed.setColor('Green');
-              }
-              await interaction.editReply({
-                embeds: [resultsEmbed],
-              });
-            } catch (error) {
-              logger.error('run', 'Error al editar el mensaje', error);
-            }
-          }
-
-          const updateEmbedInterval = setInterval(updateEmbed, 3000);
-
-          logger.debug(
-            'run',
-            `Cargando codigo "${_code}" para todos los usuarios ${
-              _force ? '(Forzado)' : ''
-            }`,
+      async function updateEmbed(end = false): Promise<void> {
+        try {
+          const theResult = allResults.join('\n');
+          resultsEmbed.setDescription(
+            theResult.slice(0, 4090) + (theResult.length > 4090 ? '...' : '')
           );
 
-          await AgsService.loadCodeForAll(
-            allUsersData,
-            _code,
-            _force,
-            async function loadCallBack(agsUserData, response): Promise<void> {
-              const format = `- < ${agsUserData.me()} > ${AgsService.parseResponseText(
-                response,
-              )}`;
-
-              allResults.push(format); // += `${format}\n`;
-            },
-          );
-
-          await Utils.getRandomSleep(2000);
-          clearInterval(updateEmbedInterval);
-          await Utils.getRandomSleep(3000);
-
-          await updateEmbed(true);
-        }
-        break;
-      case 'user':
-      case 'me':
-        {
-          const agsUserData = await AgsUsersManager.getUserToken({
-            ds_id: _para === 'me' ? interaction.user.id : _user?.id,
+          if (end) {
+            resultsEmbed.setTitle(
+              `Codigo cargado correctamente${_force ? ' (Forzado)' : ''}`
+            );
+            resultsEmbed.setColor('Green');
+          }
+          await interaction.editReply({
+            embeds: [resultsEmbed]
           });
+        } catch (error) {
+          logger.error('run', 'Error al editar el mensaje', error);
+        }
+      }
 
-          if (!agsUserData) {
-            void Utils.embedReply(interaction, {
-              title: 'Error',
-              description: 'No se encontro el usuario',
-              color: 'Red',
-              footer: { text: 'AgsCodeSniper' },
-            });
-            return;
-          }
+      const updateEmbedInterval = setInterval(updateEmbed, 3000);
 
-          logger.debug(
-            'run',
-            `Cargando codigo "${_code}" para el usuario "${
-              _para === 'me' ? interaction.user.id : _user?.id
-            }" ${_force ? '(Forzado)' : ''}`,
-          );
+      logger.debug(
+        'run',
+        `Cargando codigo "${_code}" para todos los usuarios ${
+          _force ? '(Forzado)' : ''
+        }`
+      );
 
-          const response = await AgsService.loadCodeForOne(agsUserData, _code);
+      await AgsService.loadCodeForAll(
+        allUsersData,
+        _code,
+        _force,
+        async function loadCallBack(agsUserData, response): Promise<void> {
           const format = `- < ${agsUserData.me()} > ${AgsService.parseResponseText(
-            response,
+            response
           )}`;
 
-          void Utils.embedReply(interaction, {
-            author: { name: _code },
-            title: `Codigo cargado correctamente${_force ? ' (Forzado)' : ''}`,
-            description: format,
-            color: 'Green',
-            footer: { text: 'AgsCodeSniper' },
-          });
+          allResults.push(format); // += `${format}\n`;
         }
-        break;
+      );
+
+      await Utils.getRandomSleep(2000);
+      clearInterval(updateEmbedInterval);
+      await Utils.getRandomSleep(3000);
+
+      await updateEmbed(true);
     }
-  },
+
+    // Cargar codigo PARA 1 CUENTA
+    if (_user || _reference) {
+      const agsUserData = await AgsUsersManager.getUserToken({
+        ds_id: _user?.id,
+        reference: _reference || undefined
+      });
+
+      if (!agsUserData) {
+        void Utils.embedReply(interaction, {
+          title: 'Error',
+          description: 'No se encontro el usuario',
+          color: 'Red',
+          footer: { text: 'NochtTests' }
+        });
+        return;
+      }
+
+      logger.debug(
+        'run',
+        `Cargando codigo "${_code}" para el usuario "${
+          _user?.id || _reference
+        }" ${_force ? '(Forzado)' : ''}`
+      );
+
+      const response = await AgsService.loadCodeForOne(agsUserData, _code);
+      const format = `- < ${agsUserData.me()} > ${AgsService.parseResponseText(
+        response
+      )}`;
+
+      void Utils.embedReply(interaction, {
+        author: { name: _code },
+        title: `Codigo cargado correctamente${_force ? ' (Forzado)' : ''}`,
+        description: format,
+        color: 'Green',
+        footer: { text: 'NochtTests' }
+      });
+    }
+  }
 } satisfies IMySlashCommand;

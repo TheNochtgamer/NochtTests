@@ -6,6 +6,7 @@ export default class AgsUserData {
   public reference: string | null = null;
   public priority: number = 0;
   public token = '';
+  public hidden = false;
 
   constructor(data: data) {
     if (typeof data === 'string') {
@@ -18,9 +19,14 @@ export default class AgsUserData {
     if (data.reference !== undefined) this.reference = data.reference;
     if (data.priority !== undefined) this.priority = data.priority;
     if (data.token !== undefined) this.token = data.token;
+    if (data.hidden !== undefined) this.hidden = data.hidden
   }
 
   me(): string {
     return (this.ds_id ? `<@${this.ds_id}>` : this.reference) ?? this.user_id;
+  }
+
+  toString(): string {
+    return `[user_${this.user_id}] ${this.me()} >> Priority: ${this.priority}`;
   }
 }

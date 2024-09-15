@@ -36,10 +36,10 @@ async function migrateCmds() {
     intents: [
       IntentsBitField.Flags.Guilds,
       IntentsBitField.Flags.GuildMessages,
-      IntentsBitField.Flags.MessageContent,
+      IntentsBitField.Flags.MessageContent
     ],
     partials: [Partials.Message],
-    presence: { status: 'invisible' },
+    presence: { status: 'invisible' }
   });
 
   await bot.init(process.env.TOKEN ?? '', true);
