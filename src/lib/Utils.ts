@@ -7,7 +7,7 @@ import type {
   Bot,
   IUserDisabledCommand,
   IGuildDisabledCommand,
-  IGlobalDisabledCommand,
+  IGlobalDisabledCommand
 } from '@/types';
 import {
   ActionRowBuilder,
@@ -16,16 +16,16 @@ import {
   EmbedBuilder,
   GuildMemberRoleManager,
   PermissionsBitField,
+  ButtonInteraction
 } from 'discord.js';
 import type {
-  ButtonInteraction,
   ApplicationCommand,
   ModalSubmitInteraction,
   Collection,
   ChatInputCommandInteraction,
   CommandInteraction,
   Message,
-  InteractionResponse,
+  InteractionResponse
 } from 'discord.js';
 import path from 'path';
 import fs from 'fs';
@@ -44,7 +44,7 @@ class Utils {
       // @ts-expect-error Proteccion OPCIONAL del objeto ante cualquier modificacion externa, el copilador reconoce this como any
       if (this[key] instanceof Function) this[key] = this[key].bind(this);
       Object.defineProperty(this, key, {
-        writable: false,
+        writable: false
       });
     });
   }
@@ -69,10 +69,10 @@ class Utils {
       path.join(PATH, 'init'),
       fs
         .readdirSync(PATH, {
-          withFileTypes: true,
+          withFileTypes: true
         })
         .filter(f => f.isDirectory() && f.name !== 'init')
-        .map(f => path.join(PATH, f.name)),
+        .map(f => path.join(PATH, f.name))
     ].flat();
 
     return modules;
@@ -95,14 +95,14 @@ class Utils {
 
       const files = fs
         .readdirSync(PATH, {
-          withFileTypes: true,
+          withFileTypes: true
         })
         .flatMap(item => {
           if (item.isFile()) return path.join(PATH, item.name);
 
           return fs
             .readdirSync(path.join(PATH, item.name), {
-              withFileTypes: true,
+              withFileTypes: true
             })
             .filter(
               f =>
@@ -389,7 +389,7 @@ class Utils {
       identifier,
       {
         lastTick: now,
-        uses,
+        uses
       } satisfies IRateLimit,
       { ttl: cooldown }
     );
@@ -537,7 +537,7 @@ class Utils {
         ? {
             embeds: interaction.message.embeds,
             components: interaction.message.components,
-            content: interaction.message.content || undefined,
+            content: interaction.message.content || undefined
           }
         : null;
 
@@ -547,14 +547,14 @@ class Utils {
             // @ts-ignore
             components: [row],
             embeds: [],
-            content: text,
+            content: text
           })
         : await interaction.reply({
             // @ts-ignore
             components: [row],
             embeds: [],
             content: text,
-            ephemeral: true,
+            ephemeral: true
           });
 
     try {
@@ -568,6 +568,131 @@ class Utils {
     } catch (error) {}
 
     return 2;
+  }
+
+  public async listForm({
+    interaction,
+    data,
+    title,
+    followUp = false
+  }: {
+    interaction:
+      | CommandInteraction
+      | ButtonInteraction
+      | ModalSubmitInteraction
+      | ChatInputCommandInteraction;
+    data: string[];
+    title?: string;
+    followUp?: boolean;
+  }) {
+    const { floor } = Math;
+    const maxItemsPerList = 10;
+    const backButton = new ButtonBuilder()
+      .setCustomId('butback')
+      .setStyle(ButtonStyle.Primary)
+      .setLabel('◀');
+    const fowardButton = new ButtonBuilder()
+      .setCustomId('butfoward')
+      .setStyle(ButtonStyle.Primary)
+      .setLabel('▶');
+
+    const listEmbed = new EmbedBuilder().setColor('Aqua').setFooter({
+      text: `NochtTests • 1/${floor(data.length / maxItemsPerList) + 1}`
+    });
+    if (title) listEmbed.setTitle(title);
+
+    if (floor(data.length / maxItemsPerList) === 0) {
+      backButton.setDisabled(true);
+      fowardButton.setDisabled(true);
+    }
+
+    let index = 0;
+    function modifyEmbed(i = 0) {
+      if (index + i < 0 || index + i > floor(data.length / maxItemsPerList))
+        return false;
+
+      index += i;
+      listEmbed.setDescription(
+        data.slice(index * 10, (index + 1) * 10).join('\n')
+      );
+      listEmbed.setFooter({
+        text: `NochtTests • ${index + 1}/${
+          floor(data.length / maxItemsPerList) + 1
+        }`
+      });
+      return true;
+    }
+
+    const payload: Parameters<typeof interaction.followUp>[0] = {
+      content: '_ _',
+      embeds: [listEmbed],
+      components: [
+        new ActionRowBuilder<ButtonBuilder>().setComponents(
+          backButton,
+          fowardButton
+        )
+      ]
+    };
+
+    modifyEmbed();
+    let secondInteraction: Message | InteractionResponse;
+    try {
+      if (followUp) {
+        secondInteraction = await interaction.followUp(payload);
+      } else {
+        secondInteraction = await (interaction.replied || interaction.deferred
+          ? interaction.editReply(payload)
+          : interaction.reply(payload));
+      }
+    } catch (error) {
+      logger.error('listForm', 'Error al enviar un embed:', error);
+      return;
+    }
+
+    const butCollector = secondInteraction.createMessageComponentCollector({
+      idle: 30 * 1000
+    });
+
+    butCollector.on('collect', async collectInteraction => {
+      if (!(collectInteraction instanceof ButtonInteraction)) return;
+      const { customId } = collectInteraction;
+
+      try {
+        await (modifyEmbed(customId === 'butback' ? -1 : 1)
+          ? collectInteraction.update({
+              embeds: [listEmbed]
+            })
+          : collectInteraction.update({}));
+      } catch (error) {
+        logger.error('listForm', 'Error al editar un mensaje:', error);
+        return;
+      }
+    });
+    butCollector.once('end', async collected => {
+      try {
+        backButton.setDisabled(true);
+        fowardButton.setDisabled(true);
+
+        const firstInteraction = collected.find(
+          c => c instanceof ButtonInteraction
+        );
+        if (!firstInteraction) return;
+
+        await firstInteraction.editReply({
+          components: [
+            new ActionRowBuilder<ButtonBuilder>().setComponents(
+              backButton,
+              fowardButton
+            )
+          ]
+        });
+      } catch (error) {
+        if (error instanceof Error && error.message === 'Unknown Message')
+          return;
+        logger.error('listForm', 'Error al editar un mensaje:', error);
+        return;
+      }
+    });
   }
 
   /**
@@ -595,14 +720,14 @@ class Utils {
     const count = existingExecutions ?? 0;
 
     cacheMe.set(identifier + CachePointers.executionsCacher, count + 1, {
-      ttl: CacheTts.executionsCacher,
+      ttl: CacheTts.executionsCacher
     });
 
     if (existingExecutions === undefined) return true;
 
     if (count >= maxExecutions) {
       cacheMe.set(identifier + CachePointers.executionsCacher, 0, {
-        ttl: CacheTts.executionsCacher,
+        ttl: CacheTts.executionsCacher
       });
       return true;
     }

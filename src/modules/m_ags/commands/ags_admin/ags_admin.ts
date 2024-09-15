@@ -4,11 +4,13 @@ import { PermissionsBitField, SlashCommandBuilder } from 'discord.js';
 import loadcode from './loadcode';
 import link_other from './link_other';
 import link_someone from './link_someone';
+import linked from './linked';
 
 const subs = new Map<string, IMySlashCommand<IMyCommandDataImSubCommand>>([
   ['loadcode', loadcode],
   ['link_other', link_other],
   ['link_someone', link_someone],
+  ['linked', linked]
 ]);
 
 export default {
@@ -36,7 +38,7 @@ export default {
 
     return {
       kind: 'SubsOnly',
-      data: cmd,
+      data: cmd
     };
   })(),
 
@@ -49,8 +51,8 @@ export default {
       (await subs.get(subCommand)?.autoComplete(interaction)) ?? [
         {
           name: 'error',
-          value: 'error',
-        },
+          value: 'error'
+        }
       ]
     );
   },
@@ -58,5 +60,5 @@ export default {
   async run(interaction) {
     const subCommand = interaction.options.getSubcommand(true);
     await subs.get(subCommand)?.run(interaction);
-  },
+  }
 } satisfies IMySlashCommand;

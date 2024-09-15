@@ -1,13 +1,12 @@
 import type { IMySlashCommand } from '@/types';
-import { SlashCommandBuilder } from 'discord.js';
+import { SlashCommandSubcommandBuilder } from 'discord.js';
 import Utils from '@/lib/Utils';
 import AgsUsersManager from '@/services/AgsUsersManager';
-import AgsUserData from '@/lib/structures/AGS/AgsUserData';
 
 export default {
   definition: {
-    kind: 'OptionsOnly',
-    data: new SlashCommandBuilder()
+    kind: 'ImSubCommand',
+    data: new SlashCommandSubcommandBuilder()
       .setName('linked')
       .setDescription('Obtiene las cuentas vinculadas al bot')
       .addStringOption(option =>
@@ -17,8 +16,13 @@ export default {
           .setRequired(true)
           .setChoices([
             { name: 'Todos', value: 'all' },
+            { name: 'Todos los Usuarios', value: 'all_users' },
+            { name: 'Todas las referencias', value: 'all_refer' },
             { name: 'Un usuario (usar opcion "user")', value: 'user' },
-            { name: 'Referencia (usar opcion "reference")', value: 'reference' }
+            {
+              name: 'Una Referencia (usar opcion "reference")',
+              value: 'reference'
+            }
           ])
       )
       .addStringOption(option =>
@@ -44,6 +48,8 @@ export default {
     await interaction.deferReply({ ephemeral: true });
     const _opciones = interaction.options.getString('opciones', true) as
       | 'all'
+      | 'all_users'
+      | 'all_refer'
       | 'user'
       | 'reference';
     const _reference = interaction.options.getString('reference', false);
@@ -52,7 +58,7 @@ export default {
     switch (_opciones) {
       case 'all':
         {
-          const agsUsersData = await AgsUsersManager.getUsersTokens();
+          const agsUsersData = await AgsUsersManager.getOnlyUsers();
           if (!agsUsersData) {
             Utils.embedReply(interaction, {
               title: 'Error',
@@ -70,12 +76,42 @@ export default {
             return '- ' + agsUser.toString();
           });
 
-          Utils.embedReply(interaction, {
-            title: 'Datos',
-            description: content.join('\n'),
-            color: 'White',
-            footer: { text: 'NochtTests' },
-            timestamp: new Date()
+          Utils.listForm({
+            interaction,
+            title: `Cuentas`,
+            data: content
+          });
+        }
+        break;
+      case 'all_users':
+      case 'all_refer':
+        {
+          const agsUsersData = await AgsUsersManager.getOnlyUsers(
+            _opciones === 'all_users' ? 'ds_users' : 'references'
+          );
+          if (!agsUsersData) {
+            Utils.embedReply(interaction, {
+              title: 'Error',
+              description: 'No se encontraron datos',
+              color: 'Red',
+              footer: { text: 'NochtTests' },
+              timestamp: new Date()
+            });
+            return;
+          }
+
+          const content = agsUsersData.map(agsUser => {
+            agsUser.token = '';
+
+            return '- ' + agsUser.toString();
+          });
+
+          Utils.listForm({
+            interaction,
+            title: `Cuentas (${
+              _opciones === 'all_users' ? 'usuarios' : 'referencias'
+            })`,
+            data: content
           });
         }
         break;
@@ -108,12 +144,10 @@ export default {
           return;
         }
 
-        Utils.embedReply(interaction, {
-          title: 'Datos',
-          description: '- ' + agsUser.toString(),
-          color: 'White',
-          footer: { text: 'NochtTests' },
-          timestamp: new Date()
+        Utils.listForm({
+          interaction,
+          title: `Cuentas`,
+          data: ['- ' + agsUser.toString()]
         });
       }
     }

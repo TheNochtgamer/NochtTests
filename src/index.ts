@@ -4,10 +4,18 @@ import Bot from './lib/structures/Bot';
 import { IntentsBitField, Partials, PresenceUpdateStatus } from 'discord.js';
 import SystemLog from './lib/structures/SystemLog';
 import DatabaseManager from './services/DatabaseManager';
+import AgsService from './services/AgsService';
 
 const logger = new SystemLog('index');
 
-export const bot = new Bot({
+if (require.main !== module) {
+  console.error(
+    'index está siendo importado externamente en vez de ser ejecutado directamente...'
+  );
+  process.exit(1);
+}
+
+const bot = new Bot({
   intents: [
     IntentsBitField.Flags.Guilds,
     IntentsBitField.Flags.GuildMessages,
@@ -25,6 +33,9 @@ export const bot = new Bot({
     process.exit(1);
   });
   await Promise.all([bot.init(process.env.TOKEN ?? '')]);
+
+  // External Bindings
+  AgsService.bot = bot;
 })().catch(logger.error.bind(logger));
 
 if (process.env.NODE_ENV === 'production') {
