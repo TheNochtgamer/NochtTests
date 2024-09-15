@@ -29,6 +29,7 @@ class AgsService {
         'Referrer-Policy': 'strict-origin-when-cross-origin',
         Cookie: `PHPSESSID=${token}`
       },
+      timeout: 5000,
       params: code
         ? {
             action: 'code',
@@ -63,9 +64,12 @@ class AgsService {
     code: string
   ): Promise<IAgsRewardPageResponse | null> {
     void this.saveCode(code);
-
     let tries = 0;
-    while (tries < 3) {
+
+    const maxTries = () => Math.floor(5 + user.priority * 0.5);
+    const sleepTime = () => Math.max(2, 10 / (tries + 1)) * 1000;
+
+    while (tries < maxTries()) {
       try {
         const { data } = await this.fetchReward(user.token, code);
 
@@ -89,7 +93,8 @@ class AgsService {
           error
         );
         tries++;
-        if (tries < 3) await Utils.getRandomSleep(2000, 7000);
+        if (tries < maxTries())
+          await Utils.getRandomSleep(sleepTime(), sleepTime() + 1000);
       }
     }
 
