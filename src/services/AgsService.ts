@@ -117,7 +117,7 @@ class AgsService {
     ) => void | Promise<void>
   ): Promise<Array<IAgsRewardPageResponse | null>> {
     const responses: Array<IAgsRewardPageResponse | null> = [];
-    const firstUser = Utils.arrayRandom(users);
+    const firstUser = Utils.arrayRandom(users.filter(u => u.ds_id));
 
     if (!force && firstUser) {
       const firstResponse = await this.loadCodeForOne(firstUser, code);
@@ -152,10 +152,11 @@ class AgsService {
     }
 
     const promises = users
+      .filter(user => force || firstUser?.user_id !== user.user_id)
       .sort((a, b) => b.priority - a.priority)
       .map(async user => {
-        if (!force && firstUser?.user_id === user.user_id) return;
         const response = await this.loadCodeForOne(user, code);
+        if (user.hidden) return;
         responses.push(response);
         if (cb) void cb(user, response);
       });

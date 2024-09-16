@@ -19,14 +19,14 @@ export default class AgsUserData {
     if (data.reference !== undefined) this.reference = data.reference;
     if (data.priority !== undefined) this.priority = data.priority;
     if (data.token !== undefined) this.token = data.token;
-    if (data.hidden !== undefined) this.hidden = data.hidden
+    if (data.hidden !== undefined) this.hidden = Boolean(data.hidden);
   }
 
-  me(): string {
+  public me(): string {
     return (this.ds_id ? `<@${this.ds_id}>` : this.reference) ?? this.user_id;
   }
 
-  toString(): string {
+  public toString(): string {
     return `[user_${this.user_id}] ${this.me()} >> Priority: ${this.priority}`;
   }
 }

@@ -20,7 +20,7 @@ class Database {
       idleTimeout: 60000,
       queueLimit: 0,
       enableKeepAlive: true,
-      keepAliveInitialDelay: 0,
+      keepAliveInitialDelay: 0
     });
   }
 
@@ -126,6 +126,7 @@ class Database {
         reference VARCHAR(30),
         token VARCHAR(255),
         priority INT DEFAULT 0,
+        hidden BOOLEAN DEFAULT FALSE,
         FOREIGN KEY (ds_id) REFERENCES users(id)
       );;
 
@@ -184,10 +185,11 @@ class Database {
         IN _ds_id VARCHAR(30),
         IN _reference VARCHAR(30),
         IN _priority INT,
-        IN _token VARCHAR(255)
+        IN _token VARCHAR(255),
+        IN _hidden BOOLEAN
       ) 
       BEGIN
-          UPDATE ags_user_tokens SET ds_id = _ds_id, reference = _reference, priority = _priority, token = _token WHERE user_id = _user_id;
+          UPDATE ags_user_tokens SET ds_id = _ds_id, reference = _reference, priority = _priority, token = _token, hidden = _hidden WHERE user_id = _user_id;
       END;;
 
       DROP PROCEDURE IF EXISTS create_ags_user_tokens;;
@@ -195,10 +197,11 @@ class Database {
         IN _ds_id VARCHAR(30),
         IN _reference VARCHAR(30),
         IN _priority INT,
-        IN _token VARCHAR(255)
+        IN _token VARCHAR(255),
+        IN _hidden BOOLEAN
       )
       BEGIN
-        INSERT INTO ags_user_tokens (ds_id, reference, priority, token) VALUES (_ds_id, _reference, _priority, _token);
+        INSERT INTO ags_user_tokens (ds_id, reference, priority, token, hidden) VALUES (_ds_id, _reference, _priority, _token, _hidden);
         SELECT * FROM ags_user_tokens WHERE user_id = LAST_INSERT_ID();
       END;;
       
@@ -222,7 +225,7 @@ class Database {
         INSERT INTO ags_exchanges (user_id, code_id, response) VALUES (_user_id, @code_id, _response);
         SELECT * FROM ags_exchanges WHERE user_id = _user_id AND code_id = @code_id;        
       END;;
-      `,
+      `
     ];
 
     for (const queryGruop of queries) {

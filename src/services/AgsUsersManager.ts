@@ -8,9 +8,15 @@ export default class AgsUsersManager {
   ): Promise<AgsUserData | null> {
     const res = await DatabaseManager.query(
       `
-      CALL create_ags_user_tokens(?, ?, ?, ?)
+      CALL create_ags_user_tokens(?, ?, ?, ?, ?)
       `,
-      [data.ds_id, data.reference, data.priority, data.token]
+      [
+        data.ds_id,
+        data.reference,
+        data.priority,
+        data.token,
+        data.hidden || false
+      ]
     );
 
     if (!res || res.length === 0) return null;
@@ -24,8 +30,15 @@ export default class AgsUsersManager {
     data: Partial<AgsUserData>
   ): Promise<any[] | null> {
     return await DatabaseManager.query(
-      `CALL update_ags_user_tokens(?, ?, ?, ?, ?)`,
-      [data.user_id, data.ds_id, data.reference, data.priority, data.token]
+      `CALL update_ags_user_tokens(?, ?, ?, ?, ?, ?)`,
+      [
+        data.user_id,
+        data.ds_id,
+        data.reference,
+        data.priority,
+        data.token,
+        data.hidden
+      ]
     );
   }
 
