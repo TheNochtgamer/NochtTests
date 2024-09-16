@@ -7,7 +7,7 @@ export default {
   definition: {
     kind: 'ImSubCommand',
     data: new SlashCommandSubcommandBuilder()
-      .setName('linked')
+      .setName('linkeds')
       .setDescription('Obtiene las cuentas vinculadas al bot')
       .addStringOption(option =>
         option
@@ -17,7 +17,7 @@ export default {
           .setChoices([
             { name: 'Todos', value: 'all' },
             { name: 'Todos los Usuarios', value: 'all_users' },
-            { name: 'Todas las referencias', value: 'all_refer' },
+            { name: 'Todas las Referencias', value: 'all_refer' },
             { name: 'Un usuario (usar opcion "user")', value: 'user' },
             {
               name: 'Una Referencia (usar opcion "reference")',

@@ -15,9 +15,12 @@ export default {
     if (!interaction.isChatInputCommand()) return;
     const client = interaction.client;
     const command = client.commands.get(interaction.commandName);
-    const subCommand =
-      interaction.options.getSubcommand() ||
-      interaction.options.getSubcommandGroup();
+    let subCommand = null;
+    try {
+      subCommand =
+        interaction.options.getSubcommand() ||
+        interaction.options.getSubcommandGroup();
+    } catch (error) {}
 
     // --CommandNotFound--
     if (!command) {
@@ -139,7 +142,7 @@ export default {
       'run',
       `${interaction.user.username} ejecuto el comando "${
         interaction.commandName
-      }${(subCommand ? ' ' : '') + subCommand}"`
+      }${subCommand ? ` ${subCommand}` : ''}"`
     );
 
     try {
@@ -155,7 +158,7 @@ export default {
           interaction.commandName
         }.
         > </${command.definition.data.name}${
-          (subCommand ? ' ' : '') + subCommand
+          subCommand ? ` ${subCommand}` : ''
         }:${interaction.command?.id}>`;
 
         if (interaction.replied || interaction.deferred) {

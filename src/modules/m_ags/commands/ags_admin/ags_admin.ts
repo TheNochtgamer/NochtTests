@@ -4,13 +4,13 @@ import { PermissionsBitField, SlashCommandBuilder } from 'discord.js';
 import loadcode from './loadcode';
 import link_other from './link_other';
 import link_someone from './link_someone';
-import linked from './linked';
+import linkeds from './linkeds';
 
 const subs = new Map<string, IMySlashCommand<IMyCommandDataImSubCommand>>([
   ['loadcode', loadcode],
   ['link_other', link_other],
   ['link_someone', link_someone],
-  ['linked', linked]
+  ['linkeds', linkeds]
 ]);
 
 export default {

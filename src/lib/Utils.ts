@@ -16,7 +16,9 @@ import {
   EmbedBuilder,
   GuildMemberRoleManager,
   PermissionsBitField,
-  ButtonInteraction
+  ButtonInteraction,
+  REST,
+  Routes
 } from 'discord.js';
 import type {
   ApplicationCommand,
@@ -136,25 +138,39 @@ class Utils {
    */
   async summitCommands(
     client: Bot,
-    guildId = process.env.GUILDID
+    guildId = '',
+    cleanMode = false
   ): Promise<void> {
     if (!client.commands.size) return;
+    const rest = new REST().setToken(process.env.TOKEN || '');
     let cmds = null;
 
+    const cmdDatas = cleanMode
+      ? []
+      : client.commands
+          .map(cmd =>
+            cmd.definition.kind !== 'ImSubCommand' ? cmd.definition.data : []
+          )
+          .flat();
     try {
-      const cmdDatas = client.commands
-        .map(cmd =>
-          cmd.definition.kind !== 'ImSubCommand' ? cmd.definition.data : []
-        )
-        .flat();
-
       if (guildId && this.validateId(guildId)) {
+        logger.debug('summitCommands', `Summiting to the guild: ${guildId}!`);
         const GUILD = await client.guilds.fetch(guildId);
         if (!GUILD) throw new Error(`No se encontro el guild`);
-        cmds = await GUILD.commands.set(cmdDatas);
+        // cmds = await GUILD.commands.set(cmdDatas);
+        cmds = await rest.put(
+          Routes.applicationGuildCommands(client.user?.id || '', guildId),
+          { body: cmdDatas }
+        );
       } else {
-        cmds = await client.application?.commands?.set(cmdDatas);
+        logger.debug('summitCommands', 'Summiting globally!');
+        cmds = await rest.put(
+          Routes.applicationCommands(client.user?.id || ''),
+          { body: cmdDatas }
+        );
       }
+
+      logger.debug('summitCommands', cmds);
 
       // if (guildId) {
       //   const GUILD = await client.guilds.fetch(guildId);
@@ -174,7 +190,7 @@ class Utils {
       );
       return;
     }
-    logger.log('summitCommands', `${cmds.size} comandos subidos`);
+    logger.log('summitCommands', `${cmdDatas.length} comandos subidos`);
   }
 
   /**
@@ -608,7 +624,7 @@ class Utils {
 
     let index = 0;
     function modifyEmbed(i = 0) {
-      if (index + i < 0 || index + i > floor(data.length / maxItemsPerList))
+      if (index + i < 0 || index + i > Math.ceil(data.length / maxItemsPerList))
         return false;
 
       index += i;
@@ -616,9 +632,9 @@ class Utils {
         data.slice(index * 10, (index + 1) * 10).join('\n')
       );
       listEmbed.setFooter({
-        text: `NochtTests • ${index + 1}/${
-          floor(data.length / maxItemsPerList) + 1
-        }`
+        text: `NochtTests • ${index + 1}/${Math.ceil(
+          data.length / maxItemsPerList
+        )}`
       });
       return true;
     }
