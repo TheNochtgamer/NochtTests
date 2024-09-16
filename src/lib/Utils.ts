@@ -642,7 +642,9 @@ class Utils {
     const payload: Parameters<typeof interaction.followUp>[0] = {
       content: '_ _',
       embeds: [listEmbed],
+      // @ts-ignore
       components: [
+        // @ts-ignore
         new ActionRowBuilder<ButtonBuilder>().setComponents(
           backButton,
           fowardButton
@@ -695,7 +697,9 @@ class Utils {
         if (!firstInteraction) return;
 
         await firstInteraction.editReply({
+          // @ts-ignore
           components: [
+            // @ts-ignore
             new ActionRowBuilder<ButtonBuilder>().setComponents(
               backButton,
               fowardButton
