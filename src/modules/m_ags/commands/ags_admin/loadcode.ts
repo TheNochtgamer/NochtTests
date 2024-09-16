@@ -2,14 +2,23 @@ import SystemLog from '@/lib/structures/SystemLog';
 import Utils from '@/lib/Utils';
 import AgsService from '@/services/AgsService';
 import AgsUsersManager from '@/services/AgsUsersManager';
-import type { IMySlashCommand } from '@/types';
+import type {
+  AgsUserData,
+  IAgsRewardPageResponse,
+  IMySlashCommand
+} from '@/types';
 import {
-  type APIEmbedField,
   EmbedBuilder,
-  SlashCommandSubcommandBuilder
+  Message,
+  SlashCommandSubcommandBuilder,
+  type TextBasedChannel
 } from 'discord.js';
 
 const logger = new SystemLog('modules', 'm_ags', 'commands', 'loadcode');
+
+// <Hardcoded configs>
+const publicCodesChannelId = '1119392838862503976';
+// </Hardcoded configs>
 
 export default {
   definition: {
@@ -46,7 +55,7 @@ export default {
   },
 
   async run(interaction) {
-    await interaction.deferReply({ ephemeral: false });
+    await interaction.deferReply({ ephemeral: true });
     const _code = interaction.options.getString('code', true);
     const _force = interaction.options.getBoolean('force', false) ?? false;
     const _user = interaction.options.getUser('user', false);
@@ -58,6 +67,24 @@ export default {
       .setFooter({ text: 'NochtTests' })
       .setColor('DarkRed')
       .setTimestamp();
+
+    const formatThis = (
+      agsUserData: AgsUserData,
+      response: IAgsRewardPageResponse | null
+    ) => `- ${agsUserData.me()} :> ${AgsService.parseResponseText(response)}`;
+
+    let codesChannel = interaction.channel as TextBasedChannel;
+    try {
+      const fetchedChannel =
+        (await interaction.client.channels.fetch(publicCodesChannelId)) ||
+        interaction.channel;
+
+      if (fetchedChannel?.isTextBased()) {
+        codesChannel = fetchedChannel;
+      } else {
+        logger.warn('run', 'codesChannelId config is invalid');
+      }
+    } catch (error) {}
 
     // Cargar codigo para TODAS LAS CUENTAS
     if (!_user && !_reference) {
@@ -74,6 +101,10 @@ export default {
         return;
       }
 
+      const resultMessage = await codesChannel.send({
+        embeds: [resultsEmbed]
+      });
+
       async function updateEmbed(end = false): Promise<void> {
         try {
           const theResult = allResults.join('\n');
@@ -87,7 +118,7 @@ export default {
             );
             resultsEmbed.setColor('Green');
           }
-          await interaction.editReply({
+          await resultMessage.edit({
             embeds: [resultsEmbed]
           });
         } catch (error) {
@@ -108,12 +139,8 @@ export default {
         allUsersData,
         _code,
         _force,
-        async function loadCallBack(agsUserData, response): Promise<void> {
-          const format = `- < ${agsUserData.me()} > ${AgsService.parseResponseText(
-            response
-          )}`;
-
-          allResults.push(format); // += `${format}\n`;
+        async (agsUserData, response): Promise<void> => {
+          allResults.push(formatThis(agsUserData, response));
         }
       );
 
@@ -122,6 +149,12 @@ export default {
       await Utils.getRandomSleep(3000);
 
       await updateEmbed(true);
+      void Utils.embedReply(interaction, {
+        author: { name: _code },
+        title: `Codigo cargado correctamente${_force ? ' (Forzado)' : ''}`,
+        color: 'Green',
+        footer: { text: 'NochtTests' }
+      });
     }
 
     // Cargar codigo PARA 1 CUENTA
@@ -149,14 +182,11 @@ export default {
       );
 
       const response = await AgsService.loadCodeForOne(agsUserData, _code);
-      const format = `- < ${agsUserData.me()} > ${AgsService.parseResponseText(
-        response
-      )}`;
 
       void Utils.embedReply(interaction, {
         author: { name: _code },
         title: `Codigo cargado correctamente${_force ? ' (Forzado)' : ''}`,
-        description: format,
+        description: formatThis(agsUserData, response),
         color: 'Green',
         footer: { text: 'NochtTests' }
       });
