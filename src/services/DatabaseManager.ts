@@ -228,14 +228,18 @@ class Database {
       `
     ];
 
+    const results = [];
+
     for (const queryGruop of queries) {
       for (const query of queryGruop.split(';;')) {
         const _query = query.replace('\n', '').trim();
         if (!_query) continue;
-        await connection.query(_query + ';');
+        results.push(await connection.query(_query + ';'));
       }
     }
     connection.release();
+
+    logger.log('migration', 'Results:', results);
   }
 }
 
