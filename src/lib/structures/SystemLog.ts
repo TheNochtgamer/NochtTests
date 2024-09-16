@@ -52,7 +52,12 @@ const webhookLog = new (class {
     type: 'info' | 'error' | 'warn' | 'debug',
     _content: string
   ): void {
-    this.logBlocks.push(`**[${type.toUpperCase()}]** ${_content}`);
+    const toLog = `**[${type.toUpperCase()}]** ${_content}`;
+    const maxBlocks = Math.ceil(toLog.length / 1980);
+
+    for (let index = 0; index < maxBlocks; index++) {
+      this.logBlocks.push(toLog.slice(index * 1980, (index + 1) * 1980));
+    }
   }
 
   private async testWebhook(): Promise<void> {
