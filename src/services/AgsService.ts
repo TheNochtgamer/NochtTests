@@ -171,6 +171,12 @@ class AgsService {
     let text = response.text || '';
     // const regex = /([<][a-z][^<]*>)|([<][/][a-z]*>)/g;
 
+    // @ts-ignore
+    if (response.extra2 == 88) {
+      text = 'Codigo canjeado, YA PUEDES CANJEAR ENTRADA';
+      return text;
+    }
+
     try {
       if (
         (typeof response.extra === 'number' && response.extra > 4) ||

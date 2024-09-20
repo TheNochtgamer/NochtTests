@@ -14,7 +14,11 @@ const subs = new Map<string, IMySlashCommand<IMyCommandDataImSubCommand>>([
 ]);
 
 export default {
-  roles_req: ['1119395999027314748', '1126211569911607500'],
+  roles_req: [
+    '1119395999027314748',
+    '1126211569911607500',
+    '1285735468511531090'
+  ],
   allRoles_req: false,
 
   // definition: {
