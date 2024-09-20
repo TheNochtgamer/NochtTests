@@ -1,0 +1,57 @@
+{
+  "in": [
+    {
+      "event": "pusher:error",
+      "data": { "code": 4200, "message": "Please reconnect immediately" }
+    },
+    { "event": "pusher:pong", "data": "{}" },
+    {
+      "event": "pusher:connection_established",
+      "data": "{\"socket_id\":\"318182.2584951\",\"activity_timeout\":120}"
+    },
+    {
+      "event": "pusher_internal:subscription_succeeded",
+      "data": "{}",
+      "channel": "chatrooms.6653466.v2"
+    },
+    {
+      "__nota": "Este es de tipo normal",
+      "event": "App\\Events\\ChatMessageEvent",
+      "data": "{\"id\":\"6b63d706-5e6e-47d2-be40-f42acb4cfc4e\",\"chatroom_id\":6653466,\"content\":\"aaaa\",\"type\":\"message\",\"created_at\":\"2024-09-20T05:57:53+00:00\",\"sender\":{\"id\":6804081,\"username\":\"TheNochtgamer\",\"slug\":\"thenochtgamer\",\"identity\":{\"color\":\"#E9113C\",\"badges\":[{\"type\":\"broadcaster\",\"text\":\"Broadcaster\"}]}}}",
+      "channel": "chatrooms.6653466.v2"
+    },
+    {
+      "__nota": "Este es de tipo reply",
+      "event": "App\\Events\\ChatMessageEvent",
+      "data": "{\"id\":\"4e61605f-3e3d-447d-9f7c-801e6c7b8bba\",\"chatroom_id\":29916588,\"content\":\"Calafiori es m\\u00e1s\",\"type\":\"reply\",\"created_at\":\"2024-09-20T06:07:37+00:00\",\"sender\":{\"id\":6196225,\"username\":\"JDax03\",\"slug\":\"jdax03\",\"identity\":{\"color\":\"#E9113C\",\"badges\":[]}},\"metadata\":{\"original_sender\":{\"id\":31376080,\"username\":\"AlanCarp0912\"},\"original_message\":{\"id\":\"528362e0-b1f7-47d5-a97c-4c83ea3995a3\",\"content\":\"Crack di marco\"}}}",
+      "channel": "chatrooms.29916588.v2"
+    },
+    {
+      "event": "App\\Events\\MessageDeletedEvent",
+      "data": "{\"id\":\"62c99955-877d-46d8-9960-d416320b677f\",\"message\":{\"id\":\"38cd2951-72de-4b25-9265-5a819313ce45\"},\"aiModerated\":false}",
+      "channel": "chatrooms.6653466.v2"
+    },
+    {
+      "event": "App\\Events\\PinnedMessageCreatedEvent",
+      "data": "{\"message\":{\"id\":\"6b63d706-5e6e-47d2-be40-f42acb4cfc4e\",\"chatroom_id\":6653466,\"content\":\"aaaa\",\"type\":\"message\",\"created_at\":\"2024-09-20T05:57:53+00:00\",\"sender\":{\"id\":6804081,\"username\":\"TheNochtgamer\",\"slug\":\"thenochtgamer\",\"identity\":{\"color\":\"#E9113C\",\"badges\":[{\"type\":\"broadcaster\",\"text\":\"Broadcaster\"}]}},\"metadata\":null},\"duration\":\"1200\",\"pinnedBy\":{\"id\":6804081,\"username\":\"TheNochtgamer\",\"slug\":\"thenochtgamer\",\"identity\":{\"color\":\"#E9113C\",\"badges\":[{\"type\":\"broadcaster\",\"text\":\"Broadcaster\",\"active\":true}]}}}",
+      "channel": "chatrooms.6653466.v2"
+    },
+    {
+      "event": "App\\Events\\PollUpdateEvent",
+      "data": "{\"poll\":{\"title\":\"\\u00bfCON QUIEN SE QUEDAN?\",\"options\":[{\"id\":0,\"label\":\"MEDINA\",\"votes\":0},{\"id\":1,\"label\":\"SIMON\",\"votes\":0}],\"duration\":30,\"remaining\":30,\"result_display_duration\":120,\"has_voted\":false,\"voted_option_id\":null}}",
+      "channel": "chatrooms.29916588.v2"
+    },
+    {
+      "event": "App\\Events\\PollDeleteEvent",
+      "data": "[]",
+      "channel": "chatrooms.29916588.v2"
+    }
+  ],
+  "out": [
+    {
+      "event": "pusher:subscribe",
+      "data": { "auth": "", "channel": "chatrooms.6653466.v2" }
+    },
+    { "event": "pusher:ping", "data": {} }
+  ]
+}
