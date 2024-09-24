@@ -5,7 +5,8 @@ export enum CachePointers {
   user = '-user',
   guild = '-guild',
   executionsCacher = '-executionsCacher',
-  agsCode = '-agsCode'
+  agsCode = '-agsCode',
+  agsPosibleCode = '-agsPosibleCode'
 }
 
 export enum CacheTts {
