@@ -6,7 +6,7 @@ import {
   AgsResponseTypes,
   AgsPrizes
 } from '@/lib/Enums';
-import axios from 'axios';
+import axios, { Axios, AxiosError } from 'axios';
 import SystemLog from '@/lib/structures/SystemLog';
 import Utils from '@/lib/Utils';
 import DatabaseManager from './DatabaseManager';
@@ -41,6 +41,17 @@ class AgsService {
     return response;
   }
 
+  public matchCode(message: string): string | null {
+    const matches = message.match(/\b[A-Za-z0-9!@#$%^&*()-_]{5,}\b/);
+
+    if (!matches) return null;
+    const [match] = matches;
+
+    if (!/[A-Za-z]/.test(match) || !/[0-9]/.test(match)) return null;
+
+    return match;
+  }
+
   public async testToken(token: string): Promise<0 | 1 | string> {
     try {
       const { data } = await this.fetchReward(token);
@@ -67,7 +78,7 @@ class AgsService {
     let tries = 0;
 
     const maxTries = () => Math.floor(5 + user.priority * 0.5);
-    const sleepTime = () => Math.max(2, 10 / (tries + 1)) * 1000;
+    const retryTime = () => 13 * 1000;
 
     while (tries < maxTries()) {
       try {
@@ -87,14 +98,25 @@ class AgsService {
         void this.saveExchange(user.user_id, code, data);
         return data;
       } catch (error) {
-        logger.error(
-          'loadOneCode',
-          `user_${user.user_id} > No se obtuvo respuesta de la pagina:`,
-          error
-        );
+        if (
+          error instanceof AxiosError &&
+          (error.code === AxiosError.ETIMEDOUT ||
+            error.code === AxiosError.ECONNABORTED)
+        ) {
+          logger.error(
+            'loadOneCode',
+            `user_${user.user_id} > No se obtuvo respuesta de la pagina`
+          );
+        } else {
+          logger.error(
+            'loadOneCode',
+            `user_${user.user_id} > Hubo un error al intentar canjear un codigo:`,
+            error
+          );
+        }
         tries++;
         if (tries < maxTries())
-          await Utils.getRandomSleep(sleepTime(), sleepTime() + 1000);
+          await Utils.getRandomSleep(retryTime(), retryTime() + 1000);
       }
     }
 
@@ -173,7 +195,7 @@ class AgsService {
 
     // @ts-ignore
     if (response.extra2 == 88) {
-      text = 'Codigo canjeado, YA PUEDES CANJEAR ENTRADA';
+      text = 'YA PUEDES CANJEAR ENTRADA';
       return text;
     }
 
