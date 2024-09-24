@@ -2,7 +2,7 @@ import type { IMyBotEvent } from '@/types';
 import utils from '@/lib/Utils';
 import SystemLog from '@/lib/structures/SystemLog';
 
-const logger = new SystemLog('modules', 'm_init', 'events', 'ready');
+const logger = new SystemLog('modules', 'init', 'events', 'ready');
 
 // EVENTO DEL BOT READY
 export default {
@@ -21,5 +21,5 @@ export default {
     // if (process.env.CHECK_COMMANDS?.toLowerCase() !== 'true') return;
     // if ((await utils.checkSyncedCommands(client)) > 0) return;
     // void utils.summitCommands(client);
-  },
+  }
 } satisfies IMyBotEvent<'ready'>;
