@@ -3,6 +3,7 @@ import { WebSocket, type RawData } from 'ws';
 import AgsService from './AgsService';
 import cacheMe from './cacheMe';
 import { CachePointers } from '@/lib/Enums';
+import type { IMessageResponse } from '@/types.d';
 
 const logger = new SystemLog('services', 'KickChatService');
 
@@ -11,84 +12,6 @@ const hardChatRoomId = '3175624';
 const pingEvery = 5 * 60 * 1000;
 const cacheCodeTtl = 3 * 60 * 1000;
 // </Hardcoded configs>
-
-interface IErrorResponse {
-  event: 'pusher:error';
-  data: {
-    error: {
-      code: number;
-      message: string;
-    };
-  };
-}
-interface IPongResponse {
-  event: 'pusher:pong';
-  data: object;
-}
-interface ISubscriptionResponse {
-  event: 'pusher_internal:subscription_succeeded';
-  data: object;
-  channel: string;
-}
-interface IChatMessageResponse {
-  event: 'App\\Events\\ChatMessageEvent';
-  data: {
-    message: {
-      id: string;
-      chatroom_id: number;
-      content: string;
-      type: 'message';
-      created_at: string;
-      sender: {
-        id: number;
-        username: string;
-        slug: string;
-        identity: {
-          color: string;
-          badges: string[];
-        };
-      };
-    };
-  };
-}
-interface IChatMessageResponseReply {
-  event: 'App\\Events\\ChatMessageEvent';
-  data: {
-    message: {
-      id: string;
-      chatroom_id: number;
-      content: string;
-      type: 'reply';
-      created_at: string;
-      sender: {
-        id: number;
-        username: string;
-        slug: string;
-        identity: {
-          color: string;
-          badges: string[];
-        };
-      };
-      metadata: {
-        original_sender: {
-          id: number;
-          username: string;
-        };
-        original_message: {
-          id: string;
-          content: string;
-        };
-      };
-    };
-  };
-}
-
-type IMessageResponse =
-  | IErrorResponse
-  | IPongResponse
-  | ISubscriptionResponse
-  | IChatMessageResponse
-  | IChatMessageResponseReply;
 
 class KickChatService {
   private connectionString =
@@ -138,6 +61,12 @@ class KickChatService {
     if (!this._status) return false;
     logger.log('start', 'Iniciando servicio de vigilancia');
 
+    if (this.ws) {
+      this.ws.close();
+      this.ws.removeListener('message', this.onMessage);
+      this.ws.removeListener('error', this.onError);
+      this.ws = null;
+    }
     this.init();
     return true;
   }
@@ -186,7 +115,10 @@ class KickChatService {
       });
 
       if (codeFinds > 1) {
-        AgsService.sendCode(code);
+        AgsService.sendCode({
+          code,
+          force: false
+        });
       }
     }
   }
