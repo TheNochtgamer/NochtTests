@@ -16,10 +16,6 @@ import {
 
 const logger = new SystemLog('modules', 'm_ags', 'commands', 'loadcode');
 
-// <Hardcoded configs>
-const publicCodesChannelId = '1119392838862503976';
-// </Hardcoded configs>
-
 export default {
   definition: {
     kind: 'ImSubCommand',
@@ -135,7 +131,7 @@ export default {
         }`
       );
 
-      await AgsService.loadCodeForAll(
+      await AgsService.redeemCodeForUsers(
         allUsersData,
         _code,
         _force,
@@ -181,7 +177,7 @@ export default {
         }" ${_force ? '(Forzado)' : ''}`
       );
 
-      const response = await AgsService.loadCodeForOne(agsUserData, _code);
+      const response = await AgsService.redeemCodeForOne(agsUserData, _code);
 
       void Utils.embedReply(interaction, {
         author: { name: _code },
