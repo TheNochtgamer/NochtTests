@@ -48,12 +48,13 @@ class AgsService {
   }
 
   public matchCode(message: string): string | null {
-    const matches = message.match(/\b[A-Za-z0-9!@#$%^&*()-_]{5,}\b/);
+    const matches = message.match(/\b[A-Za-z0-9!#$%^&*()-_]{5,}\b/);
 
     if (!matches) return null;
     const [match] = matches;
 
-    if (!/[A-Za-z]/.test(match) || !/[0-9]/.test(match)) return null;
+    if (!/[A-Za-z]/.test(match) || !/[0-9]/.test(match) || !/(!|-)/.test(match))
+      return null;
 
     return match;
   }
@@ -81,10 +82,12 @@ class AgsService {
    */
   public async sendCode({
     code,
-    force
+    force = false,
+    testBeforeShow = false
   }: {
     code: string;
     force?: boolean;
+    testBeforeShow?: boolean;
   }): Promise<0 | 1 | 2> {
     const resultsEmbed = new EmbedBuilder()
       .setTitle(`Cargando codigo...${force ? ' (Forzado)' : ''}`)
@@ -112,7 +115,7 @@ class AgsService {
     } catch (error) {
       logger.error(
         'sendCode',
-        'can not get publicCodesChannelId channel, is config invalid?',
+        'Can not get publicCodesChannelId channel, is config invalid?:',
         error
       );
     }
@@ -153,7 +156,7 @@ class AgsService {
 
     const updateEmbedInterval = setInterval(updateEmbed, 3000);
 
-    logger.debug(
+    logger.log(
       'sendCode',
       `Cargando codigo "${code}" para todos los usuarios ${
         force ? '(Forzado)' : ''
