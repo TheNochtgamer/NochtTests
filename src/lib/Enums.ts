@@ -5,7 +5,8 @@ export enum CachePointers {
   user = '-user',
   guild = '-guild',
   executionsCacher = '-executionsCacher',
-  agsCode = '-agsCode'
+  agsCode = '-agsCode',
+  agsPosibleCode = '-agsPosibleCode'
 }
 
 export enum CacheTts {
@@ -100,9 +101,9 @@ export const AgsPrizes = Object.freeze({
   'Coca Cola': '230adef0a2a41e55df3b117df661b972.png',
   'Coca Cola Zero': '8b1a4e16d5e12ec5ff8a10d2249384d6.png',
   "Llavero Assasin's Creed": 'e7c22c0b3f1bb068b2559a2bb93ea6cd.png',
-  'Entrada Domingo': '879d5be8a6ad0495b02d6ba95b37cf41.png',
-  'Entrada Sabado': '05b9fb0efdee532198a7daacaeb9a497.png',
-  'Entrada Viernes': '510b621cfdd59eccc50ee6d6231221bc.png',
-  'Gamer Pack': '21f0f0511d22fe57b86f6f504fabc985.png',
+  'ENTRADA Domingo': '879d5be8a6ad0495b02d6ba95b37cf41.png',
+  'ENTRADA Sabado': '05b9fb0efdee532198a7daacaeb9a497.png',
+  'ENTRADA Viernes': '510b621cfdd59eccc50ee6d6231221bc.png',
+  'GAMER PACK': '21f0f0511d22fe57b86f6f504fabc985.png',
   'Mouse Pad AGS': '015489f53e307ef43ed15719c9fc48f5.png'
 } satisfies { [key: string]: string });

@@ -2,7 +2,7 @@ import type { IMyBotEvent } from '@/types';
 import Utils from '@/lib/Utils';
 import SystemLog from '@/lib/structures/SystemLog';
 
-const logger = new SystemLog('modules', 'm_init', 'events', 'autoCompletes');
+const logger = new SystemLog('modules', 'init', 'events', 'autoCompletes');
 
 // EVENTO PARA CUANDO SE EJECUTA UN AUTOCOMPLETE
 export default {

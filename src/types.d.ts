@@ -1,7 +1,7 @@
 import type Discord, {
   ClientEvents,
   EmbedData,
-  ColorResolvable,
+  ColorResolvable
 } from 'discord.js';
 import type _Bot from './lib/structures/Bot';
 import type _GuildData from './lib/structures/GuildData';
@@ -172,3 +172,81 @@ export interface IAgsRewardPageResponse {
   more?: number;
   morename?: string;
 }
+
+interface IErrorResponse {
+  event: 'pusher:error';
+  data: {
+    error: {
+      code: number;
+      message: string;
+    };
+  };
+}
+interface IPongResponse {
+  event: 'pusher:pong';
+  data: object;
+}
+interface ISubscriptionResponse {
+  event: 'pusher_internal:subscription_succeeded';
+  data: object;
+  channel: string;
+}
+interface IChatMessageResponse {
+  event: 'App\\Events\\ChatMessageEvent';
+  data: {
+    message: {
+      id: string;
+      chatroom_id: number;
+      content: string;
+      type: 'message';
+      created_at: string;
+      sender: {
+        id: number;
+        username: string;
+        slug: string;
+        identity: {
+          color: string;
+          badges: string[];
+        };
+      };
+    };
+  };
+}
+interface IChatMessageResponseReply {
+  event: 'App\\Events\\ChatMessageEvent';
+  data: {
+    message: {
+      id: string;
+      chatroom_id: number;
+      content: string;
+      type: 'reply';
+      created_at: string;
+      sender: {
+        id: number;
+        username: string;
+        slug: string;
+        identity: {
+          color: string;
+          badges: string[];
+        };
+      };
+      metadata: {
+        original_sender: {
+          id: number;
+          username: string;
+        };
+        original_message: {
+          id: string;
+          content: string;
+        };
+      };
+    };
+  };
+}
+
+export type IMessageResponse =
+  | IErrorResponse
+  | IPongResponse
+  | ISubscriptionResponse
+  | IChatMessageResponse
+  | IChatMessageResponseReply;
