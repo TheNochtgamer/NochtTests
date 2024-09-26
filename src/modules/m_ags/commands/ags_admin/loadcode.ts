@@ -48,6 +48,12 @@ export default {
           .setRequired(false)
           .setAutocomplete(true)
       )
+      .addBooleanOption(option =>
+        option
+          .setName('hideuntilworks')
+          .setDescription('Esconde el mensaje hasta que el codigo funcione')
+          .setRequired(false)
+      )
   },
 
   async run(interaction) {
@@ -56,6 +62,8 @@ export default {
     const _force = interaction.options.getBoolean('force', false) ?? false;
     const _user = interaction.options.getUser('user', false);
     const _reference = interaction.options.getString('reference', false);
+    const _hideUntilWorks =
+      interaction.options.getBoolean('hideuntilworks', false) ?? false;
 
     const formatThis = (
       agsUserData: AgsUserData,
@@ -66,7 +74,8 @@ export default {
     if (!_user && !_reference) {
       const result = await AgsService.sendCode({
         code: _code,
-        force: _force
+        force: _force,
+        hideUntilWorks: _hideUntilWorks
       });
 
       if (result === 1) {

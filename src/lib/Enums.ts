@@ -85,7 +85,8 @@ export const AgsResponseTypes = Object.freeze({
   noSufficientData: 'Es necesario completar tu DNI y',
   toMuchRequests: 'Por favor, probá de<br>',
   toMuchRequestsRegExp: /nuevo en ([0-9]+) minutos/i,
-  invalidToken: 'Tenes que estar logeado para poder canjear un código.'
+  invalidToken: 'Tenes que estar logeado para poder canjear un código.',
+  noCodeAvaliable: 'No hay codigos disponible en este momento.'
 });
 
 export const AgsPrizes = Object.freeze({
