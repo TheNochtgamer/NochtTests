@@ -11,7 +11,18 @@ import SystemLog from '@/lib/structures/SystemLog';
 import Utils from '@/lib/Utils';
 import DatabaseManager from './DatabaseManager';
 import cacheMe from './cacheMe';
-import { EmbedBuilder } from 'discord.js';
+import {
+  DMChannel,
+  EmbedBuilder,
+  NewsChannel,
+  PartialDMChannel,
+  PrivateThreadChannel,
+  PublicThreadChannel,
+  StageChannel,
+  TextBasedChannel,
+  TextChannel,
+  VoiceChannel
+} from 'discord.js';
 import AgsUsersManager from './AgsUsersManager';
 
 const logger = new SystemLog('services', 'AgsService');
@@ -83,11 +94,11 @@ class AgsService {
   public async sendCode({
     code,
     force = false,
-    testBeforeShow = false
+    hideUntilWorks = false
   }: {
     code: string;
     force?: boolean;
-    testBeforeShow?: boolean;
+    hideUntilWorks?: boolean;
   }): Promise<0 | 1 | 2> {
     const resultsEmbed = new EmbedBuilder()
       .setTitle(`Cargando codigo...${force ? ' (Forzado)' : ''}`)
@@ -99,9 +110,9 @@ class AgsService {
     const formatThis = (
       agsUserData: AgsUserData,
       response: IAgsRewardPageResponse | null
-    ) => `- ${agsUserData.me()} :> ${this.parseResponseText(response)}`;
+    ) => `- ${agsUserData.me()} ⇢ ${this.parseResponseText(response)}`;
 
-    let codesChannel;
+    let codesChannel: TextBasedChannel | undefined;
     try {
       const fetchedChannel = await this.bot?.channels.fetch(
         publicCodesChannelId
@@ -127,9 +138,11 @@ class AgsService {
       return 1;
     }
 
-    const resultsMessage = await codesChannel?.send({
-      embeds: [resultsEmbed]
-    });
+    let resultsMessage = hideUntilWorks
+      ? undefined
+      : await codesChannel?.send({
+          embeds: [resultsEmbed]
+        });
 
     async function updateEmbed(isEnd = false): Promise<void> {
       if (!resultsMessage) return;
@@ -167,7 +180,13 @@ class AgsService {
       allUsersData,
       code,
       force,
-      async (agsUserData, response): Promise<void> => {
+      async (agsUserData, response, aborted): Promise<void> => {
+        if (!aborted && hideUntilWorks) {
+          resultsMessage = await codesChannel?.send({
+            embeds: [resultsEmbed]
+          });
+        }
+
         allResults.push(formatThis(agsUserData, response));
       }
     );
@@ -242,7 +261,8 @@ class AgsService {
     force: boolean = false,
     cb?: (
       user: AgsUserData,
-      response: IAgsRewardPageResponse | null
+      response: IAgsRewardPageResponse | null,
+      aborted: boolean
     ) => void | Promise<void>
   ): Promise<Array<IAgsRewardPageResponse | null>> {
     const responses: Array<IAgsRewardPageResponse | null> = [];
@@ -252,7 +272,6 @@ class AgsService {
       const firstResponse = await this.redeemCodeForOne(firstUser, code);
 
       responses.push(firstResponse);
-      if (cb) void cb(firstUser, firstResponse);
 
       if (!firstResponse) return responses;
 
@@ -266,6 +285,7 @@ class AgsService {
           'loadCodeForAll',
           'Abortando... El codigo llego a su limite...'
         );
+        if (cb) void cb(firstUser, firstResponse, true);
         return responses;
       }
 
@@ -276,8 +296,21 @@ class AgsService {
         ) >= 90
       ) {
         logger.log('loadCodeForAll', 'Abortando... Codigo invalido...');
+        if (cb) void cb(firstUser, firstResponse, true);
         return responses;
       }
+
+      if (
+        Utils.compareTwoStrings(
+          firstResponse.text || '',
+          AgsResponseTypes.noCodeAvaliable
+        ) >= 90
+      ) {
+        logger.log('loadCodeForAll', 'Abortando... Pagina caida...');
+        if (cb) void cb(firstUser, firstResponse, true);
+        return responses;
+      }
+      if (cb) void cb(firstUser, firstResponse, false);
     }
 
     const promises = users
@@ -287,7 +320,7 @@ class AgsService {
         const response = await this.redeemCodeForOne(user, code);
         if (user.hidden) return;
         responses.push(response);
-        if (cb) void cb(user, response);
+        if (cb) void cb(user, response, false);
       });
 
     await Promise.all(promises);
@@ -306,11 +339,12 @@ class AgsService {
       return text;
     }
 
+    if (Utils.compareTwoStrings(text, AgsResponseTypes.noCodeAvaliable) >= 90) {
+      text = '<La pagina está apagada>';
+    }
+
     try {
-      if (
-        (typeof response.extra === 'number' && response.extra > 4) ||
-        (typeof response.code === 'string' && response.code.length > 8)
-      ) {
+      if (typeof response.code === 'string' && response.code.length > 8) {
         // text = text
         //   .replaceAll(/[\w]+agsSuper/g, '')
         //   .replaceAll('\n', '')
