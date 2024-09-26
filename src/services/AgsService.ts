@@ -59,7 +59,7 @@ class AgsService {
   }
 
   public matchCode(message: string): string | null {
-    const matches = message.match(/\b[A-Za-z0-9!#$%^&*()-_]{5,}\b/);
+    const matches = message.match(/(!|-|\b)[A-Za-z0-9!#$%^&*()-_]{5,}(!|-|\b)/);
 
     if (!matches) return null;
     const [match] = matches;
