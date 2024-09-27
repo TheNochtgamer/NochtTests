@@ -63,7 +63,9 @@ const webhookLog = new (class {
   private async testWebhook(): Promise<void> {
     if (!process.env.LOG_WEBHOOK_URL) return;
     try {
-      await this.sendLog(`${this.now()} Iniciando sistema.`);
+      await this.sendLog(
+        `${this.now()} Iniciando sistema. NODE_ENV: ${process.env.NODE_ENV}`
+      );
       this._logWebhookExist = true;
     } catch (error) {
       console.error(`${this.now()} Error en el webhook de logs: `, error);
