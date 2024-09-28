@@ -137,7 +137,7 @@ class AgsService {
       if (!resultsMessage) return;
 
       try {
-        const theResult = allResults.join('\n');
+        const theResult = allResults.join('\n') || '...';
         resultsEmbed.setDescription(
           theResult.slice(0, 4090) + (theResult.length > 4090 ? '...' : '')
         );

@@ -2,9 +2,11 @@ import type { IMyCommandDataImSubCommand, IMySlashCommand } from '@/types';
 import { SlashCommandBuilder } from 'discord.js';
 
 import linkme from './linkme';
+import unlinkme from './unlinkme';
 
 const subs = new Map<string, IMySlashCommand<IMyCommandDataImSubCommand>>([
   ['linkme', linkme],
+  ['unlinkme', unlinkme]
 ]);
 
 export default {
@@ -26,7 +28,7 @@ export default {
 
     return {
       kind: 'SubsOnly',
-      data: cmd,
+      data: cmd
     };
   })(),
 
@@ -39,8 +41,8 @@ export default {
       (await subs.get(subCommand)?.autoComplete(interaction)) ?? [
         {
           name: 'error',
-          value: 'error',
-        },
+          value: 'error'
+        }
       ]
     );
   },
@@ -48,5 +50,5 @@ export default {
   async run(interaction) {
     const subCommand = interaction.options.getSubcommand(true);
     await subs.get(subCommand)?.run(interaction);
-  },
+  }
 } satisfies IMySlashCommand;
