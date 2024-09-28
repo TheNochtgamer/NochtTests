@@ -1,4 +1,3 @@
-import type { AgsUserData as IAgsUserData } from '@/types';
 import AgsUserData from '@/lib/structures/AGS/AgsUserData';
 import DatabaseManager from './DatabaseManager';
 

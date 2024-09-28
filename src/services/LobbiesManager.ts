@@ -1,6 +1,5 @@
 import { type ChatInputCommandInteraction } from 'discord.js';
 import Lobby from '@/lib/structures/Lobby';
-import cacheMe from './cacheMe';
 
 export default class LobbiesManager {
   private static readonly activeLobbies = new Map<string, Lobby>();
@@ -32,12 +31,12 @@ export default class LobbiesManager {
     if (this.userIsOnLobby(interaction.user.id)) {
       await interaction.reply({
         content: 'Ya estas en una sala',
-        ephemeral: false,
+        ephemeral: false
       });
       return;
     }
     await interaction.deferReply({
-      ephemeral: false,
+      ephemeral: false
     });
 
     const game = interaction.options.get('game', true).value as string;
@@ -58,7 +57,7 @@ export default class LobbiesManager {
     if (this.userIsOnLobby(interaction.user.id)) {
       await interaction.reply({
         content: 'Ya estas en una sala',
-        ephemeral: false,
+        ephemeral: false
       });
       return;
     }
@@ -69,7 +68,7 @@ export default class LobbiesManager {
     if (!lobby) {
       await interaction.reply({
         content: 'No se encontro la sala',
-        ephemeral: false,
+        ephemeral: false
       });
       return;
     }
@@ -77,7 +76,7 @@ export default class LobbiesManager {
     lobby.addUser(interaction);
     await interaction.reply({
       content: `Te has unido a la sala`,
-      ephemeral: false,
+      ephemeral: false
     });
   }
 }

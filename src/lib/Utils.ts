@@ -218,7 +218,7 @@ class Utils {
           ? await client.guilds.cache.get(guildId)?.commands?.fetch()
           : await client.application?.commands?.fetch();
       if (!serverCmds) throw new Error('No se encontraron los comandos');
-    } catch (error) {
+    } catch {
       logger.error(
         'checkSyncedCommands',
         'Error al intentar obtener los comandos'
@@ -581,7 +581,7 @@ class Utils {
       );
       if (response.customId === 'accept') return 0;
       if (response.customId === 'deny') return 1;
-    } catch (error) {}
+    } catch {}
 
     return 2;
   }

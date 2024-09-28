@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import type { IAgsRewardPageResponse, AgsUserData, Bot } from '@/types';
 import {
   AgsPages,
@@ -6,23 +5,13 @@ import {
   AgsResponseTypes,
   AgsPrizes
 } from '@/lib/Enums';
-import axios, { Axios, AxiosError } from 'axios';
+import axios, { AxiosError } from 'axios';
 import SystemLog from '@/lib/structures/SystemLog';
 import Utils from '@/lib/Utils';
 import DatabaseManager from './DatabaseManager';
 import cacheMe from './cacheMe';
-import {
-  DMChannel,
-  EmbedBuilder,
-  NewsChannel,
-  PartialDMChannel,
-  PrivateThreadChannel,
-  PublicThreadChannel,
-  StageChannel,
-  TextBasedChannel,
-  TextChannel,
-  VoiceChannel
-} from 'discord.js';
+import type { TextBasedChannel } from 'discord.js';
+import { EmbedBuilder } from 'discord.js';
 import AgsUsersManager from './AgsUsersManager';
 
 const logger = new SystemLog('services', 'AgsService');
