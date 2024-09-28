@@ -194,20 +194,18 @@ interface ISubscriptionResponse {
 interface IChatMessageResponse {
   event: 'App\\Events\\ChatMessageEvent';
   data: {
-    message: {
-      id: string;
-      chatroom_id: number;
-      content: string;
-      type: 'message';
-      created_at: string;
-      sender: {
-        id: number;
-        username: string;
-        slug: string;
-        identity: {
-          color: string;
-          badges: string[];
-        };
+    id: string;
+    chatroom_id: number;
+    content: string;
+    type: 'message';
+    created_at: string;
+    sender: {
+      id: number;
+      username: string;
+      slug: string;
+      identity: {
+        color: string;
+        badges: string[];
       };
     };
   };
@@ -215,30 +213,28 @@ interface IChatMessageResponse {
 interface IChatMessageResponseReply {
   event: 'App\\Events\\ChatMessageEvent';
   data: {
-    message: {
-      id: string;
-      chatroom_id: number;
-      content: string;
-      type: 'reply';
-      created_at: string;
-      sender: {
+    id: string;
+    chatroom_id: number;
+    content: string;
+    type: 'reply';
+    created_at: string;
+    sender: {
+      id: number;
+      username: string;
+      slug: string;
+      identity: {
+        color: string;
+        badges: string[];
+      };
+    };
+    metadata: {
+      original_sender: {
         id: number;
         username: string;
-        slug: string;
-        identity: {
-          color: string;
-          badges: string[];
-        };
       };
-      metadata: {
-        original_sender: {
-          id: number;
-          username: string;
-        };
-        original_message: {
-          id: string;
-          content: string;
-        };
+      original_message: {
+        id: string;
+        content: string;
       };
     };
   };

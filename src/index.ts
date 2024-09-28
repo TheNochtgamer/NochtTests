@@ -38,7 +38,7 @@ const bot = new Bot({
   AgsService.bot = bot;
 })().catch(logger.error.bind(logger));
 
-if (process.env.NODE_ENV === 'production') {
+if ((process.env.NODE_ENV || '').toLowerCase() === 'production') {
   process.on('unhandledRejection', err => {
     logger.error('<index unhandledRejection>', err);
   });

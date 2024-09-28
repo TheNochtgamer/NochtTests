@@ -7,12 +7,7 @@ import type {
   IAgsRewardPageResponse,
   IMySlashCommand
 } from '@/types';
-import {
-  EmbedBuilder,
-  Message,
-  SlashCommandSubcommandBuilder,
-  type TextBasedChannel
-} from 'discord.js';
+import { SlashCommandSubcommandBuilder } from 'discord.js';
 
 const logger = new SystemLog('modules', 'm_ags', 'commands', 'loadcode');
 

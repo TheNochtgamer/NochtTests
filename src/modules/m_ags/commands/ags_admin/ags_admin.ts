@@ -5,12 +5,16 @@ import loadcode from './loadcode';
 import link_other from './link_other';
 import link_someone from './link_someone';
 import linkeds from './linkeds';
+import unlink_other from './unlink_other';
+import unlink_someone from './unlink_someone';
 
 const subs = new Map<string, IMySlashCommand<IMyCommandDataImSubCommand>>([
   ['loadcode', loadcode],
   ['link_other', link_other],
   ['link_someone', link_someone],
-  ['linkeds', linkeds]
+  ['linkeds', linkeds],
+  ['unlink_other', unlink_other],
+  ['unlink_someone', unlink_someone]
 ]);
 
 export default {

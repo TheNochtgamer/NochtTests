@@ -53,20 +53,20 @@ class KickChatService {
         ? 'Apagando servicio de vigilancia'
         : 'El servicio de vigilancia ya estaba apagado'
     );
+
+    this.ws?.close();
+    this.ws?.removeListener('message', this.onMessage);
+    this.ws?.removeListener('error', this.onError);
+    this.ws = null;
+
     if (this._loopInterval) clearInterval(this._loopInterval);
     this._status = false;
   }
 
   public start(): boolean {
-    if (!this._status) return false;
+    if (this._status) return false;
     logger.log('start', 'Iniciando servicio de vigilancia');
 
-    if (this.ws) {
-      this.ws.close();
-      this.ws.removeListener('message', this.onMessage);
-      this.ws.removeListener('error', this.onError);
-      this.ws = null;
-    }
     this.init();
     return true;
   }
@@ -83,7 +83,7 @@ class KickChatService {
   }
 
   private onceOpen() {
-    logger.log('init', 'Conectado a KickChat');
+    logger.log('onceOpen', 'WebSocket conectado, enviando subscripcions');
     this._status = true;
     this.ws?.send(
       JSON.stringify({
@@ -101,25 +101,43 @@ class KickChatService {
 
     if (!parsedData) return;
 
-    if (parsedData.event === 'App\\Events\\ChatMessageEvent') {
-      const code = AgsService.matchCode(parsedData.data.message.content);
+    switch (parsedData.event) {
+      case 'App\\Events\\ChatMessageEvent':
+        {
+          const code = AgsService.matchCode(parsedData.data?.content);
 
-      if (!code) return;
+          if (!code) return;
 
-      let codeFinds =
-        (cacheMe.get(code + CachePointers.agsPosibleCode) as number | null) ||
-        0;
+          logger.log(
+            'onMessage',
+            `Posible codigo encontrado en el chat:\n${parsedData.data.sender.username}: ${code}`
+          );
 
-      cacheMe.set(code + CachePointers.agsPosibleCode, ++codeFinds, {
-        ttl: cacheCodeTtl
-      });
+          const alreadyExchange = cacheMe.has(
+            code + CachePointers.agsPosibleCode
+          );
+          cacheMe.set(code + CachePointers.agsPosibleCode, 0, {
+            ttl: cacheCodeTtl
+          });
+          if (alreadyExchange) return;
 
-      if (codeFinds > 1) {
-        AgsService.sendCode({
-          code,
-          force: false
-        });
-      }
+          AgsService.sendCode({
+            code,
+            force: false,
+            hideUntilWorks: true
+          });
+        }
+        break;
+      case 'pusher_internal:subscription_succeeded':
+        {
+          logger.log(
+            'init',
+            `Conectado al chatroom de kick [${
+              parsedData.channel.split('.')[1]
+            }]`
+          );
+        }
+        break;
     }
   }
 

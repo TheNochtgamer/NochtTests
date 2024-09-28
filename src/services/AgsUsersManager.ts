@@ -1,4 +1,3 @@
-import type { AgsUserData as IAgsUserData } from '@/types';
 import AgsUserData from '@/lib/structures/AGS/AgsUserData';
 import DatabaseManager from './DatabaseManager';
 
@@ -40,6 +39,27 @@ export default class AgsUsersManager {
         data.hidden
       ]
     );
+  }
+
+  public static async deleteUserToken(data: {
+    user_id?: string;
+    ds_id?: string;
+    reference?: string;
+  }): Promise<0 | 1 | 2 | 3> {
+    if (!data.user_id && !data.ds_id && !data.reference) return 2;
+
+    const agsUser = await this.getUserToken(data);
+
+    if (!agsUser) return 1;
+
+    const result = await DatabaseManager.query(
+      `DELETE FROM ags_user_tokens A WHERE A.user_id = ?`,
+      [agsUser.user_id]
+    );
+
+    if (!result) return 3;
+
+    return 0;
   }
 
   public static async getUserToken(tableData: {

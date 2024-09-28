@@ -20,7 +20,7 @@ export default {
       subCommand =
         interaction.options.getSubcommand() ||
         interaction.options.getSubcommandGroup();
-    } catch (error) {}
+    } catch {}
 
     // --CommandNotFound--
     if (!command) {
@@ -98,7 +98,7 @@ export default {
           await interaction.deferReply({
             ephemeral: command.deferIfToLate?.ephemeral ?? true
           });
-        } catch (error) {}
+        } catch {}
       }, 2.5 * 1000);
     // --/AutomaticallyDefer--
 
@@ -171,7 +171,7 @@ export default {
             ephemeral: true
           });
         }
-      } catch (error) {}
+      } catch {}
     }
   }
 } satisfies IMyBotEvent<'interactionCreate'>;

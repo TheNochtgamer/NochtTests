@@ -38,12 +38,12 @@ const webhookLog = new (class {
   }
 
   public parseToLog(_content: unknown): any {
-    if (typeof _content === 'string') return _content;
+    if (_content instanceof Error)
+      return `<Name>${_content.name}</Name>\n<Message>${_content.message}</Message>\n<Stack> ${_content.stack} </Stack>`;
 
     if (typeof _content === 'object') return JSON.stringify(_content, null, 2);
 
-    if (_content instanceof Error)
-      return `<Name>${_content.name}</Name> <Error>${_content.message}</Error>\n<Stack> ${_content.stack} </Stack>`;
+    if (typeof _content === 'string') return _content;
 
     return _content;
   }
@@ -63,7 +63,9 @@ const webhookLog = new (class {
   private async testWebhook(): Promise<void> {
     if (!process.env.LOG_WEBHOOK_URL) return;
     try {
-      await this.sendLog(`${this.now()} Iniciando sistema.`);
+      await this.sendLog(
+        `${this.now()} Iniciando sistema. NODE_ENV: ${process.env.NODE_ENV}`
+      );
       this._logWebhookExist = true;
     } catch (error) {
       console.error(`${this.now()} Error en el webhook de logs: `, error);

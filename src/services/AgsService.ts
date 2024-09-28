@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import type { IAgsRewardPageResponse, AgsUserData, Bot } from '@/types';
 import {
   AgsPages,
@@ -6,23 +5,13 @@ import {
   AgsResponseTypes,
   AgsPrizes
 } from '@/lib/Enums';
-import axios, { Axios, AxiosError } from 'axios';
+import axios, { AxiosError } from 'axios';
 import SystemLog from '@/lib/structures/SystemLog';
 import Utils from '@/lib/Utils';
 import DatabaseManager from './DatabaseManager';
 import cacheMe from './cacheMe';
-import {
-  DMChannel,
-  EmbedBuilder,
-  NewsChannel,
-  PartialDMChannel,
-  PrivateThreadChannel,
-  PublicThreadChannel,
-  StageChannel,
-  TextBasedChannel,
-  TextChannel,
-  VoiceChannel
-} from 'discord.js';
+import type { TextBasedChannel } from 'discord.js';
+import { EmbedBuilder } from 'discord.js';
 import AgsUsersManager from './AgsUsersManager';
 
 const logger = new SystemLog('services', 'AgsService');
@@ -59,7 +48,7 @@ class AgsService {
   }
 
   public matchCode(message: string): string | null {
-    const matches = message.match(/\b[A-Za-z0-9!#$%^&*()-_]{5,}\b/);
+    const matches = message.match(/(!|-|\b)[A-Za-z0-9!#$%^&*()-_]{5,}(!|-|\b)/);
 
     if (!matches) return null;
     const [match] = matches;
@@ -148,7 +137,7 @@ class AgsService {
       if (!resultsMessage) return;
 
       try {
-        const theResult = allResults.join('\n');
+        const theResult = allResults.join('\n') || '...';
         resultsEmbed.setDescription(
           theResult.slice(0, 4090) + (theResult.length > 4090 ? '...' : '')
         );
@@ -229,12 +218,12 @@ class AgsService {
           (error.code === AxiosError.ETIMEDOUT ||
             error.code === AxiosError.ECONNABORTED)
         ) {
-          logger.error(
+          logger.warn(
             'loadOneCode',
             `user_${user.user_id} > No se obtuvo respuesta de la pagina`
           );
         } else {
-          logger.error(
+          logger.warn(
             'loadOneCode',
             `user_${user.user_id} > Hubo un error al intentar canjear un codigo:`,
             error
