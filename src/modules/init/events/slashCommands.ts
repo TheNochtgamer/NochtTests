@@ -147,6 +147,9 @@ export default {
 
     try {
       await command.run(interaction);
+      logger.debug(
+        `Termino la ejecucion del comando ${interaction.commandName}`
+      );
     } catch (error) {
       logger.error(
         'run',
@@ -171,7 +174,9 @@ export default {
             ephemeral: true
           });
         }
-      } catch {}
+      } catch (error) {
+        console.error('SlashCommands:run', 'Error inesperado:', error);
+      }
     }
   }
 } satisfies IMyBotEvent<'interactionCreate'>;

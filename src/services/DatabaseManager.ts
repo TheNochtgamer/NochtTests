@@ -17,7 +17,7 @@ class Database {
       waitForConnections: true,
       connectionLimit: 10,
       maxIdle: 10,
-      idleTimeout: 60000,
+      idleTimeout: 60 * 1000,
       queueLimit: 0,
       enableKeepAlive: true,
       keepAliveInitialDelay: 0
@@ -31,6 +31,7 @@ class Database {
       try {
         const connection = await this.dbPool.getConnection();
         await connection.query('SELECT 1');
+
         logger.log('tryConnection', 'Conexión exitosa');
         connection.release();
         connected = true;
@@ -58,14 +59,13 @@ class Database {
 
   async query<R = any>(query: string, values: any[] = []): Promise<R[] | null> {
     try {
-      const connection = await this.dbPool.getConnection();
-      const [rows] = await connection.query(
+      const [rows] = await this.dbPool.query(
         query.replace('\n', ''),
         values.map(this.antiSqlInjection.bind(this))
       );
-      connection.release();
       return rows as R[];
     } catch (error) {
+      console.log(error);
       if (error instanceof Error)
         logger.error(
           'query',
@@ -141,8 +141,7 @@ class Database {
         date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         response TEXT,
         PRIMARY KEY (user_id, code_id), 
-        FOREIGN KEY (code_id) REFERENCES ags_codes(code_id),
-        FOREIGN KEY (user_id) REFERENCES ags_user_tokens(user_id)
+        FOREIGN KEY (code_id) REFERENCES ags_codes(code_id)
       );;
       `,
       // VIEWS

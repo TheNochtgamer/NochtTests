@@ -617,14 +617,17 @@ class Utils {
     });
     if (title) listEmbed.setTitle(title);
 
-    if (floor(data.length / maxItemsPerList) === 0) {
+    if (data.length < maxItemsPerList) {
       backButton.setDisabled(true);
       fowardButton.setDisabled(true);
     }
 
     let index = 0;
     function modifyEmbed(i = 0) {
-      if (index + i < 0 || index + i > Math.ceil(data.length / maxItemsPerList))
+      if (
+        index + i < 0 ||
+        index + i >= Math.ceil(data.length / maxItemsPerList)
+      )
         return false;
 
       index += i;
