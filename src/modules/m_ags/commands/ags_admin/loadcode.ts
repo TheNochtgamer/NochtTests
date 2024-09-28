@@ -60,11 +60,6 @@ export default {
     const _hideUntilWorks =
       interaction.options.getBoolean('hideuntilworks', false) ?? false;
 
-    const formatThis = (
-      agsUserData: AgsUserData,
-      response: IAgsRewardPageResponse | null
-    ) => `- ${agsUserData.me()} :> ${AgsService.parseResponseText(response)}`;
-
     // Cargar codigo para TODAS LAS CUENTAS
     if (!_user && !_reference) {
       const result = await AgsService.sendCode({
@@ -120,7 +115,7 @@ export default {
       void Utils.embedReply(interaction, {
         author: { name: _code },
         title: `Codigo cargado correctamente${_force ? ' (Forzado)' : ''}`,
-        description: formatThis(agsUserData, response),
+        description: AgsService.formatThis(agsUserData, response),
         color: 'Green',
         footer: { text: 'NochtTests' }
       });

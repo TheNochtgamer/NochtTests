@@ -89,17 +89,14 @@ class AgsService {
     force?: boolean;
     hideUntilWorks?: boolean;
   }): Promise<0 | 1 | 2> {
-    const resultsEmbed = new EmbedBuilder()
-      .setTitle(`Cargando codigo...${force ? ' (Forzado)' : ''}`)
-      .setAuthor({ name: code })
-      .setFooter({ text: 'NochtTests' })
-      .setColor('DarkRed')
-      .setTimestamp();
-
-    const formatThis = (
-      agsUserData: AgsUserData,
-      response: IAgsRewardPageResponse | null
-    ) => `- ${agsUserData.me()} ⇢ ${this.parseResponseText(response)}`;
+    const resultEmbeds = [
+      new EmbedBuilder()
+        .setTitle(`Cargando codigo...${force ? ' (Forzado)' : ''}`)
+        .setAuthor({ name: code })
+        .setFooter({ text: 'NochtTests' })
+        .setColor('DarkRed')
+        .setTimestamp()
+    ];
 
     let codesChannel: TextBasedChannel | undefined;
     try {
@@ -122,6 +119,7 @@ class AgsService {
 
     const allUsersData = await AgsUsersManager.getUsersTokens();
     const allResults: string[] = [];
+    let simpleAnim = 3;
 
     if (!allUsersData || allUsersData.length === 0) {
       return 1;
@@ -130,33 +128,84 @@ class AgsService {
     let resultsMessage = hideUntilWorks
       ? undefined
       : await codesChannel?.send({
-          embeds: [resultsEmbed]
+          embeds: resultEmbeds
         });
 
-    async function updateEmbed(isEnd = false): Promise<void> {
+    async function updateEmbed(isTheLast = false): Promise<void> {
       if (!resultsMessage) return;
 
-      try {
-        const theResult = allResults.join('\n') || '...';
-        resultsEmbed.setDescription(
-          theResult.slice(0, 4090) + (theResult.length > 4090 ? '...' : '')
-        );
+      const clonedResults = Array.from(allResults);
 
-        if (isEnd) {
-          resultsEmbed.setTitle(
+      try {
+        if (!isTheLast) {
+          if (simpleAnim > 3) simpleAnim = 1;
+          clonedResults.push(new Array(simpleAnim++).fill('.').join(''));
+        }
+
+        const totalEmbeds = Math.ceil(clonedResults.join('\n').length / 4090);
+        let lastResultIndex = 0;
+
+        for (let i = 0; i < totalEmbeds; i++) {
+          let myDescription = '';
+          for (let j = lastResultIndex; j < clonedResults.length; j++) {
+            const thisResult = clonedResults[j] + '\n';
+
+            if ((myDescription + thisResult).length > 4090) {
+              break;
+            }
+
+            myDescription += thisResult;
+            lastResultIndex++;
+          }
+
+          if (!(resultEmbeds[i] instanceof EmbedBuilder)) {
+            resultEmbeds[i] = new EmbedBuilder()
+              .setTitle(`Respuestas ${i + 2}`)
+              .setAuthor({ name: code })
+              .setFooter({ text: 'NochtTests' })
+              .setColor('DarkRed')
+              .setTimestamp();
+          }
+
+          resultEmbeds[i].setDescription(
+            myDescription.slice(0, 4090) || '<???>'
+          );
+        }
+
+        if (isTheLast) {
+          resultEmbeds[0].setTitle(
             `Codigo cargado correctamente${force ? ' (Forzado)' : ''}`
           );
-          resultsEmbed.setColor('Green');
+          resultEmbeds.forEach(e => e.setColor('Green'));
         }
+
         await resultsMessage.edit({
-          embeds: [resultsEmbed]
+          embeds: resultEmbeds
         });
       } catch (error) {
         logger.error('sendCode', 'Error al editar el mensaje', error);
       }
+      // try {
+      //   const theResult = allResults.join('\n') || '...';
+      //   resultEmbeds.setDescription(
+      //     theResult.slice(0, 4090) + (theResult.length > 4090 ? '...' : '')
+      //   );
+
+      //   if (isEnd) {
+      //     resultEmbeds.setTitle(
+      //       `Codigo cargado correctamente${force ? ' (Forzado)' : ''}`
+      //     );
+      //     resultEmbeds.setColor('Green');
+      //   }
+      //   await resultsMessage.edit({
+      //     embeds: [resultEmbeds]
+      //   });
+      // } catch (error) {
+      //   logger.error('sendCode', 'Error al editar el mensaje', error);
+      // }
     }
 
-    const updateEmbedInterval = setInterval(updateEmbed, 3000);
+    const updateEmbedInterval = setInterval(updateEmbed, 2200);
 
     logger.log(
       'sendCode',
@@ -172,11 +221,11 @@ class AgsService {
       async (agsUserData, response, aborted): Promise<void> => {
         if (!aborted && hideUntilWorks) {
           resultsMessage = await codesChannel?.send({
-            embeds: [resultsEmbed]
+            embeds: resultEmbeds
           });
         }
 
-        allResults.push(formatThis(agsUserData, response));
+        allResults.push(this.formatThis(agsUserData, response));
       }
     );
 
@@ -390,6 +439,13 @@ class AgsService {
     const responseText = response === null ? null : JSON.stringify(response);
     await DatabaseManager.query(`
       CALL create_ags_exchange ('${user_id}', '${code}', '${responseText}');`);
+  }
+
+  public formatThis(
+    agsUserData: AgsUserData,
+    response: IAgsRewardPageResponse | null
+  ) {
+    return `- ${agsUserData.me()} » ${this.parseResponseText(response)}`;
   }
 }
 
