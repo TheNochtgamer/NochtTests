@@ -38,12 +38,12 @@ const webhookLog = new (class {
   }
 
   public parseToLog(_content: unknown): any {
-    if (typeof _content === 'string') return _content;
+    if (_content instanceof Error)
+      return `<Name>${_content.name}</Name>\n<Message>${_content.message}</Message>\n<Stack> ${_content.stack} </Stack>`;
 
     if (typeof _content === 'object') return JSON.stringify(_content, null, 2);
 
-    if (_content instanceof Error)
-      return `<Name>${_content.name}</Name> <Error>${_content.message}</Error>\n<Stack> ${_content.stack} </Stack>`;
+    if (typeof _content === 'string') return _content;
 
     return _content;
   }

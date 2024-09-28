@@ -44,7 +44,7 @@ export default class Bot extends Client {
       } catch (error) {
         logger.error(
           'loadCommands',
-          `Error al cargar el comando "${commandFile}"`,
+          `Error al cargar el comando "${commandFile}":`,
           error
         );
       }
@@ -98,7 +98,7 @@ export default class Bot extends Client {
     if (this.user?.id) return;
     await Promise.all([
       eventLess ? null : this.loadEvents(),
-      this.loadCommands(),
+      this.loadCommands()
     ]);
 
     // console.log(['lib', 'structures', 'bot'], 'Login in...');

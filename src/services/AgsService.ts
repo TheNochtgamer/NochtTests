@@ -229,12 +229,12 @@ class AgsService {
           (error.code === AxiosError.ETIMEDOUT ||
             error.code === AxiosError.ECONNABORTED)
         ) {
-          logger.error(
+          logger.warn(
             'loadOneCode',
             `user_${user.user_id} > No se obtuvo respuesta de la pagina`
           );
         } else {
-          logger.error(
+          logger.warn(
             'loadOneCode',
             `user_${user.user_id} > Hubo un error al intentar canjear un codigo:`,
             error
