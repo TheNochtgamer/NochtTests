@@ -10,7 +10,7 @@ const logger = new SystemLog('services', 'KickChatService');
 // <Hardcoded configs>
 const hardChatRoomId = '3175624';
 const pingEvery = 5 * 60 * 1000;
-const cacheCodeTtl = 3 * 60 * 1000;
+const cacheCodeTtl = 10 * 60 * 1000;
 // </Hardcoded configs>
 
 class KickChatService {
