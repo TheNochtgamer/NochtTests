@@ -6,7 +6,8 @@ export enum CachePointers {
   guild = '-guild',
   executionsCacher = '-executionsCacher',
   agsCode = '-agsCode',
-  agsPosibleCode = '-agsPosibleCode'
+  agsPosibleCode = '-agsPosibleCode',
+  agsExchangedCode = '-agsExchangedCode'
 }
 
 export enum CacheTts {
@@ -106,5 +107,6 @@ export const AgsPrizes = Object.freeze({
   'ENTRADA Sabado': '05b9fb0efdee532198a7daacaeb9a497.png',
   'ENTRADA Viernes': '510b621cfdd59eccc50ee6d6231221bc.png',
   'GAMER PACK': '21f0f0511d22fe57b86f6f504fabc985.png',
-  'Mouse Pad AGS': '015489f53e307ef43ed15719c9fc48f5.png'
+  'Mouse Pad AGS': '015489f53e307ef43ed15719c9fc48f5.png',
+  'Segui Participando (NADA)': '1 Segui participando'
 } satisfies { [key: string]: string });

@@ -125,6 +125,7 @@ class AgsService {
       return 1;
     }
 
+    let hasSentMessage = false;
     let resultsMessage = hideUntilWorks
       ? undefined
       : await codesChannel?.send({
@@ -160,7 +161,7 @@ class AgsService {
 
           if (!(resultEmbeds[i] instanceof EmbedBuilder)) {
             resultEmbeds[i] = new EmbedBuilder()
-              .setTitle(`Respuestas ${i + 2}`)
+              .setTitle(`Respuestas ${i + 1}`)
               .setAuthor({ name: code })
               .setFooter({ text: 'NochtTests' })
               .setColor('DarkRed')
@@ -214,15 +215,25 @@ class AgsService {
       }`
     );
 
+    async function executeOnce() {
+      try {
+        if (!hasSentMessage) {
+          hasSentMessage = true;
+          resultsMessage = await codesChannel?.send({
+            embeds: resultEmbeds
+          });
+        }
+        return resultsMessage;
+      } catch (error) {}
+    }
+
     await this.redeemCodeForUsers(
       allUsersData,
       code,
       force,
       async (agsUserData, response, aborted): Promise<void> => {
-        if (!aborted && hideUntilWorks) {
-          resultsMessage = await codesChannel?.send({
-            embeds: resultEmbeds
-          });
+        if (!aborted && hideUntilWorks && !resultsMessage) {
+          void executeOnce();
         }
 
         allResults.push(this.formatThis(agsUserData, response));

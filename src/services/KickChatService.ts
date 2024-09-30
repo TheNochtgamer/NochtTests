@@ -108,18 +108,29 @@ class KickChatService {
 
           if (!code) return;
 
+          const posibleCode = (cacheMe.get(
+            code + CachePointers.agsPosibleCode
+          ) as { seen: number; exchanged: boolean } | undefined) || {
+            seen: 0,
+            exchanged: false
+          };
+          posibleCode.seen++;
+
           logger.log(
             'onMessage',
-            `Posible codigo encontrado en el chat:\n${parsedData.data.sender.username}: ${code}`
+            `<x${posibleCode.seen}> Posible codigo encontrado en el chat:\n${parsedData.data.sender.username}: ${code}`
           );
 
-          const alreadyExchange = cacheMe.has(
-            code + CachePointers.agsPosibleCode
-          );
-          cacheMe.set(code + CachePointers.agsPosibleCode, 0, {
+          cacheMe.set(code + CachePointers.agsPosibleCode, posibleCode, {
             ttl: cacheCodeTtl
           });
-          if (alreadyExchange) return;
+
+          if (posibleCode.seen < 5 || posibleCode.exchanged) return;
+
+          posibleCode.exchanged = true;
+          cacheMe.set(code + CachePointers.agsPosibleCode, posibleCode, {
+            ttl: cacheCodeTtl
+          });
 
           AgsService.sendCode({
             code,
@@ -131,7 +142,7 @@ class KickChatService {
       case 'pusher_internal:subscription_succeeded':
         {
           logger.log(
-            'init',
+            'onMessage',
             `Conectado al chatroom de kick [${
               parsedData.channel.split('.')[1]
             }]`
