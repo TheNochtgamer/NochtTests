@@ -255,13 +255,16 @@ class AgsService {
 
   public async redeemCodeForOne(
     user: AgsUserData,
-    code: string
+    code: string,
+    myIndex: number = 0
   ): Promise<IAgsRewardPageResponse | null> {
     void this.saveCode(code);
     let tries = 0;
 
     const maxTries = () => Math.floor(5 + user.priority * 0.5);
     const retryTime = () => 13 * 1000;
+
+    await Utils.getRandomSleep(300 + myIndex * 300, 3000 + myIndex * 1000);
 
     while (tries < maxTries()) {
       try {
@@ -369,8 +372,8 @@ class AgsService {
     const promises = users
       .filter(user => force || firstUser?.user_id !== user.user_id)
       .sort((a, b) => b.priority - a.priority)
-      .map(async user => {
-        const response = await this.redeemCodeForOne(user, code);
+      .map(async (user, index) => {
+        const response = await this.redeemCodeForOne(user, code, index);
         if (user.hidden) return;
         responses.push(response);
         if (cb) void cb(user, response, false);
