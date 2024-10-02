@@ -23,7 +23,11 @@ const publicCodesChannelId = '1119392838862503976';
 class AgsService {
   public bot: Bot | undefined;
 
-  private async fetchReward(token: string, code?: string) {
+  private async fetchReward(
+    token: string,
+    code?: string,
+    timeout: number = 15 * 1000
+  ) {
     const response = await axios.get<IAgsRewardPageResponse>(AgsPages.reward, {
       headers: {
         accept: 'application/json, text/plain, */*',
@@ -35,7 +39,7 @@ class AgsService {
         'Referrer-Policy': 'strict-origin-when-cross-origin',
         Cookie: `PHPSESSID=${token}`
       },
-      timeout: 5000,
+      timeout,
       params: code
         ? {
             action: 'code',
@@ -264,7 +268,7 @@ class AgsService {
         const { data } = await this.fetchReward(user.token, code);
 
         logger.log(
-          'loadOneCode',
+          'redeemCodeForOne',
           `user_${user.user_id}:${
             user.ds_id ?? user.reference
           } >\n${JSON.stringify(data, null, 2)}`
@@ -279,12 +283,12 @@ class AgsService {
             error.code === AxiosError.ECONNABORTED)
         ) {
           logger.warn(
-            'loadOneCode',
+            'redeemCodeForOne',
             `user_${user.user_id} > No se obtuvo respuesta de la pagina`
           );
         } else {
           logger.warn(
-            'loadOneCode',
+            'redeemCodeForOne',
             `user_${user.user_id} > Hubo un error al intentar canjear un codigo:`,
             error
           );
@@ -296,7 +300,7 @@ class AgsService {
     }
 
     logger.error(
-      'loadOneCode',
+      'redeemCodeForOne',
       `user_${user.user_id} > Demasiados intentos fallidos`
     );
 
@@ -331,7 +335,7 @@ class AgsService {
         ) >= 90
       ) {
         logger.log(
-          'loadCodeForAll',
+          'redeemCodeForUsers',
           'Abortando... El codigo llego a su limite...'
         );
         if (cb) void cb(firstUser, firstResponse, true);
@@ -344,7 +348,7 @@ class AgsService {
           AgsResponseTypes.invalidCode
         ) >= 90
       ) {
-        logger.log('loadCodeForAll', 'Abortando... Codigo invalido...');
+        logger.log('redeemCodeForUsers', 'Abortando... Codigo invalido...');
         if (cb) void cb(firstUser, firstResponse, true);
         return responses;
       }
@@ -355,7 +359,7 @@ class AgsService {
           AgsResponseTypes.noCodeAvaliable
         ) >= 90
       ) {
-        logger.log('loadCodeForAll', 'Abortando... Pagina caida...');
+        logger.log('redeemCodeForUsers', 'Abortando... Pagina caida...');
         if (cb) void cb(firstUser, firstResponse, true);
         return responses;
       }
