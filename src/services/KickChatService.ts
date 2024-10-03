@@ -10,7 +10,6 @@ const logger = new SystemLog('services', 'KickChatService');
 // <Hardcoded configs>
 const hardChatRoomId = '3175624';
 const pingEvery = 5 * 60 * 1000;
-const cacheCodeTtl = 10 * 60 * 1000;
 // </Hardcoded configs>
 
 class KickChatService {
@@ -20,6 +19,8 @@ class KickChatService {
   private ws: WebSocket | null = null;
   private _status = false;
   private _loopInterval: NodeJS.Timeout | null = null;
+  private lastChatMessageAt: Date | null = null;
+  private lastCodeSendedAt: Date = new Date();
 
   constructor(chatRoomId = hardChatRoomId) {
     this.chatRoomId = chatRoomId;
@@ -60,6 +61,7 @@ class KickChatService {
     this.ws = null;
 
     if (this._loopInterval) clearInterval(this._loopInterval);
+    this.lastChatMessageAt = null;
     this._status = false;
   }
 
@@ -73,6 +75,18 @@ class KickChatService {
 
   private aliveLoop() {
     if (!this.ws?.OPEN) return;
+
+    if (
+      this.lastChatMessageAt &&
+      new Date().getTime() - this.lastChatMessageAt.getTime() > 10 * 60 * 1000
+    ) {
+      logger.warn(
+        'aliveLoop',
+        'No se ha recibido mensajes en el chat de kick por mas de 10 minutos, apagando servicio...'
+      );
+      this.stop();
+      return;
+    }
 
     this.ws.send(
       JSON.stringify({
@@ -105,34 +119,35 @@ class KickChatService {
       case 'App\\Events\\ChatMessageEvent':
         {
           const code = AgsService.matchCode(parsedData.data?.content);
+          const sender = parsedData.data.sender;
+
+          this.lastChatMessageAt = new Date();
 
           if (!code) return;
 
-          const posibleCode = (cacheMe.get(
-            code + CachePointers.agsPosibleCode
-          ) as { seen: number; exchanged: boolean } | undefined) || {
-            seen: 0,
-            exchanged: false
-          };
-          posibleCode.seen++;
+          const isIgnorable =
+            !sender.identity.badges.some(
+              b => b.type.trim().toLowerCase() === 'moderator'
+            ) ||
+            cacheMe.has(code + CachePointers.agsExchangedCode) ||
+            new Date().getTime() - this.lastCodeSendedAt.getTime() < 10000;
 
           logger.log(
             'onMessage',
-            `<x${posibleCode.seen}> Posible codigo encontrado en el chat:\n${parsedData.data.sender.username}: ${code}`
+            `${
+              isIgnorable ? '(IGNORANDO) ' : ''
+            }Posible codigo encontrado en el chat:\n[${sender.identity?.badges
+              ?.map(b => b.text)
+              .join(' ')}] ${sender.username}: ${
+              parsedData.data?.content
+            }\n${code}`
           );
 
-          cacheMe.set(code + CachePointers.agsPosibleCode, posibleCode, {
-            ttl: cacheCodeTtl
-          });
+          if (isIgnorable) return;
 
-          if (posibleCode.seen < 5 || posibleCode.exchanged) return;
+          this.lastCodeSendedAt = new Date();
 
-          posibleCode.exchanged = true;
-          cacheMe.set(code + CachePointers.agsPosibleCode, posibleCode, {
-            ttl: cacheCodeTtl
-          });
-
-          AgsService.sendCode({
+          void AgsService.sendCode({
             code,
             force: false,
             hideUntilWorks: true

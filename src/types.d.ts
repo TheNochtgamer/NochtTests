@@ -205,7 +205,12 @@ interface IChatMessageResponse {
       slug: string;
       identity: {
         color: string;
-        badges: string[];
+        badges: [
+          {
+            type: string;
+            text: string;
+          }
+        ];
       };
     };
   };
@@ -224,7 +229,12 @@ interface IChatMessageResponseReply {
       slug: string;
       identity: {
         color: string;
-        badges: string[];
+        badges: [
+          {
+            type: string;
+            text: string;
+          }
+        ];
       };
     };
     metadata: {

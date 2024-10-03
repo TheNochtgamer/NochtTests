@@ -101,6 +101,7 @@ class AgsService {
         .setColor('DarkRed')
         .setTimestamp()
     ];
+    void this.saveCode(code);
 
     let codesChannel: TextBasedChannel | undefined;
     try {
@@ -258,7 +259,6 @@ class AgsService {
     code: string,
     myIndex: number = 0
   ): Promise<IAgsRewardPageResponse | null> {
-    void this.saveCode(code);
     let tries = 0;
 
     const maxTries = () => Math.floor(5 + user.priority * 0.5);
@@ -329,7 +329,10 @@ class AgsService {
 
       responses.push(firstResponse);
 
-      if (!firstResponse) return responses;
+      if (!firstResponse) {
+        if (cb) void cb(firstUser, null, true);
+        return responses;
+      }
 
       if (
         Utils.compareTwoStrings(
@@ -442,8 +445,8 @@ class AgsService {
   }
 
   private async saveCode(code: string): Promise<void> {
-    if (cacheMe.has(code + CachePointers.agsCode)) return;
-    cacheMe.set(code + CachePointers.agsCode, code);
+    if (cacheMe.has(code + CachePointers.agsExchangedCode)) return;
+    cacheMe.set(code + CachePointers.agsExchangedCode, code);
 
     await DatabaseManager.query(`
       CALL create_ags_code ('${code}');`);
